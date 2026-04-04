@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | QuickSite Kenya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
+  <script type="module" crossorigin src="./assets/script-DVFOzhky.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/script-BXClLhe-.css">
+</head>
+<body>
+    <div id="three-canvas-container"></div>
+    <div id="app-wrapper">
+        <nav id="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="portfolio.html" class="active">Portfolio</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <div class="hero-badge reveal" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                <i data-lucide="layers"></i>
+                <span>The Masterpiece Gallery</span>
+            </div>
+            <h1>Our <span>Masterpieces</span></h1>
+            <p>A curated gallery of elite digital experiences crafted for Nairobi's finest.</p>
+            <div class="header-actions" style="margin-top: 30px;">
+                <button id="openAddModal" class="btn btn-secondary admin-only">Sell Your Website</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="portfolio-section reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                    <i data-lucide="award"></i>
+                    <span>Curated Selection</span>
+                </div>
+                <h2>Elite <span>Portfolio</span></h2>
+                <p>Bespoke projects delivered to our exclusive clientele.</p>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <img src="https://picsum.photos/seed/luxury-resort/600/400" alt="Serengeti Elite">
+                    <div class="portfolio-overlay">
+                        <h3>Serengeti Elite</h3>
+                        <p>Luxury Travel & Booking Experience</p>
+                        <a href="portfolio.html?site=Serengeti%20Elite" class="btn btn-primary btn-sm">View Case Study</a>
+                    </div>
+                </div>
+                <div class="portfolio-item">
+                    <img src="https://picsum.photos/seed/law-firm/600/400" alt="Nairobi Chambers">
+                    <div class="portfolio-overlay">
+                        <h3>Nairobi Chambers</h3>
+                        <p>Prestigious Legal Corporate Identity</p>
+                        <a href="portfolio.html?site=Nairobi%20Chambers" class="btn btn-primary btn-sm">View Case Study</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="marketplace-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Website <span>Marketplace</span></h2>
+                <p>Premium pre-built websites ready for immediate deployment. Secure your digital asset today.</p>
+            </div>
+            <div class="marketplace-grid" id="marketplaceGrid">
+                <!-- Marketplace Item 1 -->
+                <div class="marketplace-item">
+                    <div class="item-badge">For Sale</div>
+                    <img src="https://picsum.photos/seed/ecommerce/600/400" alt="Fashion Hub">
+                    <div class="item-content">
+                        <div class="item-header">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">Fashion Hub Pro</h3>
+                                <span style="font-size: 0.7rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">E-commerce</span>
+                            </div>
+                            <span class="price-tag">KSh 45,000</span>
+                        </div>
+                        <p>Complete e-commerce solution with M-Pesa integration and inventory management.</p>
+                        <div class="item-footer">
+                            <a href="contact.html" class="btn btn-secondary btn-sm">Inquire Now</a>
+                            <a href="portfolio.html?site=Fashion%20Hub%20Pro" class="btn btn-primary btn-sm" target="_blank">Live Demo</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Marketplace Item 2 -->
+                <div class="marketplace-item">
+                    <div class="item-badge">For Sale</div>
+                    <img src="https://picsum.photos/seed/realestate/600/400" alt="Property Pulse">
+                    <div class="item-content">
+                        <div class="item-header">
+                            <div>
+                                <h3 style="margin-bottom: 5px;">Property Pulse</h3>
+                                <span style="font-size: 0.7rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">Real Estate</span>
+                            </div>
+                            <span class="price-tag">KSh 38,500</span>
+                        </div>
+                        <p>High-converting real estate portal with advanced search and map integration.</p>
+                        <div class="item-footer">
+                            <a href="contact.html" class="btn btn-secondary btn-sm">Inquire Now</a>
+                            <a href="portfolio.html?site=Property%20Pulse" class="btn btn-primary btn-sm" target="_blank">Live Demo</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add Website Modal -->
+    <div id="addWebsiteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>List Your <span>Website</span></h2>
+            <p>Fill in the details to showcase your digital asset in our elite marketplace.</p>
+            <form id="addWebsiteForm">
+                <div class="form-group">
+                    <label>Website Name</label>
+                    <input type="text" id="siteName" placeholder="e.g. Luxury Spa Portal" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" id="siteCategory" placeholder="e.g. Real Estate" required>
+                </div>
+                <div class="form-group">
+                    <label>Price (KSh)</label>
+                    <input type="number" id="sitePrice" placeholder="e.g. 50000" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="siteDesc" placeholder="Briefly describe the features..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Preview Image URL</label>
+                    <input type="url" id="siteImage" placeholder="https://example.com/image.jpg" required>
+                    <p style="font-size: 0.65rem; color: #ff4444; margin-top: 5px; opacity: 0.8;">* Avoid local URLs (e.g. localhost, 192.168.x.x) as they will be blocked by browsers.</p>
+                </div>
+                <div class="form-group">
+                    <label>Live Demo Link</label>
+                    <input type="url" id="siteLink" placeholder="https://your-demo-site.com" required>
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">Submit for Review</button>
+            </form>
+        </div>
+    </div>
+
+    <section class="admin-management-section admin-only block" style="display: none;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Marketplace <span>Management</span></h2>
+                <p id="adminManageDesc">Checking administrator status...</p>
+            </div>
+            <div id="adminManageActions" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <button id="adminManageBtn" class="btn btn-secondary">Admin Login to Manage</button>
+                <button id="clearMarketplaceBtn" class="btn btn-primary admin-only" style="background: #ff4444; border-color: #ff4444; color: white;">Clear All Listings</button>
+                <button id="adminLogoutBtn" class="btn btn-primary admin-only">Logout</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+                    <div class="hero-badge" style="margin-top: 20px; padding: 5px 15px;">
+                        <i data-lucide="check-circle" style="font-size: 1rem;"></i>
+                        <span style="font-size: 0.7rem;">Verified Elite Agency</span>
+                    </div>
+                    <p style="margin-top: 20px;">Nairobi's premier digital agency for high-end web solutions.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Connect</h4>
+                    <p>Westlands, Nairobi</p>
+                    <p>Email: private@quicksite.co.ke</p>
+                    <div class="social-links">
+                        <a href="#"><i data-lucide="facebook"></i></a>
+                        <a href="#"><i data-lucide="twitter"></i></a>
+                        <a href="#"><i data-lucide="instagram"></i></a>
+                        <a href="#"><i data-lucide="linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="newsletter">
+                    <h4>Join the Elite</h4>
+                    <p>Subscribe for exclusive digital insights.</p>
+                    <form>
+                        <input type="email" placeholder="Your Professional Email">
+                        <button type="submit" class="btn btn-secondary" style="width: 100%;">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 QuickSite Kenya. All Rights Reserved. <a href="#" id="adminLoginLink" style="opacity: 0.2; font-size: 0.7rem; margin-left: 15px; cursor: pointer; transition: opacity 0.3s;">Admin Login</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 9999; justify-content: center; align-items: center; font-size: 1.5rem;">
+        Authenticating...
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-modal" id="closeAdminModal">&times;</span>
+            <h2>Admin Authentication</h2>
+            <p>Please sign in with your authorized administrator account to access elite features.</p>
+            <form id="adminLoginForm" style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <input type="email" id="adminEmail" placeholder="Email Address" required style="padding: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; border-radius: 5px;">
+                <input type="password" id="adminPassword" placeholder="Password" required style="padding: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; border-radius: 5px;">
+                <button type="submit" id="emailSignInBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    Sign In
+                </button>
+            </form>
+            <div style="margin: 20px 0; color: #D4AF37; font-size: 0.8rem; display: flex; align-items: center; gap: 10px;">
+                <hr style="flex: 1; border: 0; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                <span>OR</span>
+                <hr style="flex: 1; border: 0; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+            </div>
+            <button id="googleSignInBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="log-in"></i> Sign In with Google
+            </button>
+        </div>
+    </div>
+
+    </div>
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

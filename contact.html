@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | QuickSite Kenya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
+  <script type="module" crossorigin src="./assets/script-DVFOzhky.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/script-BXClLhe-.css">
+</head>
+<body>
+    <div id="three-canvas-container"></div>
+    <div id="app-wrapper">
+        <nav id="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <div class="hero-badge reveal" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                <i data-lucide="mail"></i>
+                <span>Private Consultation</span>
+            </div>
+            <h1>Private <span>Consultation</span></h1>
+            <p>Begin your brand's digital evolution with Nairobi's premier agency.</p>
+        </div>
+    </header>
+
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2>Connect with Us</h2>
+                    <p>Ready to elevate your digital presence? Our elite team in Westlands is prepared to architect your next masterpiece. We value discretion and excellence in every partnership.</p>
+                    <div class="contact-details">
+                        <div class="detail">📍 Westlands, Nairobi, Kenya</div>
+                        <div class="detail">📧 private@quicksite.co.ke</div>
+                        <div class="detail">📞 +254 700 000 000</div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Professional Email</label>
+                            <input type="email" placeholder="Enter your business email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Project Vision</label>
+                            <textarea rows="5" placeholder="Describe your digital vision" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-secondary" style="width: 100%;">Initiate Consultation</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+                    <div class="hero-badge" style="margin-top: 20px; padding: 5px 15px;">
+                        <i data-lucide="check-circle" style="font-size: 1rem;"></i>
+                        <span style="font-size: 0.7rem;">Verified Elite Agency</span>
+                    </div>
+                    <p style="margin-top: 20px;">Nairobi's premier digital agency for high-end web solutions.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Connect</h4>
+                    <p>Westlands, Nairobi</p>
+                    <p>Email: private@quicksite.co.ke</p>
+                    <div class="social-links">
+                        <a href="#"><i data-lucide="facebook"></i></a>
+                        <a href="#"><i data-lucide="twitter"></i></a>
+                        <a href="#"><i data-lucide="instagram"></i></a>
+                        <a href="#"><i data-lucide="linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="newsletter">
+                    <h4>Join the Elite</h4>
+                    <p>Subscribe for exclusive digital insights.</p>
+                    <form>
+                        <input type="email" placeholder="Your Professional Email">
+                        <button type="submit" class="btn btn-secondary" style="width: 100%;">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 QuickSite Kenya. All Rights Reserved. <a href="#" id="adminLoginLink" style="opacity: 0.2; font-size: 0.7rem; margin-left: 15px; cursor: pointer; transition: opacity 0.3s;">Admin Login</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 9999; justify-content: center; align-items: center; font-size: 1.5rem;">
+        Authenticating...
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-modal" id="closeAdminModal">&times;</span>
+            <h2>Admin Authentication</h2>
+            <p>Please sign in with your authorized administrator account to access elite features.</p>
+            <form id="adminLoginForm" style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <input type="email" id="adminEmail" placeholder="Email Address" required style="padding: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; border-radius: 5px;">
+                <input type="password" id="adminPassword" placeholder="Password" required style="padding: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; border-radius: 5px;">
+                <button type="submit" id="emailSignInBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    Sign In
+                </button>
+            </form>
+            <div style="margin: 20px 0; color: #D4AF37; font-size: 0.8rem; display: flex; align-items: center; gap: 10px;">
+                <hr style="flex: 1; border: 0; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+                <span>OR</span>
+                <hr style="flex: 1; border: 0; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+            </div>
+            <button id="googleSignInBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="log-in"></i> Sign In with Google
+            </button>
+        </div>
+    </div>
+
+    </div>
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
