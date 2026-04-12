@@ -1268,9 +1268,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const adminManageBtn = document.getElementById('adminManageBtn');
         const viewInquiriesBtn = document.getElementById('viewInquiriesBtn');
         const adminManageDesc = document.getElementById('adminManageDesc');
-        const adminLoginLink = document.getElementById('adminLoginLink');
-        const adminSection = document.querySelector('.admin-management-section');
+        const adminSection = document.getElementById('admin-dashboard');
+        const adminNavLi = document.getElementById('adminNavLi');
         
+        // Update navbar link
+        if (adminNavLi) {
+            adminNavLi.style.display = isAdmin ? 'block' : 'none';
+        }
+
         // Update body class
         if (isAdmin) {
             document.body.classList.add('is-admin');
@@ -1302,36 +1307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     e.preventDefault();
                     openAddWebsiteModal();
                 };
-
-                // Add Category-Specific Add Buttons
-                const quickAddContainer = document.getElementById('adminQuickAddGrid');
-                const quickAddSection = document.getElementById('adminQuickAdd');
-                if (quickAddContainer && quickAddSection) {
-                    quickAddSection.style.display = 'block';
-                    quickAddContainer.innerHTML = ''; // Clear existing
-                    
-                    const categories = [
-                        { name: "E-Commerce Platforms", icon: "shopping-cart" },
-                        { name: "E-Learning Systems", icon: "graduation-cap" },
-                        { name: "Social Media Websites", icon: "share-2" },
-                        { name: "Business Landing Pages", icon: "target" },
-                        { name: "Corporate & Business Sites", icon: "building" },
-                        { name: "Portfolio & Creative Sites", icon: "palette" },
-                        { name: "Custom Web Applications", icon: "cpu" },
-                        { name: "Other Digital Assets", icon: "box" }
-                    ];
-
-                    categories.forEach(cat => {
-                        const btn = document.createElement('button');
-                        btn.className = 'btn btn-secondary';
-                        btn.style.padding = '12px';
-                        btn.style.fontSize = '0.75rem';
-                        btn.style.justifyContent = 'flex-start';
-                        btn.innerHTML = `<i data-lucide="${cat.icon}" style="width: 16px; height: 16px; margin-right: 8px;"></i> Add ${cat.name.split(' ')[0]}`;
-                        btn.onclick = () => openAddWebsiteModal(cat.name);
-                        quickAddContainer.appendChild(btn);
-                    });
-                }
                 
                 if (viewInquiriesBtn) {
                     viewInquiriesBtn.style.display = 'inline-flex';
