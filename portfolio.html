@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
-  <script type="module" crossorigin src="./assets/script-DVFOzhky.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/script-BXClLhe-.css">
+  <script type="module" crossorigin src="./assets/script-9o5PWJ3m.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/script-B3fFiYKa.css">
 </head>
 <body>
     <div id="three-canvas-container"></div>
@@ -57,71 +57,26 @@
                 <h2>Elite <span>Portfolio</span></h2>
                 <p>Bespoke projects delivered to our exclusive clientele.</p>
             </div>
-            <div class="portfolio-grid">
-                <div class="portfolio-item">
-                    <img src="https://picsum.photos/seed/luxury-resort/600/400" alt="Serengeti Elite">
-                    <div class="portfolio-overlay">
-                        <h3>Serengeti Elite</h3>
-                        <p>Luxury Travel & Booking Experience</p>
-                        <a href="portfolio.html?site=Serengeti%20Elite" class="btn btn-primary btn-sm">View Case Study</a>
-                    </div>
-                </div>
-                <div class="portfolio-item">
-                    <img src="https://picsum.photos/seed/law-firm/600/400" alt="Nairobi Chambers">
-                    <div class="portfolio-overlay">
-                        <h3>Nairobi Chambers</h3>
-                        <p>Prestigious Legal Corporate Identity</p>
-                        <a href="portfolio.html?site=Nairobi%20Chambers" class="btn btn-primary btn-sm">View Case Study</a>
-                    </div>
+            <div id="portfolioSections">
+                <!-- Dynamic sections based on categories will be injected here -->
+                <div class="no-items-message" style="text-align: center; padding: 40px; opacity: 0.6;">
+                    <p>Our latest masterpieces are currently being curated. Check back soon for new additions.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <section class="marketplace-section">
-        <div class="container">
+        <div class="container" id="marketplaceContainer">
             <div class="section-header">
                 <h2>Website <span>Marketplace</span></h2>
                 <p>Premium pre-built websites ready for immediate deployment. Secure your digital asset today.</p>
             </div>
-            <div class="marketplace-grid" id="marketplaceGrid">
-                <!-- Marketplace Item 1 -->
-                <div class="marketplace-item">
-                    <div class="item-badge">For Sale</div>
-                    <img src="https://picsum.photos/seed/ecommerce/600/400" alt="Fashion Hub">
-                    <div class="item-content">
-                        <div class="item-header">
-                            <div>
-                                <h3 style="margin-bottom: 5px;">Fashion Hub Pro</h3>
-                                <span style="font-size: 0.7rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">E-commerce</span>
-                            </div>
-                            <span class="price-tag">KSh 45,000</span>
-                        </div>
-                        <p>Complete e-commerce solution with M-Pesa integration and inventory management.</p>
-                        <div class="item-footer">
-                            <a href="contact.html" class="btn btn-secondary btn-sm">Inquire Now</a>
-                            <a href="portfolio.html?site=Fashion%20Hub%20Pro" class="btn btn-primary btn-sm" target="_blank">Live Demo</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Marketplace Item 2 -->
-                <div class="marketplace-item">
-                    <div class="item-badge">For Sale</div>
-                    <img src="https://picsum.photos/seed/realestate/600/400" alt="Property Pulse">
-                    <div class="item-content">
-                        <div class="item-header">
-                            <div>
-                                <h3 style="margin-bottom: 5px;">Property Pulse</h3>
-                                <span style="font-size: 0.7rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">Real Estate</span>
-                            </div>
-                            <span class="price-tag">KSh 38,500</span>
-                        </div>
-                        <p>High-converting real estate portal with advanced search and map integration.</p>
-                        <div class="item-footer">
-                            <a href="contact.html" class="btn btn-secondary btn-sm">Inquire Now</a>
-                            <a href="portfolio.html?site=Property%20Pulse" class="btn btn-primary btn-sm" target="_blank">Live Demo</a>
-                        </div>
-                    </div>
+            
+            <div id="marketplaceSections">
+                <!-- Dynamic sections based on categories will be injected here -->
+                <div class="no-items-message" style="text-align: center; padding: 40px; opacity: 0.6;">
+                    <p>The marketplace is currently being updated with elite digital assets. Stay tuned.</p>
                 </div>
             </div>
         </div>
@@ -130,7 +85,7 @@
     <!-- Add Website Modal -->
     <div id="addWebsiteModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <span class="close-modal" id="closeAddModal">&times;</span>
             <h2>List Your <span>Website</span></h2>
             <p>Fill in the details to showcase your digital asset in our elite marketplace.</p>
             <form id="addWebsiteForm">
@@ -140,7 +95,17 @@
                 </div>
                 <div class="form-group">
                     <label>Category</label>
-                    <input type="text" id="siteCategory" placeholder="e.g. Real Estate" required>
+                    <select id="siteCategory" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 8px; color: white;">
+                        <option value="" disabled selected>Select a Service Category</option>
+                        <option value="Business Landing Pages">Business Landing Pages</option>
+                        <option value="Website Design & Development">Website Design & Development</option>
+                        <option value="E-Commerce Development">E-Commerce Development</option>
+                        <option value="Website Redesign">Website Redesign</option>
+                        <option value="SEO Optimization">SEO Optimization</option>
+                        <option value="Website Maintenance">Website Maintenance</option>
+                        <option value="Hosting & Domain Setup">Hosting & Domain Setup</option>
+                        <option value="Branding & UI Design">Branding & UI Design</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Price (KSh)</label>
@@ -172,6 +137,9 @@
             </div>
             <div id="adminManageActions" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
                 <button id="adminManageBtn" class="btn btn-secondary">Admin Login to Manage</button>
+                <button id="viewInquiriesBtn" class="btn btn-secondary admin-only" style="display: none;">
+                    <i data-lucide="mail" style="width: 16px; height: 16px; margin-right: 8px;"></i> View Inquiries
+                </button>
                 <button id="clearMarketplaceBtn" class="btn btn-primary admin-only" style="background: #ff4444; border-color: #ff4444; color: white;">Clear All Listings</button>
                 <button id="adminLogoutBtn" class="btn btn-primary admin-only">Logout</button>
             </div>
@@ -203,12 +171,13 @@
                 <div class="footer-contact">
                     <h4>Connect</h4>
                     <p>Westlands, Nairobi</p>
-                    <p>Email: private@quicksite.co.ke</p>
+                    <p>Email: quicksitekenya@gmail.com</p>
+                    <p>Phone: 0708691648</p>
                     <div class="social-links">
-                        <a href="#"><i data-lucide="facebook"></i></a>
-                        <a href="#"><i data-lucide="twitter"></i></a>
-                        <a href="#"><i data-lucide="instagram"></i></a>
-                        <a href="#"><i data-lucide="linkedin"></i></a>
+                        <a href="https://www.facebook.com/share/1EbvTxPJwT/" target="_blank" rel="noopener noreferrer"><i data-lucide="facebook"></i></a>
+                        <a href="https://x.com/QuickSiteKenya" target="_blank" rel="noopener noreferrer"><i data-lucide="twitter"></i></a>
+                        <a href="https://www.instagram.com/quicksitekenya/" target="_blank" rel="noopener noreferrer"><i data-lucide="instagram"></i></a>
+                        <a href="https://www.tiktok.com/@quicksitekenya" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tiktok"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
                     </div>
                 </div>
                 <div class="newsletter">
@@ -221,7 +190,8 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 QuickSite Kenya. All Rights Reserved. <a href="#" id="adminLoginLink" style="opacity: 0.2; font-size: 0.7rem; margin-left: 15px; cursor: pointer; transition: opacity 0.3s;">Admin Login</a></p>
+                <p>&copy; 2026 QuickSite Kenya. All Rights Reserved.</p>
+                <a href="#" id="adminLoginLink" class="admin-login-link">Admin Login</a>
             </div>
         </div>
     </footer>
@@ -232,26 +202,52 @@
     </div>
 
     <!-- Admin Login Modal -->
+    <!-- Inquiries Modal -->
+    <div id="inquiriesModal" class="modal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <span class="close-modal" id="closeInquiriesModal">&times;</span>
+            <div class="section-header" style="text-align: left; margin-bottom: 30px;">
+                <h2 style="font-size: 1.8rem;">Client <span>Inquiries</span></h2>
+                <p>Manage and respond to consultation requests from potential clients.</p>
+            </div>
+            
+            <div id="inquiriesList" class="inquiries-container" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+                <div class="loading-spinner" style="text-align: center; padding: 40px;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px; opacity: 0.6;">Retrieving inquiries...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="adminModal" class="modal">
         <div class="modal-content" style="text-align: center;">
             <span class="close-modal" id="closeAdminModal">&times;</span>
             <h2>Admin Authentication</h2>
             <p>Please sign in with your authorized administrator account to access elite features.</p>
-            <form id="adminLoginForm" style="margin-top: 30px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
-                <input type="email" id="adminEmail" placeholder="Email Address" required style="padding: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; border-radius: 5px;">
-                <input type="password" id="adminPassword" placeholder="Password" required style="padding: 10px; border: 1px solid rgba(212, 175, 55, 0.3); background: rgba(0,0,0,0.5); color: white; border-radius: 5px;">
-                <button type="submit" id="emailSignInBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                    Sign In
+            <form id="adminLoginForm" style="margin: 30px 0; text-align: left;">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 0.9rem;">Admin Email</label>
+                    <input type="email" id="adminEmail" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 5px; color: white;">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 0.9rem;">Password</label>
+                    <input type="password" id="adminPassword" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 5px; color: white;">
+                </div>
+                <button type="submit" id="emailSignInBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 10px;">
+                    <i data-lucide="log-in"></i> Sign In
                 </button>
             </form>
-            <div style="margin: 20px 0; color: #D4AF37; font-size: 0.8rem; display: flex; align-items: center; gap: 10px;">
-                <hr style="flex: 1; border: 0; border-top: 1px solid rgba(212, 175, 55, 0.2);">
-                <span>OR</span>
-                <hr style="flex: 1; border: 0; border-top: 1px solid rgba(212, 175, 55, 0.2);">
+            <p style="font-size: 0.75rem; opacity: 0.6; margin-top: 20px;">Only authorized accounts have administrative access.</p>
+            <div id="authNetworkNote" style="display: none; margin-top: 15px; padding: 10px; background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; border-radius: 8px; text-align: left;">
+                <p style="font-size: 0.75rem; color: #ff4d4d; font-weight: 600; margin-bottom: 5px;">⚠️ Network Request Blocked</p>
+                <p style="font-size: 0.7rem; color: #eee; line-height: 1.4;">Your browser or an extension (Ad-blocker/Brave) is blocking the authentication request. To fix this:</p>
+                <ul style="font-size: 0.65rem; color: #ccc; margin-top: 5px; padding-left: 15px;">
+                    <li>Disable <b>Brave Shields</b> or <b>uBlock Origin</b> for this site.</li>
+                    <li>Whitelist: <code style="background: #333; padding: 2px 4px; border-radius: 3px;">gen-lang-client-0240166093.firebaseapp.com</code></li>
+                    <li>Try using <b>Incognito Mode</b>.</li>
+                </ul>
             </div>
-            <button id="googleSignInBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 10px;">
-                <i data-lucide="log-in"></i> Sign In with Google
-            </button>
         </div>
     </div>
 
