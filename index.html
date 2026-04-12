@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickSite Kenya | Empowering Kenyan Businesses</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+    <div id="three-canvas-container"></div>
+    <div class="scroll-progress"></div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); color: white; z-index: 9999; justify-content: center; align-items: center; font-size: 1.5rem;">
+        Authenticating...
+    </div>
+    <div id="app-wrapper">
+        <nav id="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <video class="hero-bg-video" autoplay muted loop playsinline>
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-gold-and-black-liquid-motion-4100-large.mp4" type="video/mp4">
+        </video>
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge reveal">
+                    <i data-lucide="award"></i>
+                    <span>Nairobi's Elite Agency</span>
+                </div>
+                <h1>Architecting <span>Digital Prestige</span></h1>
+                <p>Nairobi's premier digital agency crafting high-performance, bespoke web assets for the most discerning brands.</p>
+                <div class="hero-btns">
+                    <a href="contact.html" class="btn btn-secondary">Start Your Project</a>
+                    <a href="portfolio.html" class="btn btn-primary">View Masterpieces</a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator" id="scrollDown">
+            <i data-lucide="chevron-down" size="40"></i>
+        </div>
+        <div class="hero-glow"></div>
+    </header>
+
+    <section class="marquee-section">
+        <div class="marquee-content">
+            <div class="marquee-item"><i data-lucide="diamond"></i> Safari Luxury</div>
+            <div class="marquee-item"><i data-lucide="shield"></i> Nairobi Legal</div>
+            <div class="marquee-item"><i data-lucide="zap"></i> Zuri Fashion</div>
+            <div class="marquee-item"><i data-lucide="crown"></i> Elite Estates</div>
+            <div class="marquee-item"><i data-lucide="star"></i> Prestige Motors</div>
+            <!-- Duplicate for seamless loop -->
+            <div class="marquee-item"><i data-lucide="diamond"></i> Safari Luxury</div>
+            <div class="marquee-item"><i data-lucide="shield"></i> Nairobi Legal</div>
+            <div class="marquee-item"><i data-lucide="zap"></i> Zuri Fashion</div>
+            <div class="marquee-item"><i data-lucide="crown"></i> Elite Estates</div>
+            <div class="marquee-item"><i data-lucide="star"></i> Prestige Motors</div>
+        </div>
+    </section>
+
+    <section class="stats reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                    <i data-lucide="bar-chart"></i>
+                    <span>Proven Results</span>
+                </div>
+                <span class="section-tag">Our Impact</span>
+                <h2>By the <span>Numbers</span></h2>
+            </div>
+            <div class="stats-grid reveal stats">
+                <div class="stat-item">
+                    <h3>150+</h3>
+                    <p>Masterpieces Created</p>
+                </div>
+                <div class="stat-item">
+                    <h3>100%</h3>
+                    <p>Client Excellence</p>
+                </div>
+                <div class="stat-item">
+                    <h3>24/7</h3>
+                    <p>Elite Support</p>
+                </div>
+                <div class="stat-item">
+                    <h3>Bespoke</h3>
+                    <p>Tailored Solutions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="client-logos reveal">
+        <div class="container">
+            <div class="section-header" style="margin-bottom: 40px;">
+                <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                    <i data-lucide="shield"></i>
+                    <span>Trusted by the Best</span>
+                </div>
+            </div>
+            <div class="logo-cloud">
+                <div class="logo-item"><img src="https://placehold.co/200x100/111/d4af37?text=SAFARI+LUXURY" alt="Safari Luxury" referrerPolicy="no-referrer"></div>
+                <div class="logo-item"><img src="https://placehold.co/200x100/111/d4af37?text=NAIROBI+LEGAL" alt="Nairobi Legal" referrerPolicy="no-referrer"></div>
+                <div class="logo-item"><img src="https://placehold.co/200x100/111/d4af37?text=ZURI+FASHION" alt="Zuri Fashion" referrerPolicy="no-referrer"></div>
+                <div class="logo-item"><img src="https://placehold.co/200x100/111/d4af37?text=ELITE+ESTATES" alt="Elite Estates" referrerPolicy="no-referrer"></div>
+                <div class="logo-item"><img src="https://placehold.co/200x100/111/d4af37?text=PRESTIGE+MOTORS" alt="Prestige Motors" referrerPolicy="no-referrer"></div>
+                <div class="logo-item"><img src="https://placehold.co/200x100/111/d4af37?text=ROYAL+BANK" alt="Royal Bank" referrerPolicy="no-referrer"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="featured-masterpiece reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                    <i data-lucide="star"></i>
+                    <span>Selected Works</span>
+                </div>
+                <span class="section-tag">Our Portfolio</span>
+                <h2>Featured <span>Masterpieces</span></h2>
+                <p>A curated selection of our most impactful digital transformations.</p>
+            </div>
+
+            <div id="featuredProjectsContainer">
+                <!-- Static fallback projects shown when DB is empty -->
+                <div class="static-fallback">
+                    <div class="featured-grid" style="margin-bottom: 60px;">
+                        <div class="featured-img">
+                            <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80" alt="Safari Luxury" referrerPolicy="no-referrer">
+                        </div>
+                        <div class="featured-info">
+                            <span class="section-tag" style="margin-bottom: 15px;">Real Estate</span>
+                            <h2>Safari <span>Luxury</span></h2>
+                            <p class="lead">Premium Real Estate platform for elite clients.</p>
+                            <p>An exclusive property showcase platform featuring high-resolution virtual tours, secure client portals, and seamless booking for high-end estates.</p>
+                            <ul class="service-features" style="margin-bottom: 30px;">
+                                <li><i data-lucide="check-circle"></i> Custom Elite Design</li>
+                                <li><i data-lucide="check-circle"></i> High Performance</li>
+                                <li><i data-lucide="check-circle"></i> Secure Integration</li>
+                            </ul>
+                            <a href="portfolio.html" class="btn btn-primary">Explore Project</a>
+                        </div>
+                    </div>
+
+                    <div class="featured-grid reverse" style="margin-bottom: 60px;">
+                        <div class="featured-img">
+                            <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80" alt="Nairobi Penthouse" referrerPolicy="no-referrer">
+                        </div>
+                        <div class="featured-info">
+                            <span class="section-tag" style="margin-bottom: 15px;">Architecture</span>
+                            <h2>Nairobi <span>Penthouse</span></h2>
+                            <p class="lead">Architectural showcase for elite clients.</p>
+                            <p>A visually stunning portfolio site designed to highlight modern architectural marvels with immersive galleries and interactive 3D models.</p>
+                            <ul class="service-features" style="margin-bottom: 30px;">
+                                <li><i data-lucide="check-circle"></i> Custom Elite Design</li>
+                                <li><i data-lucide="check-circle"></i> High Performance</li>
+                                <li><i data-lucide="check-circle"></i> Secure Integration</li>
+                            </ul>
+                            <a href="portfolio.html" class="btn btn-primary">Explore Project</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services-preview reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                    <i data-lucide="zap"></i>
+                    <span>Elite Capabilities</span>
+                </div>
+                <span class="section-tag">Our Expertise</span>
+                <h2>The <span>Bento</span> of Excellence</h2>
+                <p>We combine artistic vision with technical precision to create digital experiences that resonate.</p>
+            </div>
+            <div class="bento-grid">
+            <div class="bento-item bento-large reveal reveal-left">
+                    <div class="bento-content">
+                        <div class="icon">✨</div>
+                        <h3>Bespoke Design</h3>
+                        <p>Unique, hand-crafted designs that reflect your brand's unique identity and prestige. Every pixel is a deliberate choice.</p>
+                        <ul class="bento-list">
+                            <li><i data-lucide="check"></i> Custom UI/UX</li>
+                            <li><i data-lucide="check"></i> Brand Identity</li>
+                            <li><i data-lucide="check"></i> Interactive Prototypes</li>
+                        </ul>
+                    </div>
+                    <div class="bento-img">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80" alt="Bespoke Design" referrerPolicy="no-referrer">
+                    </div>
+                </div>
+                <div class="bento-item bento-medium reveal reveal-right">
+                    <div class="bento-content">
+                        <div class="icon">💎</div>
+                        <h3>Elite E-Commerce</h3>
+                        <p>Seamless shopping experiences with secure M-Pesa integration for the discerning customer.</p>
+                        <a href="services.html" class="btn btn-primary btn-sm">Learn More</a>
+                    </div>
+                </div>
+                <div class="bento-item bento-small reveal reveal-left">
+                    <div class="bento-content">
+                        <div class="icon">👑</div>
+                        <h3>Strategic SEO</h3>
+                        <p>Dominating search results to ensure your brand is always at the forefront.</p>
+                    </div>
+                </div>
+                <div class="bento-item bento-medium reveal reveal-up">
+                    <div class="bento-content">
+                        <div class="icon">⚡</div>
+                        <h3>High Performance</h3>
+                        <p>Blazing fast load times that keep your elite clientele engaged and satisfied.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="center-btn" style="text-align: center; margin-top: 50px;">
+                <a href="services.html" class="btn btn-primary">Discover All Services</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="luxury-immersion reveal">
+        <div class="container">
+            <div class="immersion-grid">
+                <div class="immersion-text">
+                    <div class="hero-badge" style="margin-bottom: 20px;">
+                        <i data-lucide="shield"></i>
+                        <span>Uncompromising Quality</span>
+                    </div>
+                    <span class="section-tag">Digital Prestige</span>
+                    <h2>Where <span>Luxury</span> Meets <span>Logic</span></h2>
+                    <p>In the world of high-end digital assets, beauty is only half the story. We build robust, scalable architectures that power the most demanding business requirements.</p>
+                    <div class="immersion-features">
+                        <div class="i-feature">
+                            <i data-lucide="shield-check"></i>
+                            <div>
+                                <h4>Bank-Grade Security</h4>
+                                <p>Protecting your brand and your clients with the highest security standards.</p>
+                            </div>
+                        </div>
+                        <div class="i-feature">
+                            <i data-lucide="globe"></i>
+                            <div>
+                                <h4>Global Standards</h4>
+                                <p>Nairobi-rooted, globally-minded. We build for the world stage.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="immersion-visual">
+                    <div class="floating-card c1">
+                        <i data-lucide="award"></i>
+                        <span>Award Winning</span>
+                    </div>
+                    <div class="floating-card c2">
+                        <i data-lucide="users"></i>
+                        <span>Elite Network</span>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Luxury Technology" referrerPolicy="no-referrer">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section reveal">
+        <div class="container">
+            <div class="cta-box">
+                <div class="cta-content">
+                    <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                        <i data-lucide="rocket"></i>
+                        <span>Take the Leap</span>
+                    </div>
+                    <h2>Ready for Your Brand's <span>Digital Evolution?</span></h2>
+                    <p>Join Nairobi's most prestigious brands and take your presence to the next level with our bespoke digital craftsmanship.</p>
+                    <div class="cta-btns">
+                        <a href="contact.html" class="btn btn-secondary">Request a Private Consultation</a>
+                        <a href="about.html" class="btn btn-primary">Learn Our Legacy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cta-bg-glow"></div>
+    </section>
+
+    <section class="live-slides reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                    <i data-lucide="globe"></i>
+                    <span>Market Leaders</span>
+                </div>
+                <span class="section-tag">Live Masterpieces</span>
+                <h2>Dominating the <span>Market</span></h2>
+                <p>Explore our high-performance digital assets currently dominating the market.</p>
+            </div>
+            <div class="slider-container">
+                <div class="slider-track" id="liveSlider">
+                    <!-- Slides will be loaded dynamically from marketplaceItems -->
+                    <div class="no-items-message" style="width: 100%; text-align: center; padding: 60px; opacity: 0.6; background: rgba(212, 175, 55, 0.05); border-radius: 20px;">
+                        <i data-lucide="monitor" style="width: 40px; height: 40px; margin-bottom: 20px; color: var(--primary-color);"></i>
+                        <h3>Market Dominance</h3>
+                        <p>Our elite digital assets are currently being prepared for the market. Check back soon.</p>
+                    </div>
+                </div>
+                <button class="slider-btn prev" id="prevSlide"><i data-lucide="chevron-left"></i></button>
+                <button class="slider-btn next" id="nextSlide"><i data-lucide="chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials reveal">
+        <div class="container">
+            <div class="section-header">
+                <div class="hero-badge" style="margin-bottom: 20px; margin-left: auto; margin-right: auto;">
+                    <i data-lucide="message-square"></i>
+                    <span>Client Trust</span>
+                </div>
+                <span class="section-tag">Testimonials</span>
+                <h2>Client <span>Experiences</span></h2>
+                <p>What Nairobi's leading entrepreneurs say about our digital artistry.</p>
+            </div>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="quote-icon"><i data-lucide="quote"></i></div>
+                    <p>"QuickSite Kenya didn't just build a website; they crafted a digital masterpiece. Our brand's prestige has soared since the launch. The attention to detail is simply unmatched in the Kenyan market."</p>
+                    <div class="testimonial-author">
+                        <div class="author-img" style="background: url('https://i.pravatar.cc/100?u=john') center/cover;"></div>
+                        <div class="author-info">
+                            <h4>John Kamau</h4>
+                            <p>Managing Director, Safari Luxury</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon"><i data-lucide="quote"></i></div>
+                    <p>"The gold-standard service is exactly what we needed. They understood our vision for a corporate yet elegant platform and delivered beyond our expectations. Truly the elite choice."</p>
+                    <div class="testimonial-author">
+                        <div class="author-img" style="background: url('https://i.pravatar.cc/100?u=sarah') center/cover;"></div>
+                        <div class="author-info">
+                            <h4>Sarah Wanjiku</h4>
+                            <p>Founder, Nairobi Legal Elite</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-management-section admin-only block" style="display: none;">
+        <div class="container">
+            <div class="section-header">
+                <h2>Marketplace <span>Management</span></h2>
+                <p id="adminManageDesc">Checking administrator status...</p>
+            </div>
+            <div id="adminManageActions" style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <button id="adminManageBtn" class="btn btn-secondary">Admin Login to Manage</button>
+                <button id="viewInquiriesBtn" class="btn btn-secondary admin-only" style="display: none;">
+                    <i data-lucide="mail" style="width: 16px; height: 16px; margin-right: 8px;"></i> View Inquiries
+                </button>
+                <button id="clearMarketplaceBtn" class="btn btn-primary admin-only" style="background: #ff4444; border-color: #ff4444; color: white;">Clear All Listings</button>
+                <button id="adminLogoutBtn" class="btn btn-primary admin-only">Logout</button>
+                <button id="testConnectionBtn" class="btn btn-secondary admin-only" style="font-size: 0.7rem; opacity: 0.6;">Test Flow</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+                    <div class="hero-badge" style="margin-top: 20px; padding: 5px 15px;">
+                        <i data-lucide="check-circle" style="font-size: 1rem;"></i>
+                        <span style="font-size: 0.7rem;">Verified Elite Agency</span>
+                    </div>
+                    <p style="margin-top: 20px;">Nairobi's premier digital agency for high-end web solutions.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Connect</h4>
+                    <p>Westlands, Nairobi</p>
+                    <p>Email: quicksitekenya@gmail.com</p>
+                    <p>Phone: 0708691648</p>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/share/1EbvTxPJwT/" target="_blank" rel="noopener noreferrer"><i data-lucide="facebook"></i></a>
+                        <a href="https://x.com/QuickSiteKenya" target="_blank" rel="noopener noreferrer"><i data-lucide="twitter"></i></a>
+                        <a href="https://www.instagram.com/quicksitekenya/" target="_blank" rel="noopener noreferrer"><i data-lucide="instagram"></i></a>
+                        <a href="https://www.tiktok.com/@quicksitekenya" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tiktok"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
+                    </div>
+                </div>
+                <div class="newsletter">
+                    <h4>Join the Elite</h4>
+                    <p>Subscribe for exclusive digital insights.</p>
+                    <form>
+                        <input type="email" placeholder="Your Professional Email">
+                        <button type="submit" class="btn btn-secondary" style="width: 100%;">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p id="copyrightText">&copy; 2026 QuickSite Kenya. All Rights Reserved.</p>
+                <a href="#" id="adminLoginLink" class="admin-login-link" style="display: none;">Admin Login</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Login Modal -->
+    <!-- Add Website Modal -->
+    <div id="addWebsiteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeAddModal">&times;</span>
+            <h2>List Your <span>Website</span></h2>
+            <p>Fill in the details to showcase your digital asset in our elite marketplace.</p>
+            <form id="addWebsiteForm">
+                <div class="form-group">
+                    <label>Website Name</label>
+                    <input type="text" id="siteName" placeholder="e.g. Luxury Spa Portal" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="siteCategory" required style="width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 8px; color: white;">
+                        <option value="" disabled selected>Select a Service Category</option>
+                        <option value="Business Landing Pages">Business Landing Pages</option>
+                        <option value="Website Design & Development">Website Design & Development</option>
+                        <option value="E-Commerce Development">E-Commerce Development</option>
+                        <option value="Website Redesign">Website Redesign</option>
+                        <option value="SEO Optimization">SEO Optimization</option>
+                        <option value="Website Maintenance">Website Maintenance</option>
+                        <option value="Hosting & Domain Setup">Hosting & Domain Setup</option>
+                        <option value="Branding & UI Design">Branding & UI Design</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price (KSh)</label>
+                    <input type="number" id="sitePrice" placeholder="e.g. 50000" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="siteDesc" placeholder="Briefly describe the features..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Preview Image URL</label>
+                    <input type="url" id="siteImage" placeholder="https://example.com/image.jpg" required>
+                    <p style="font-size: 0.65rem; color: #ff4444; margin-top: 5px; opacity: 0.8;">* Avoid local URLs (e.g. localhost, 192.168.x.x) as they will be blocked by browsers.</p>
+                </div>
+                <div class="form-group">
+                    <label>Live Demo Link</label>
+                    <input type="url" id="siteLink" placeholder="https://your-demo-site.com" required>
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">Submit for Review</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inquiries Modal -->
+    <div id="inquiriesModal" class="modal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <span class="close-modal" id="closeInquiriesModal">&times;</span>
+            <div class="section-header" style="text-align: left; margin-bottom: 30px;">
+                <h2 style="font-size: 1.8rem;">Client <span>Inquiries</span></h2>
+                <p>Manage and respond to consultation requests from potential clients.</p>
+            </div>
+            
+            <div id="inquiriesList" class="inquiries-container" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">
+                <div class="loading-spinner" style="text-align: center; padding: 40px;">
+                    <div class="spinner"></div>
+                    <p style="margin-top: 15px; opacity: 0.6;">Retrieving inquiries...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close-modal" id="closeAdminModal">&times;</span>
+            <h2>Admin Authentication</h2>
+            <p>Please sign in with your authorized administrator account to access elite features.</p>
+            
+            <form id="adminLoginForm" style="margin: 30px 0; text-align: left;">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 0.9rem;">Admin Email</label>
+                    <input type="email" id="adminEmail" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 5px; color: white;">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 5px; font-size: 0.9rem;">Password</label>
+                    <input type="password" id="adminPassword" required style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 5px; color: white;">
+                </div>
+                <button type="submit" id="emailSignInBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; display: flex; align-items: center; gap: 10px;">
+                    <i data-lucide="log-in"></i> Sign In
+                </button>
+            </form>
+            <p style="font-size: 0.75rem; opacity: 0.6; margin-top: 20px;">Only authorized accounts have administrative access.</p>
+            <div id="authNetworkNote" style="display: none; margin-top: 20px; padding: 15px; background: rgba(255, 77, 77, 0.15); border: 1px solid #ff4d4d; border-radius: 12px; text-align: left; box-shadow: 0 10px 30px rgba(255, 77, 77, 0.1);">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <p style="font-size: 0.85rem; color: #ff4d4d; font-weight: 700; margin: 0;">Connection Blocked by Ad-Blocker</p>
+                </div>
+                <p style="font-size: 0.75rem; color: #eee; line-height: 1.5; margin-bottom: 12px;">Your browser or an extension (like <b>uBlock Origin</b> or <b>Brave Shields</b>) is preventing the login request from reaching our security servers.</p>
+                <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+                    <p style="font-size: 0.65rem; color: #aaa; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Whitelist this domain:</p>
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                        <code style="background: #222; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; color: var(--primary-color); border: 1px solid rgba(212, 175, 55, 0.3); word-break: break-all;">gen-lang-client-0240166093.firebaseapp.com</code>
+                    </div>
+                </div>
+                <p style="font-size: 0.75rem; color: #eee; font-weight: 600; margin-bottom: 8px;">Quick Fixes:</p>
+                <ul style="font-size: 0.7rem; color: #ccc; padding-left: 20px; line-height: 1.6;">
+                    <li>Turn off <b>Brave Shields</b> for this site.</li>
+                    <li>Disable <b>uBlock Origin</b> or <b>AdBlock Plus</b>.</li>
+                    <li>Try <b>Incognito Mode</b> (where extensions are disabled).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    <script type="module" src="script.js"></script>
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

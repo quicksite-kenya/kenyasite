@@ -1,0 +1,41 @@
+name: Vite Build & Deploy to GitHub Pages
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # ensures Node.js 24
+
+on:
+  push:
+    branches:
+      - main  # trigger on pushes to main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Node.js 24
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Build the Vite project
+      - name: Build project
+        run: npm run build
+
+      # 5. Deploy to GitHub Pages using PAT
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_PAT }}   # <-- reference your secret here
+          publish_dir: ./dist
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
+          keep_files: true

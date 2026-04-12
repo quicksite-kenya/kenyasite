@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && 
+             (request.auth.token.email.lower() == "michaelmulili41@gmail.com" || 
+              request.auth.token.email.lower() == "michael.mulili@quicksite.com" || 
+              request.auth.token.email.lower() == "michael.michael@quicksite.com" ||
+              request.auth.token.email.lower() == "quicksitekenya@gmail.com");
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+[.][a-zA-Z]{2,}$");
+    }
+
+    // Validation for inquiry data
+    function isValidInquiry(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             isValidEmail(data.email) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() < 20)) &&
+             data['service'] is string && data['service'].size() < 200 &&
+             data.message is string && data.message.size() < 5000;
+    }
+
+    match /marketplaceItems/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /inquiries/{inquiryId} {
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin() && 
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) &&
+                    request.resource.data.status in ['New', 'Read', 'Replied', 'Closed'];
+      allow create: if isValidInquiry(request.resource.data);
+    }
+    
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

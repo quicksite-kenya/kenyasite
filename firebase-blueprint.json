@@ -1,0 +1,104 @@
+{
+  "entities": {
+    "marketplaceItems": {
+      "title": "Marketplace Item",
+      "description": "A website listed for sale in the marketplace.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the website."
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "Business Landing Pages",
+            "Website Design & Development",
+            "E-Commerce Development",
+            "Website Redesign",
+            "SEO Optimization",
+            "Website Maintenance",
+            "Hosting & Domain Setup",
+            "Branding & UI Design"
+          ],
+          "description": "The category of the website based on services offered."
+        },
+        "price": {
+          "type": "string",
+          "description": "The price of the website in KSh."
+        },
+        "desc": {
+          "type": "string",
+          "description": "A brief description of the website features."
+        },
+        "img": {
+          "type": "string",
+          "description": "The URL of the preview image."
+        },
+        "link": {
+          "type": "string",
+          "description": "The URL of the live demo."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the item was created."
+        }
+      },
+      "required": ["name", "category", "price", "desc", "img", "createdAt"]
+    },
+    "inquiries": {
+      "title": "Inquiry",
+      "description": "A request for a service or digital consultation from a potential client.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The client's full name."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The client's professional email."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The client's phone number (optional)."
+        },
+        "service": {
+          "type": "string",
+          "description": "The service they are interested in."
+        },
+        "message": {
+          "type": "string",
+          "description": "The client's project vision or message."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["New", "Read", "Replied", "Closed"],
+          "description": "The current status of the inquiry."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the inquiry was sent."
+        },
+        "source": {
+          "type": "string",
+          "description": "The source of the inquiry (e.g., contact-form, newsletter, server-api)."
+        }
+      },
+      "required": ["name", "email", "service", "message", "createdAt", "status"]
+    }
+  },
+  "firestore": {
+    "/marketplaceItems/{itemId}": {
+      "schema": "marketplaceItems",
+      "description": "Collection of websites available for sale."
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "inquiries",
+      "description": "Collection of inquiries from clients."
+    }
+  }
+}
