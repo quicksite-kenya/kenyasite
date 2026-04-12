@@ -53,7 +53,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
-  <script type="module" crossorigin src="./assets/script-Czz5EoZB.js"></script>
+  <script type="module" crossorigin src="./assets/script-DiPX3HGB.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/script-CyZoDcJA.css">
 </head>
 <body>
@@ -75,6 +75,7 @@
                 <li><a href="portfolio.html">Portfolio</a></li>
                 <li><a href="blog.html">Blog</a></li>
                 <li><a href="contact.html">Contact</a></li>
+                <li id="adminNavLi" style="display: none;"><a href="#admin-dashboard" id="adminNavLink" style="color: var(--primary-color); font-weight: 700;">Admin</a></li>
             </ul>
             <div class="hamburger">
                 <span></span>
@@ -418,7 +419,7 @@
         </div>
     </section>
 
-    <section class="admin-management-section admin-only block" style="display: none;">
+    <section id="admin-dashboard" class="admin-management-section admin-only block" style="display: none;">
         <div class="container">
             <div class="section-header">
                 <h2>Marketplace <span>Management</span></h2>
@@ -432,13 +433,6 @@
                 <button id="clearMarketplaceBtn" class="btn btn-primary admin-only" style="background: #ff4444; border-color: #ff4444; color: white;">Clear All Listings</button>
                 <button id="adminLogoutBtn" class="btn btn-primary admin-only">Logout</button>
                 <button id="testConnectionBtn" class="btn btn-secondary admin-only" style="font-size: 0.7rem; opacity: 0.6;">Test Flow</button>
-            </div>
-
-            <div id="adminQuickAdd" class="admin-only" style="display: none; margin-top: 40px; padding-top: 40px; border-top: 1px solid var(--glass-border);">
-                <h3 style="text-align: center; margin-bottom: 25px; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7;">Quick Add by Service Category</h3>
-                <div id="adminQuickAddGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px;">
-                    <!-- Category buttons injected via script.js -->
-                </div>
             </div>
         </div>
     </section>
