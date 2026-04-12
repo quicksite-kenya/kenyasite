@@ -12,16 +12,16 @@
         "category": {
           "type": "string",
           "enum": [
+            "E-Commerce Platforms",
+            "E-Learning Systems",
+            "Social Media Websites",
             "Business Landing Pages",
-            "Website Design & Development",
-            "E-Commerce Development",
-            "Website Redesign",
-            "SEO Optimization",
-            "Website Maintenance",
-            "Hosting & Domain Setup",
-            "Branding & UI Design"
+            "Corporate & Business Sites",
+            "Portfolio & Creative Sites",
+            "Custom Web Applications",
+            "Other Digital Assets"
           ],
-          "description": "The category of the website based on services offered."
+          "description": "The type of website or digital asset."
         },
         "price": {
           "type": "string",

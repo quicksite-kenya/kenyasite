@@ -535,6 +535,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portfolioGrid = document.getElementById('portfolioSections');
     const featuredProjectsContainer = document.getElementById('featuredProjectsContainer');
 
+    // --- Category Selector Logic ---
+    const initCategorySelector = () => {
+        const selector = document.getElementById('categorySelector');
+        const hiddenInput = document.getElementById('siteCategory');
+        if (!selector || !hiddenInput) return;
+
+        const options = selector.querySelectorAll('.category-option');
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                selectCategory(option.getAttribute('data-value'));
+            });
+        });
+    };
+
+    const selectCategory = (value) => {
+        const selector = document.getElementById('categorySelector');
+        const hiddenInput = document.getElementById('siteCategory');
+        if (!selector || !hiddenInput) return;
+
+        const options = selector.querySelectorAll('.category-option');
+        options.forEach(opt => {
+            if (opt.getAttribute('data-value') === value) {
+                opt.classList.add('active');
+            } else {
+                opt.classList.remove('active');
+            }
+        });
+        hiddenInput.value = value;
+    };
+
+    const openAddWebsiteModal = (preSelectedCategory = null) => {
+        const modal = document.getElementById('addWebsiteModal');
+        if (!modal) return;
+        
+        modal.style.display = 'block';
+        if (preSelectedCategory) {
+            selectCategory(preSelectedCategory);
+        } else {
+            // Reset if no category provided
+            const options = document.querySelectorAll('.category-option');
+            options.forEach(opt => opt.classList.remove('active'));
+            const hiddenInput = document.getElementById('siteCategory');
+            if (hiddenInput) hiddenInput.value = '';
+        }
+    };
+
+    initCategorySelector();
+
     // --- Custom Cursor Implementation ---
     const cursorDot = document.querySelector('.cursor-dot');
     const cursorOutline = document.querySelector('.cursor-outline');
@@ -1252,8 +1300,38 @@ document.addEventListener('DOMContentLoaded', async () => {
                 adminManageBtn.style.display = 'inline-flex';
                 adminManageBtn.onclick = (e) => {
                     e.preventDefault();
-                    if (addWebsiteModal) addWebsiteModal.style.display = 'block';
+                    openAddWebsiteModal();
                 };
+
+                // Add Category-Specific Add Buttons
+                const quickAddContainer = document.getElementById('adminQuickAddGrid');
+                const quickAddSection = document.getElementById('adminQuickAdd');
+                if (quickAddContainer && quickAddSection) {
+                    quickAddSection.style.display = 'block';
+                    quickAddContainer.innerHTML = ''; // Clear existing
+                    
+                    const categories = [
+                        { name: "E-Commerce Platforms", icon: "shopping-cart" },
+                        { name: "E-Learning Systems", icon: "graduation-cap" },
+                        { name: "Social Media Websites", icon: "share-2" },
+                        { name: "Business Landing Pages", icon: "target" },
+                        { name: "Corporate & Business Sites", icon: "building" },
+                        { name: "Portfolio & Creative Sites", icon: "palette" },
+                        { name: "Custom Web Applications", icon: "cpu" },
+                        { name: "Other Digital Assets", icon: "box" }
+                    ];
+
+                    categories.forEach(cat => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-secondary';
+                        btn.style.padding = '12px';
+                        btn.style.fontSize = '0.75rem';
+                        btn.style.justifyContent = 'flex-start';
+                        btn.innerHTML = `<i data-lucide="${cat.icon}" style="width: 16px; height: 16px; margin-right: 8px;"></i> Add ${cat.name.split(' ')[0]}`;
+                        btn.onclick = () => openAddWebsiteModal(cat.name);
+                        quickAddContainer.appendChild(btn);
+                    });
+                }
                 
                 if (viewInquiriesBtn) {
                     viewInquiriesBtn.style.display = 'inline-flex';
@@ -1574,6 +1652,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 addWebsiteForm.reset();
+                // Reset category selector
+                const options = document.querySelectorAll('.category-option');
+                options.forEach(opt => opt.classList.remove('active'));
+                const hiddenInput = document.getElementById('siteCategory');
+                if (hiddenInput) hiddenInput.value = '';
+
                 if (addWebsiteModal) addWebsiteModal.style.display = 'none';
                 
                 showToast('Website submitted successfully!');
@@ -1773,14 +1857,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Define the order of categories
             const categoryOrder = [
+                "E-Commerce Platforms",
+                "E-Learning Systems",
+                "Social Media Websites",
                 "Business Landing Pages",
-                "Website Design & Development",
-                "E-Commerce Development",
-                "Website Redesign",
-                "SEO Optimization",
-                "Website Maintenance",
-                "Hosting & Domain Setup",
-                "Branding & UI Design"
+                "Corporate & Business Sites",
+                "Portfolio & Creative Sites",
+                "Custom Web Applications",
+                "Other Digital Assets"
             ];
 
             // Render sections
@@ -1913,14 +1997,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Define the order of categories
             const categoryOrder = [
+                "E-Commerce Platforms",
+                "E-Learning Systems",
+                "Social Media Websites",
                 "Business Landing Pages",
-                "Website Design & Development",
-                "E-Commerce Development",
-                "Website Redesign",
-                "SEO Optimization",
-                "Website Maintenance",
-                "Hosting & Domain Setup",
-                "Branding & UI Design"
+                "Corporate & Business Sites",
+                "Portfolio & Creative Sites",
+                "Custom Web Applications",
+                "Other Digital Assets"
             ];
 
             // Render sections

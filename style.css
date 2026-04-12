@@ -68,9 +68,35 @@ img {
     border-radius: 12px;
 }
 
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+.domain-badge {
+    animation: fadeIn 1s ease-out forwards;
+}
+
+.domain-badge:hover {
+    border-color: var(--primary-color) !important;
+    background: rgba(255,255,255,0.1) !important;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.category-option:hover {
+    border-color: var(--primary-color) !important;
+    background: rgba(212, 175, 55, 0.1) !important;
+    transform: translateY(-3px);
+}
+
+.category-option.active {
+    background: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.category-option.active i, .category-option.active p {
+    color: black !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-spin {
