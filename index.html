@@ -37,6 +37,7 @@
         "https://www.facebook.com/share/1EbvTxPJwT/",
         "https://x.com/QuickSiteKenya",
         "https://www.instagram.com/quicksitekenya/",
+        "https://wa.me/254708691648",
         "https://www.tiktok.com/@quicksitekenya"
       ],
       "contactPoint": {
@@ -53,8 +54,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
-  <script type="module" crossorigin src="./assets/script-DiPX3HGB.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/script-CyZoDcJA.css">
+  <script type="module" crossorigin src="./assets/script-Dk6OjjTE.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/script-D8FfWzzX.css">
 </head>
 <body>
     <div id="three-canvas-container"></div>
@@ -430,6 +431,9 @@
                 <button id="viewInquiriesBtn" class="btn btn-secondary admin-only" style="display: none;">
                     <i data-lucide="mail" style="width: 16px; height: 16px; margin-right: 8px;"></i> View Inquiries
                 </button>
+                <button id="manageBlogBtn" class="btn btn-secondary admin-only" style="display: none;">
+                    <i data-lucide="book-open" style="width: 16px; height: 16px; margin-right: 8px;"></i> Manage Blog
+                </button>
                 <button id="clearMarketplaceBtn" class="btn btn-primary admin-only" style="background: #ff4444; border-color: #ff4444; color: white;">Clear All Listings</button>
                 <button id="adminLogoutBtn" class="btn btn-primary admin-only">Logout</button>
                 <button id="testConnectionBtn" class="btn btn-secondary admin-only" style="font-size: 0.7rem; opacity: 0.6;">Test Flow</button>
@@ -468,6 +472,7 @@
                         <a href="https://www.facebook.com/share/1EbvTxPJwT/" target="_blank" rel="noopener noreferrer"><i data-lucide="facebook"></i></a>
                         <a href="https://x.com/QuickSiteKenya" target="_blank" rel="noopener noreferrer"><i data-lucide="twitter"></i></a>
                         <a href="https://www.instagram.com/quicksitekenya/" target="_blank" rel="noopener noreferrer"><i data-lucide="instagram"></i></a>
+                        <a href="https://wa.me/254708691648" target="_blank" rel="noopener noreferrer"><i data-lucide="message-circle"></i></a>
                         <a href="https://www.tiktok.com/@quicksitekenya" target="_blank" rel="noopener noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tiktok"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg></a>
                     </div>
                 </div>
@@ -574,6 +579,49 @@
                     <p style="margin-top: 15px; opacity: 0.6;">Retrieving inquiries...</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Blog Post Modal -->
+    <div id="blogPostModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="close-modal" id="closeBlogPostModal">&times;</span>
+            <div class="section-header" style="text-align: left; margin-bottom: 30px;">
+                <h2 id="blogModalTitle">Add <span>Blog Post</span></h2>
+                <p>Share news, product releases, or elite insights with your audience.</p>
+            </div>
+            
+            <form id="blogPostForm">
+                <input type="hidden" id="editPostId">
+                <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>Post Title</label>
+                        <input type="text" id="postTitleInput" required placeholder="e.g., New Product Release: Safari Luxury v2">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="postCategoryInput" required>
+                            <option value="News">News</option>
+                            <option value="Product Release">Product Release</option>
+                            <option value="Feature Update">Feature Update</option>
+                            <option value="Insights">Insights</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Subtitle / Summary</label>
+                    <input type="text" id="postSubtitleInput" required placeholder="A brief overview of the post...">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Featured Image URL</label>
+                    <input type="url" id="postImgInput" required placeholder="https://images.unsplash.com/...">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Content (HTML allowed)</label>
+                    <textarea id="postContentInput" required style="min-height: 200px;" placeholder="Write your masterpiece here..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">Publish Post</button>
+            </form>
         </div>
     </div>
 
