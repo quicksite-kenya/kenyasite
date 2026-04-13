@@ -89,6 +89,44 @@
         }
       },
       "required": ["name", "email", "service", "message", "createdAt", "status"]
+    },
+    "blogPosts": {
+      "title": "Blog Post",
+      "description": "A news article, product release, or feature update.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the post."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "A brief summary or subtitle."
+        },
+        "content": {
+          "type": "string",
+          "description": "The full HTML content of the post."
+        },
+        "img": {
+          "type": "string",
+          "description": "The URL of the featured image."
+        },
+        "date": {
+          "type": "string",
+          "description": "The display date (e.g., April 1, 2026)."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["News", "Product Release", "Feature Update", "Insights"],
+          "description": "The type of blog post."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the post was created."
+        }
+      },
+      "required": ["title", "subtitle", "content", "img", "date", "category", "createdAt"]
     }
   },
   "firestore": {
@@ -99,6 +137,10 @@
     "/inquiries/{inquiryId}": {
       "schema": "inquiries",
       "description": "Collection of inquiries from clients."
+    },
+    "/blogPosts/{postId}": {
+      "schema": "blogPosts",
+      "description": "Collection of blog posts and news updates."
     }
   }
 }

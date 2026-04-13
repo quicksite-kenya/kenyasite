@@ -36,6 +36,11 @@ service cloud.firestore {
       allow create: if isValidInquiry(request.resource.data);
     }
     
+    match /blogPosts/{postId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
     match /{document=**} {
       allow read, write: if false;
     }

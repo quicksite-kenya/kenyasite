@@ -523,9 +523,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const adminManageBtn = document.getElementById('adminManageBtn');
     const adminLogoutBtn = document.getElementById('adminLogoutBtn');
     const viewInquiriesBtn = document.getElementById('viewInquiriesBtn');
+    const manageBlogBtn = document.getElementById('manageBlogBtn');
     const inquiriesModal = document.getElementById('inquiriesModal');
+    const blogPostModal = document.getElementById('blogPostModal');
     const closeInquiriesModal = document.getElementById('closeInquiriesModal');
+    const closeBlogPostModal = document.getElementById('closeBlogPostModal');
     const inquiriesList = document.getElementById('inquiriesList');
+    const blogPostForm = document.getElementById('blogPostForm');
     const clearMarketplaceBtn = document.getElementById('clearMarketplaceBtn');
     const adminManageDesc = document.getElementById('adminManageDesc');
     const addWebsiteModal = document.getElementById('addWebsiteModal');
@@ -1138,6 +1142,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    if (closeBlogPostModal) {
+        closeBlogPostModal.onclick = () => {
+            blogPostModal.style.display = 'none';
+        };
+    }
+
+    if (manageBlogBtn) {
+        manageBlogBtn.onclick = (e) => {
+            e.preventDefault();
+            document.getElementById('blogModalTitle').innerHTML = 'Add <span>Blog Post</span>';
+            blogPostForm.reset();
+            document.getElementById('editPostId').value = '';
+            blogPostModal.style.display = 'block';
+        };
+    }
+
     // --- Newsletter Subscription ---
     const newsletterForms = document.querySelectorAll('.newsletter form');
     newsletterForms.forEach(form => {
@@ -1270,10 +1290,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const adminManageDesc = document.getElementById('adminManageDesc');
         const adminSection = document.getElementById('admin-dashboard');
         const adminNavLi = document.getElementById('adminNavLi');
+        const manageBlogBtn = document.getElementById('manageBlogBtn');
         
         // Update navbar link
         if (adminNavLi) {
             adminNavLi.style.display = isAdmin ? 'block' : 'none';
+        }
+
+        if (manageBlogBtn) {
+            manageBlogBtn.style.display = isAdmin ? 'inline-flex' : 'none';
         }
 
         // Update body class
@@ -2202,112 +2227,180 @@ document.addEventListener('DOMContentLoaded', async () => {
     handlePortfolioParams();
 
     // --- Dynamic Blog Post Handling ---
-    const handleBlogParams = () => {
+    const loadBlogPosts = () => {
+        const blogGrid = document.getElementById('blog-grid');
+        if (!blogGrid) return;
+
+        const q = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
+        onSnapshot(q, (snapshot) => {
+            blogGrid.innerHTML = '';
+            if (snapshot.empty) {
+                blogGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No elite insights published yet. Check back soon.</p>';
+                return;
+            }
+
+            snapshot.forEach((docSnap) => {
+                const post = docSnap.data();
+                const postId = docSnap.id;
+                const article = document.createElement('article');
+                article.className = 'blog-card reveal';
+                
+                const safeImg = getSafeImageUrl(post.img, post.title, 600, 400);
+                
+                article.innerHTML = `
+                    <div class="blog-img">
+                        <img src="${safeImg}" alt="${post.title}" referrerPolicy="no-referrer">
+                        <div class="blog-category-badge">${post.category || 'Insights'}</div>
+                    </div>
+                    <div class="blog-content">
+                        <span class="blog-date">${post.date}</span>
+                        <h3>${post.title}</h3>
+                        <p>${post.subtitle}</p>
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <a href="blog-post.html?id=${postId}" class="btn btn-primary">Explore Article</a>
+                            ${isAdmin ? `
+                                <button class="btn btn-secondary edit-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem;">Edit</button>
+                                <button class="btn btn-primary delete-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem; background: #ff4444; border-color: #ff4444;">Delete</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                blogGrid.appendChild(article);
+            });
+
+            // Add event listeners for edit/delete
+            if (isAdmin) {
+                document.querySelectorAll('.edit-post-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        const id = btn.getAttribute('data-id');
+                        editBlogPost(id);
+                    };
+                });
+                document.querySelectorAll('.delete-post-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        const id = btn.getAttribute('data-id');
+                        deleteBlogPost(id);
+                    };
+                });
+            }
+
+            if (window.lucide) window.lucide.createIcons();
+        }, (error) => {
+            handleFirestoreError(error, OperationType.LIST, 'blogPosts');
+        });
+    };
+
+    const editBlogPost = async (id) => {
+        try {
+            const postRef = doc(db, 'blogPosts', id);
+            const snapshot = await getDocs(query(collection(db, 'blogPosts'), where('__name__', '==', id)));
+            if (!snapshot.empty) {
+                const post = snapshot.docs[0].data();
+                document.getElementById('blogModalTitle').innerHTML = 'Edit <span>Blog Post</span>';
+                document.getElementById('editPostId').value = id;
+                document.getElementById('postTitleInput').value = post.title;
+                document.getElementById('postSubtitleInput').value = post.subtitle;
+                document.getElementById('postImgInput').value = post.img;
+                document.getElementById('postCategoryInput').value = post.category || 'Insights';
+                document.getElementById('postContentInput').value = post.content;
+                blogPostModal.style.display = 'block';
+            }
+        } catch (error) {
+            handleFirestoreError(error, OperationType.GET, `blogPosts/${id}`);
+        }
+    };
+
+    const deleteBlogPost = (id) => {
+        showConfirm('Are you sure you want to delete this elite insight?', async () => {
+            try {
+                await deleteDoc(doc(db, 'blogPosts', id));
+                showToast('Article removed from the digital ether.');
+            } catch (error) {
+                handleFirestoreError(error, OperationType.DELETE, `blogPosts/${id}`);
+            }
+        });
+    };
+
+    if (blogPostForm) {
+        blogPostForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('editPostId').value;
+            const postData = {
+                title: document.getElementById('postTitleInput').value,
+                subtitle: document.getElementById('postSubtitleInput').value,
+                img: document.getElementById('postImgInput').value,
+                category: document.getElementById('postCategoryInput').value,
+                content: document.getElementById('postContentInput').value,
+                date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, 'blogPosts', editId), postData);
+                    showToast('Insight updated successfully.');
+                } else {
+                    await addDoc(collection(db, 'blogPosts'), postData);
+                    showToast('New elite insight published.');
+                }
+                blogPostModal.style.display = 'none';
+                blogPostForm.reset();
+            } catch (error) {
+                handleFirestoreError(error, editId ? OperationType.UPDATE : OperationType.CREATE, 'blogPosts');
+            }
+        };
+    }
+
+    const handleBlogParams = async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
 
         if (postId && window.location.pathname.includes('blog-post.html')) {
-            const blogPosts = {
-                'luxury-web-design': {
-                    date: 'April 1, 2026',
-                    title: 'The Evolution of Luxury Web Design in Kenya',
-                    subtitle: 'How high-end brands are redefining the digital experience through minimalist aesthetics and gold-standard UI.',
-                    img: 'https://placehold.co/800x500/1a1a1a/d4af37?text=Preview',
-                    content: `
-                        <p>In the rapidly evolving digital landscape of Nairobi, a new standard for web design is emerging. No longer is it enough to simply have a functional website; for Kenya's elite brands, the digital presence must be an extension of their physical prestige.</p>
-                        
-                        <h2>The Shift to Minimalism</h2>
-                        <p>We are seeing a significant move away from cluttered, information-heavy layouts toward minimalist, "breathing" designs. This aesthetic choice isn't just about style—it's about clarity and focus. By stripping away the non-essential, brands can highlight their core values and premium offerings with greater impact.</p>
-                        
-                        <blockquote>"Luxury is not about more; it's about the right things, presented perfectly."</blockquote>
-                        
-                        <h2>Gold-Standard UI/UX</h2>
-                        <p>User experience in the luxury sector requires a different approach. It's about the 'digital concierge' experience—anticipating the user's needs and providing a seamless, frictionless journey. From smooth scroll animations to intuitive navigation, every interaction is an opportunity to reinforce the brand's commitment to excellence.</p>
-                        
-                        <h2>The Kenyan Context</h2>
-                        <p>What makes luxury web design unique in Kenya is the integration of local cultural elements with global design standards. Whether it's the subtle use of traditional patterns in a modern context or the optimization for high-end mobile devices, the goal is to create a digital asset that feels both international and deeply rooted in the Kenyan market.</p>
-                    `
-                },
-                'mpesa-integration': {
-                    date: 'March 25, 2026',
-                    title: 'Integrating M-Pesa for High-Value Transactions',
-                    subtitle: 'A strategic guide to handling premium payments securely and efficiently in the Kenyan market.',
-                    img: 'https://placehold.co/800x500/1a1a1a/d4af37?text=Preview',
-                    content: `
-                        <p>M-Pesa has revolutionized commerce in Kenya, but for high-end businesses, the integration must go beyond basic functionality. It requires a sophisticated approach that prioritizes security, user trust, and seamless brand alignment.</p>
-                        
-                        <h2>Security First</h2>
-                        <p>When dealing with high-value transactions, security is paramount. Implementing robust API integrations with real-time verification and multi-factor authentication is non-negotiable. Our approach ensures that both the business and the client are protected at every step of the payment process.</p>
-                        
-                        <blockquote>"Trust is the ultimate currency in high-value digital transactions."</blockquote>
-                        
-                        <h2>Seamless User Experience</h2>
-                        <p>The payment process should never feel like a hurdle. By integrating M-Pesa directly into the checkout flow with custom-styled interfaces, we maintain the premium feel of the brand even during the transaction phase. No jarring redirects, just a smooth, integrated experience.</p>
-                        
-                        <h2>Reporting and Analytics</h2>
-                        <p>For elite businesses, data is key. Our integrations provide detailed transaction reporting and real-time analytics, allowing business owners to monitor their revenue streams with precision and make informed strategic decisions.</p>
-                    `
-                },
-                'strategic-seo': {
-                    date: 'March 15, 2026',
-                    title: 'Strategic SEO for Nairobi\'s Prestigious Brands',
-                    subtitle: 'How to position your brand at the pinnacle of search results for high-intent, high-value keywords.',
-                    img: 'https://placehold.co/800x500/1a1a1a/d4af37?text=Preview',
-                    content: `
-                        <p>In the competitive markets of Nairobi and beyond, being visible is not enough. You must be visible to the right people at the right time. Strategic SEO for luxury brands is about quality over quantity.</p>
-                        
-                        <h2>Targeting High-Intent Keywords</h2>
-                        <p>Instead of chasing broad, high-volume search terms, we focus on high-intent, niche keywords that align with the search behavior of high-net-worth individuals. This ensures that the traffic coming to your site is qualified and more likely to convert.</p>
-                        
-                        <blockquote>"SEO is not just about being found; it's about being found by those who matter most to your brand."</blockquote>
-                        
-                        <h2>Content as Authority</h2>
-                        <p>Search engines reward authority. By creating high-quality, insightful content that positions your brand as a thought leader in your industry, we not only improve your search rankings but also build deep trust with your audience.</p>
-                        
-                        <h2>Technical Excellence</h2>
-                        <p>Luxury SEO also involves technical perfection. Fast loading speeds, mobile optimization, and secure hosting are all signals that search engines use to rank sites. For a premium brand, these technical details are the foundation of digital success.</p>
-                    `
-                }
-            };
+            try {
+                const q = query(collection(db, 'blogPosts'), where('__name__', '==', postId));
+                const snapshot = await getDocs(q);
+                
+                if (!snapshot.empty) {
+                    const post = snapshot.docs[0].data();
+                    // Update Metadata
+                    document.title = `${post.title} | QuickSite Kenya`;
+                    
+                    // Update Header
+                    const dateEl = document.getElementById('post-date');
+                    const titleEl = document.getElementById('post-title');
+                    const subtitleEl = document.getElementById('post-subtitle');
+                    const imgContainer = document.getElementById('post-img-container');
+                    const bodyEl = document.getElementById('post-body');
 
-            const post = blogPosts[postId];
-            if (post) {
-                // Update Metadata
-                document.title = `${post.title} | QuickSite Kenya`;
-                
-                // Update Header
-                const dateEl = document.getElementById('post-date');
-                const titleEl = document.getElementById('post-title');
-                const subtitleEl = document.getElementById('post-subtitle');
-                const imgContainer = document.getElementById('post-img-container');
-                const bodyEl = document.getElementById('post-body');
-
-                if (dateEl) dateEl.innerText = post.date;
-                if (titleEl) titleEl.innerText = post.title;
-                if (subtitleEl) subtitleEl.innerText = post.subtitle;
-                
-                // Update Image
-                if (imgContainer) {
-                    const safeImg = getSafeImageUrl(post.img, post.title, 1200, 600);
-                    imgContainer.innerHTML = `<img src="${safeImg}" alt="${post.title}" referrerPolicy="no-referrer">`;
+                    if (dateEl) dateEl.innerText = post.date;
+                    if (titleEl) titleEl.innerText = post.title;
+                    if (subtitleEl) subtitleEl.innerText = post.subtitle;
+                    
+                    // Update Image
+                    if (imgContainer) {
+                        const safeImg = getSafeImageUrl(post.img, post.title, 1200, 600);
+                        imgContainer.innerHTML = `<img src="${safeImg}" alt="${post.title}" referrerPolicy="no-referrer">`;
+                    }
+                    
+                    // Update Body
+                    if (bodyEl) bodyEl.innerHTML = post.content;
+                    
+                    if (window.lucide) window.lucide.createIcons();
+                } else {
+                    // Handle post not found
+                    const titleEl = document.getElementById('post-title');
+                    const subtitleEl = document.getElementById('post-subtitle');
+                    if (titleEl) titleEl.innerText = 'Article Not Found';
+                    if (subtitleEl) subtitleEl.innerText = 'The requested article could not be located.';
                 }
-                
-                // Update Body
-                if (bodyEl) bodyEl.innerHTML = post.content;
-                
-                // Re-initialize Lucide icons if any were added in content
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            } else {
-                // Handle post not found
-                const titleEl = document.getElementById('post-title');
-                const subtitleEl = document.getElementById('post-subtitle');
-                if (titleEl) titleEl.innerText = 'Article Not Found';
-                if (subtitleEl) subtitleEl.innerText = 'The requested article could not be located.';
+            } catch (error) {
+                handleFirestoreError(error, OperationType.GET, `blogPosts/${postId}`);
             }
         }
     };
 
+    loadBlogPosts();
     handleBlogParams();
 });

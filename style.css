@@ -195,13 +195,20 @@ img {
 
 /* Hero Section */
 .hero {
-    height: 0;
-    min-height: 400px;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     position: relative;
     background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.1), transparent);
     overflow: hidden;
+    padding: 100px 0;
+}
+
+@media (max-width: 768px) {
+    .hero {
+        min-height: 80vh;
+        padding: 120px 0 60px;
+    }
 }
 
 .hero-content {
@@ -433,6 +440,14 @@ img {
     border-radius: 20px;
     position: relative;
     animation: modalSlide 0.5s ease;
+}
+
+@media (max-width: 576px) {
+    .modal-content {
+        width: 95%;
+        padding: 30px 20px;
+        margin: 10% auto;
+    }
 }
 
 @keyframes modalSlide {
@@ -2989,10 +3004,23 @@ body.is-admin .admin-only.block {
 }
 
 @media (max-width: 768px) {
-    .post-body h2 {
-        font-size: 1.6rem;
+    .logo {
+        font-size: 1.4rem;
     }
-    
+
+    .marquee-item {
+        font-size: 1rem;
+        gap: 10px;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .testimonial-grid {
+        grid-template-columns: 1fr;
+    }
+
     .post-main-img {
         max-height: 300px;
     }
@@ -3049,11 +3077,13 @@ body.is-admin .admin-only.block {
     }
 
     .hero h1 {
-        font-size: 2.8rem;
+        font-size: 2.5rem;
+        line-height: 1.2;
     }
 
     .hero p {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        margin-bottom: 30px;
     }
 
     .page-header {
@@ -3069,7 +3099,14 @@ body.is-admin .admin-only.block {
     }
 
     .stats-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     .marketplace-grid {
@@ -3085,6 +3122,16 @@ body.is-admin .admin-only.block {
 @media (max-width: 480px) {
     .hero h1 {
         font-size: 2.2rem;
+        line-height: 1.2;
+    }
+
+    .hero p {
+        font-size: 0.95rem;
+        margin-bottom: 25px;
+    }
+
+    .logo {
+        font-size: 1.2rem;
     }
 
     .stats-grid {
