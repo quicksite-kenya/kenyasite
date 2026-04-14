@@ -35,6 +35,11 @@
           "type": "string",
           "description": "The URL of the preview image."
         },
+        "galleryImages": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "An array of URLs for the project gallery."
+        },
         "link": {
           "type": "string",
           "description": "The URL of the live demo."

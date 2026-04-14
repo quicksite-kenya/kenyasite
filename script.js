@@ -1631,9 +1631,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const desc = document.getElementById('siteDesc').value;
             const img = document.getElementById('siteImage').value; // Fixed ID: siteImage instead of siteImg
             const link = document.getElementById('siteLink').value;
+            const galleryInput = document.getElementById('siteGallery');
+            const galleryImages = galleryInput ? galleryInput.value.split('\n').map(url => url.trim()).filter(url => url !== '') : [];
 
             // Aggressive sanitization on submission
             const safeImg = getSafeImageUrl(img, name);
+            const safeGallery = galleryImages.map(url => getSafeImageUrl(url, name));
 
             const submitBtn = addWebsiteForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
@@ -1647,6 +1650,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     price,
                     desc,
                     img: safeImg,
+                    galleryImages: safeGallery,
                     link,
                     createdAt: serverTimestamp()
                 });
@@ -2156,11 +2160,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Fetch site details from Firestore
             let siteImgUrl = null;
+            let siteGallery = [];
             try {
                 const q = query(collection(db, 'marketplaceItems'), where('name', '==', siteName), limit(1));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
-                    siteImgUrl = querySnapshot.docs[0].data().img;
+                    const data = querySnapshot.docs[0].data();
+                    siteImgUrl = data.img;
+                    siteGallery = data.galleryImages || [];
                 }
             } catch (error) {
                 console.error("Error fetching site details:", error);
@@ -2169,17 +2176,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const seed = encodeURIComponent(siteName.replace(/\s+/g, ''));
             const fallbackImg = getSafeImageUrl(`https://placehold.co/800x500/1a1a1a/d4af37?text=Preview`, seed, 800, 500);
             
-            const img1 = siteImgUrl ? getSafeImageUrl(siteImgUrl, siteName) : fallbackImg;
-            const img2 = siteImgUrl ? getSafeImageUrl(siteImgUrl, siteName) : fallbackImg;
-            const img3 = siteImgUrl ? getSafeImageUrl(siteImgUrl, siteName) : fallbackImg;
-            const img4 = siteImgUrl ? getSafeImageUrl(siteImgUrl, siteName) : fallbackImg;
-
-            const galleryData = [
-                { url: img1, cap: 'Homepage Overview' },
-                { url: img2, cap: 'Core Features' },
-                { url: img3, cap: 'User Dashboard' },
-                { url: img4, cap: 'Mobile Responsive View' }
-            ];
+            let galleryData = [];
+            
+            if (siteGallery && siteGallery.length > 0) {
+                galleryData = siteGallery.map((url, index) => ({
+                    url: getSafeImageUrl(url, siteName),
+                    cap: index === 0 ? 'Homepage Overview' : `Feature Highlight ${index}`
+                }));
+            } else {
+                const img1 = siteImgUrl ? getSafeImageUrl(siteImgUrl, siteName) : fallbackImg;
+                galleryData = [
+                    { url: img1, cap: 'Homepage Overview' },
+                    { url: img1, cap: 'Core Features' },
+                    { url: img1, cap: 'User Dashboard' },
+                    { url: img1, cap: 'Mobile Responsive View' }
+                ];
+            }
 
             if (galleryData) {
                 const gallerySection = document.createElement('section');
