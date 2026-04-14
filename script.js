@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { db, auth, logOut, signInWithEmail, signUpWithEmail, serverTimestamp } from './firebase.js';
+import { db, auth, logOut, signInWithEmail, signUpWithEmail, serverTimestamp, storage } from './firebase.js';
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, limit, updateDoc, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // --- AI Consultation Chatbot ---
 const initAIConsultation = () => {
@@ -1608,6 +1609,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    // Helper to upload files to Firebase Storage
+    const uploadFile = async (file, path) => {
+        if (!file) return null;
+        const storageRef = ref(storage, path);
+        await uploadBytes(storageRef, file);
+        return await getDownloadURL(storageRef);
+    };
+
     // Add Website Modal Logic
     if (addWebsiteModal && closeAddModal) {
         closeAddModal.onclick = () => addWebsiteModal.style.display = 'none';
@@ -1629,28 +1638,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             const category = document.getElementById('siteCategory').value;
             const price = document.getElementById('sitePrice').value;
             const desc = document.getElementById('siteDesc').value;
-            const img = document.getElementById('siteImage').value; // Fixed ID: siteImage instead of siteImg
             const link = document.getElementById('siteLink').value;
-            const galleryInput = document.getElementById('siteGallery');
-            const galleryImages = galleryInput ? galleryInput.value.split('\n').map(url => url.trim()).filter(url => url !== '') : [];
-
-            // Aggressive sanitization on submission
-            const safeImg = getSafeImageUrl(img, name);
-            const safeGallery = galleryImages.map(url => getSafeImageUrl(url, name));
+            
+            const mainImageFile = document.getElementById('siteImageFile').files[0];
+            const galleryFiles = document.getElementById('siteGalleryFiles').files;
 
             const submitBtn = addWebsiteForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
-            submitBtn.innerText = 'Submitting...';
+            submitBtn.innerText = 'Uploading...';
             submitBtn.disabled = true;
 
             try {
+                if (!mainImageFile) {
+                    showToast('Please select a preview image.', 'error');
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                // Upload main image
+                const mainImgUrl = await uploadFile(mainImageFile, `marketplace/${Date.now()}_main_${mainImageFile.name}`);
+                
+                // Upload gallery images
+                const galleryUrls = [];
+                for (let i = 0; i < galleryFiles.length; i++) {
+                    const url = await uploadFile(galleryFiles[i], `marketplace/${Date.now()}_gallery_${i}_${galleryFiles[i].name}`);
+                    if (url) galleryUrls.push(url);
+                }
+
                 await addDoc(collection(db, 'marketplaceItems'), {
                     name,
                     category,
                     price,
                     desc,
-                    img: safeImg,
-                    galleryImages: safeGallery,
+                    img: mainImgUrl,
+                    galleryImages: galleryUrls,
                     link,
                     createdAt: serverTimestamp()
                 });
@@ -2314,7 +2336,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('editPostId').value = id;
                 document.getElementById('postTitleInput').value = post.title;
                 document.getElementById('postSubtitleInput').value = post.subtitle;
-                document.getElementById('postImgInput').value = post.img;
+                const fileInput = document.getElementById('postImgFile');
+                if (fileInput) {
+                    fileInput.dataset.oldUrl = post.img;
+                    fileInput.required = false; // Not required when editing
+                }
                 document.getElementById('postCategoryInput').value = post.category || 'Insights';
                 document.getElementById('postContentInput').value = post.content;
                 blogPostModal.style.display = 'block';
@@ -2339,17 +2365,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         blogPostForm.onsubmit = async (e) => {
             e.preventDefault();
             const editId = document.getElementById('editPostId').value;
-            const postData = {
-                title: document.getElementById('postTitleInput').value,
-                subtitle: document.getElementById('postSubtitleInput').value,
-                img: document.getElementById('postImgInput').value,
-                category: document.getElementById('postCategoryInput').value,
-                content: document.getElementById('postContentInput').value,
-                date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-                createdAt: serverTimestamp()
-            };
+            const featuredImageFile = document.getElementById('postImgFile').files[0];
+            const oldImgUrl = document.getElementById('postImgFile').dataset.oldUrl;
+
+            const submitBtn = blogPostForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = 'Uploading...';
+            submitBtn.disabled = true;
 
             try {
+                let featuredImgUrl = oldImgUrl;
+                if (featuredImageFile) {
+                    featuredImgUrl = await uploadFile(featuredImageFile, `blog/${Date.now()}_${featuredImageFile.name}`);
+                }
+
+                if (!featuredImgUrl && !editId) {
+                    showToast('Please select a featured image.', 'error');
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+
+                const postData = {
+                    title: document.getElementById('postTitleInput').value,
+                    subtitle: document.getElementById('postSubtitleInput').value,
+                    img: featuredImgUrl,
+                    category: document.getElementById('postCategoryInput').value,
+                    content: document.getElementById('postContentInput').value,
+                    date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+                    createdAt: serverTimestamp()
+                };
+
                 if (editId) {
                     await updateDoc(doc(db, 'blogPosts', editId), postData);
                     showToast('Insight updated successfully.');
@@ -2359,8 +2405,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 blogPostModal.style.display = 'none';
                 blogPostForm.reset();
+                document.getElementById('postImgFile').required = true; // Reset requirement
             } catch (error) {
                 handleFirestoreError(error, editId ? OperationType.UPDATE : OperationType.CREATE, 'blogPosts');
+            } finally {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
             }
         };
     }

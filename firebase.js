@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { initializeFirestore, doc, getDocFromServer, serverTimestamp } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import firebaseConfig from './firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
@@ -10,6 +11,9 @@ export const db = initializeFirestore(app, {
   experimentalAutoDetectLongPolling: false, // Force it
   useFetchStreams: false, // Sometimes helps with proxies
 }, firebaseConfig.firestoreDatabaseId);
+
+// Initialize Storage
+export const storage = getStorage(app);
 
 // Use standard getAuth but set persistence explicitly
 export const auth = getAuth(app);
