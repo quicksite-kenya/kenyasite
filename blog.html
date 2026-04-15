@@ -46,7 +46,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
-  <script type="module" crossorigin src="./assets/script-eY2DLpx_.js"></script>
+  <script type="module" crossorigin src="./assets/script-B0HRKqrP.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/script-D8FfWzzX.css">
 </head>
 <body>
@@ -196,14 +196,14 @@
                     <textarea id="siteDesc" placeholder="Briefly describe the features..." required></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Preview Image</label>
-                    <input type="file" id="siteImageFile" accept="image/*" required>
-                    <p style="font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">* Upload a high-quality preview of your website.</p>
+                    <label>Preview Image URL</label>
+                    <input type="url" id="siteImage" placeholder="https://example.com/image.jpg" required>
+                    <p style="font-size: 0.65rem; color: #ff4444; margin-top: 5px; opacity: 0.8;">* Avoid local URLs (e.g. localhost, 192.168.x.x) as they will be blocked by browsers.</p>
                 </div>
                 <div class="form-group">
-                    <label>Gallery Images</label>
-                    <input type="file" id="siteGalleryFiles" accept="image/*" multiple>
-                    <p style="font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">* Select multiple images to showcase in the Project Gallery.</p>
+                    <label>Gallery Image URLs (One per line)</label>
+                    <textarea id="siteGallery" placeholder="https://example.com/gallery1.jpg&#10;https://example.com/gallery2.jpg" rows="3"></textarea>
+                    <p style="font-size: 0.65rem; opacity: 0.6; margin-top: 5px;">* These images will appear in the Project Gallery section.</p>
                 </div>
                 <div class="form-group">
                     <label>Live Demo Link</label>
@@ -263,8 +263,8 @@
                     <input type="text" id="postSubtitleInput" required placeholder="A brief overview of the post...">
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
-                    <label>Featured Image</label>
-                    <input type="file" id="postImgFile" accept="image/*" required>
+                    <label>Featured Image URL</label>
+                    <input type="url" id="postImgInput" required placeholder="https://images.unsplash.com/...">
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label>Content (HTML allowed)</label>
