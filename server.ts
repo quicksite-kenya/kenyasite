@@ -102,6 +102,28 @@ async function startServer() {
     });
   });
 
+  // Test Email Endpoint
+  app.get("/api/test-email", async (req, res) => {
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!resendKey) {
+      return res.status(500).json({ error: "RESEND_API_KEY not configured." });
+    }
+
+    try {
+      const resend = new Resend(resendKey);
+      const data = await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: 'quicksitekenya@gmail.com',
+        subject: 'Hello World',
+        html: '<p>Congrats on sending your <strong>first email</strong>!</p>'
+      });
+      res.json({ success: true, data });
+    } catch (error) {
+      console.error("Test Email Error:", error);
+      res.status(500).json({ error: "Failed to send test email." });
+    }
+  });
+
   // API Routes
   app.post("/api/consultation", async (req, res) => {
     console.log(">>> [API] Received consultation request:", req.body);

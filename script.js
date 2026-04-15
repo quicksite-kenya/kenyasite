@@ -861,7 +861,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             
             try {
-                await addDoc(collection(db, 'inquiries'), data);
+                // Use the server API to handle both Firestore save and Email notification
+                const response = await fetch('/api/consultation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to submit inquiry');
+                }
                 
                 contactForm.innerHTML = `
                     <div style="text-align: center; padding: 40px; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--primary-color); border-radius: 15px;">
@@ -1609,14 +1622,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    // Helper to upload files to Firebase Storage
-    const uploadFile = async (file, path) => {
-        if (!file) return null;
-        const storageRef = ref(storage, path);
-        await uploadBytes(storageRef, file);
-        return await getDownloadURL(storageRef);
-    };
-
     // Add Website Modal Logic
     if (addWebsiteModal && closeAddModal) {
         closeAddModal.onclick = () => addWebsiteModal.style.display = 'none';
@@ -1640,39 +1645,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             const desc = document.getElementById('siteDesc').value;
             const link = document.getElementById('siteLink').value;
             
-            const mainImageFile = document.getElementById('siteImageFile').files[0];
-            const galleryFiles = document.getElementById('siteGalleryFiles').files;
+            const img = document.getElementById('siteImage').value;
+            const galleryRaw = document.getElementById('siteGallery').value;
+            const galleryImages = galleryRaw.split('\n').map(url => url.trim()).filter(url => url !== '');
 
             const submitBtn = addWebsiteForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
-            submitBtn.innerText = 'Uploading...';
+            submitBtn.innerText = 'Publishing...';
             submitBtn.disabled = true;
 
             try {
-                if (!mainImageFile) {
-                    showToast('Please select a preview image.', 'error');
-                    submitBtn.innerText = originalText;
-                    submitBtn.disabled = false;
-                    return;
-                }
-
-                // Upload main image
-                const mainImgUrl = await uploadFile(mainImageFile, `marketplace/${Date.now()}_main_${mainImageFile.name}`);
-                
-                // Upload gallery images
-                const galleryUrls = [];
-                for (let i = 0; i < galleryFiles.length; i++) {
-                    const url = await uploadFile(galleryFiles[i], `marketplace/${Date.now()}_gallery_${i}_${galleryFiles[i].name}`);
-                    if (url) galleryUrls.push(url);
-                }
-
                 await addDoc(collection(db, 'marketplaceItems'), {
                     name,
                     category,
                     price,
                     desc,
-                    img: mainImgUrl,
-                    galleryImages: galleryUrls,
+                    img,
+                    galleryImages,
                     link,
                     createdAt: serverTimestamp()
                 });
@@ -2290,11 +2279,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span class="blog-date">${post.date}</span>
                         <h3>${post.title}</h3>
                         <p>${post.subtitle}</p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
                             <a href="blog-post.html?id=${postId}" class="btn btn-primary">Explore Article</a>
                             ${isAdmin ? `
                                 <button class="btn btn-secondary edit-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem;">Edit</button>
                                 <button class="btn btn-primary delete-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem; background: #ff4444; border-color: #ff4444;">Delete</button>
+                                <button class="btn btn-secondary share-post-btn" data-id="${postId}" data-title="${post.title}" style="padding: 8px 15px; font-size: 0.7rem; background: #25D366; border-color: #25D366; color: white;">Share</button>
                             ` : ''}
                         </div>
                     </div>
@@ -2318,6 +2308,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                         deleteBlogPost(id);
                     };
                 });
+                document.querySelectorAll('.share-post-btn').forEach(btn => {
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        const id = btn.getAttribute('data-id');
+                        const title = btn.getAttribute('data-title');
+                        
+                        // Show the admin share prompt modal
+                        showSharePrompt(id, title);
+                    };
+                });
             }
 
             if (window.lucide) window.lucide.createIcons();
@@ -2336,11 +2336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('editPostId').value = id;
                 document.getElementById('postTitleInput').value = post.title;
                 document.getElementById('postSubtitleInput').value = post.subtitle;
-                const fileInput = document.getElementById('postImgFile');
-                if (fileInput) {
-                    fileInput.dataset.oldUrl = post.img;
-                    fileInput.required = false; // Not required when editing
-                }
+                document.getElementById('postImgInput').value = post.img;
                 document.getElementById('postCategoryInput').value = post.category || 'Insights';
                 document.getElementById('postContentInput').value = post.content;
                 blogPostModal.style.display = 'block';
@@ -2361,51 +2357,105 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    const showSharePrompt = (postId, postTitle) => {
+        const url = encodeURIComponent(`${window.location.origin}/blog-post.html?id=${postId}`);
+        const title = encodeURIComponent(postTitle);
+        const rawUrl = `${window.location.origin}/blog-post.html?id=${postId}`;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal active';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '10000';
+
+        overlay.innerHTML = `
+            <div class="modal-content" style="text-align: center; max-width: 400px; padding: 40px 30px;">
+                <div style="width: 60px; height: 60px; background: rgba(37, 211, 102, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i data-lucide="check" style="color: #25D366; width: 30px; height: 30px;"></i>
+                </div>
+                <h3 style="margin-bottom: 10px;">Post Published! 🎉</h3>
+                <p style="margin-bottom: 25px; font-size: 0.9rem; opacity: 0.8;">Share your elite insight with your network.</p>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="btn btn-primary" style="background: #1877F2; border-color: #1877F2; color: white; display: flex; justify-content: center; gap: 10px;">
+                        <i data-lucide="facebook"></i> Share on Facebook
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?text=${title}&url=${url}" target="_blank" class="btn btn-primary" style="background: #1DA1F2; border-color: #1DA1F2; color: white; display: flex; justify-content: center; gap: 10px;">
+                        <i data-lucide="twitter"></i> Share on Twitter (X)
+                    </a>
+                    <a href="https://api.whatsapp.com/send?text=${title}%20${url}" target="_blank" class="btn btn-primary" style="background: #25D366; border-color: #25D366; color: white; display: flex; justify-content: center; gap: 10px;">
+                        <i data-lucide="message-circle"></i> Share on WhatsApp
+                    </a>
+                    <button id="instagram-share-btn" class="btn btn-primary" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border: none; color: white; display: flex; justify-content: center; gap: 10px;">
+                        <i data-lucide="instagram"></i> Copy Link for Instagram
+                    </button>
+                    <button id="tiktok-share-btn" class="btn btn-primary" style="background: #000000; border-color: #333333; color: white; display: flex; justify-content: center; gap: 10px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tiktok"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg> Copy Link for TikTok
+                    </button>
+                </div>
+                <button id="close-share-prompt" class="btn btn-secondary" style="margin-top: 25px; width: 100%;">Done</button>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        if (window.lucide) window.lucide.createIcons();
+
+        overlay.querySelector('#tiktok-share-btn').onclick = () => {
+            navigator.clipboard.writeText(rawUrl).then(() => {
+                showToast('Link copied! Open TikTok to paste and share.');
+                setTimeout(() => {
+                    window.open('https://www.tiktok.com/', '_blank');
+                }, 1500);
+            });
+        };
+
+        overlay.querySelector('#instagram-share-btn').onclick = () => {
+            navigator.clipboard.writeText(rawUrl).then(() => {
+                showToast('Link copied! Open Instagram to paste in your bio/story.');
+                setTimeout(() => {
+                    window.open('https://www.instagram.com/', '_blank');
+                }, 1500);
+            });
+        };
+
+        const close = () => document.body.removeChild(overlay);
+        overlay.querySelector('#close-share-prompt').onclick = close;
+        overlay.onclick = (e) => { if (e.target === overlay) close(); };
+    };
+
     if (blogPostForm) {
         blogPostForm.onsubmit = async (e) => {
             e.preventDefault();
             const editId = document.getElementById('editPostId').value;
-            const featuredImageFile = document.getElementById('postImgFile').files[0];
-            const oldImgUrl = document.getElementById('postImgFile').dataset.oldUrl;
+            const img = document.getElementById('postImgInput').value;
 
             const submitBtn = blogPostForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
-            submitBtn.innerText = 'Uploading...';
+            submitBtn.innerText = 'Publishing...';
             submitBtn.disabled = true;
 
             try {
-                let featuredImgUrl = oldImgUrl;
-                if (featuredImageFile) {
-                    featuredImgUrl = await uploadFile(featuredImageFile, `blog/${Date.now()}_${featuredImageFile.name}`);
-                }
-
-                if (!featuredImgUrl && !editId) {
-                    showToast('Please select a featured image.', 'error');
-                    submitBtn.innerText = originalText;
-                    submitBtn.disabled = false;
-                    return;
-                }
-
                 const postData = {
                     title: document.getElementById('postTitleInput').value,
                     subtitle: document.getElementById('postSubtitleInput').value,
-                    img: featuredImgUrl,
+                    img: img,
                     category: document.getElementById('postCategoryInput').value,
                     content: document.getElementById('postContentInput').value,
                     date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
                     createdAt: serverTimestamp()
                 };
 
+                let newPostId = editId;
                 if (editId) {
                     await updateDoc(doc(db, 'blogPosts', editId), postData);
                     showToast('Insight updated successfully.');
                 } else {
-                    await addDoc(collection(db, 'blogPosts'), postData);
+                    const docRef = await addDoc(collection(db, 'blogPosts'), postData);
+                    newPostId = docRef.id;
                     showToast('New elite insight published.');
                 }
                 blogPostModal.style.display = 'none';
                 blogPostForm.reset();
-                document.getElementById('postImgFile').required = true; // Reset requirement
             } catch (error) {
                 handleFirestoreError(error, editId ? OperationType.UPDATE : OperationType.CREATE, 'blogPosts');
             } finally {
