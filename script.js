@@ -1646,8 +1646,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const link = document.getElementById('siteLink').value;
             
             const img = document.getElementById('siteImage').value;
-            const galleryRaw = document.getElementById('siteGallery').value;
-            const galleryImages = galleryRaw.split('\n').map(url => url.trim()).filter(url => url !== '');
 
             const submitBtn = addWebsiteForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
@@ -1661,7 +1659,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     price,
                     desc,
                     img,
-                    galleryImages,
                     link,
                     createdAt: serverTimestamp()
                 });
@@ -2170,65 +2167,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // Fetch site details from Firestore
-            let siteImgUrl = null;
-            let siteGallery = [];
             try {
                 const q = query(collection(db, 'marketplaceItems'), where('name', '==', siteName), limit(1));
-                const querySnapshot = await getDocs(q);
-                if (!querySnapshot.empty) {
-                    const data = querySnapshot.docs[0].data();
-                    siteImgUrl = data.img;
-                    siteGallery = data.galleryImages || [];
-                }
+                await getDocs(q);
             } catch (error) {
                 console.error("Error fetching site details:", error);
-            }
-
-            const seed = encodeURIComponent(siteName.replace(/\s+/g, ''));
-            const fallbackImg = getSafeImageUrl(`https://placehold.co/800x500/1a1a1a/d4af37?text=Preview`, seed, 800, 500);
-            
-            let galleryData = [];
-            
-            if (siteGallery && siteGallery.length > 0) {
-                galleryData = siteGallery.map((url, index) => ({
-                    url: getSafeImageUrl(url, siteName),
-                    cap: index === 0 ? 'Homepage Overview' : `Feature Highlight ${index}`
-                }));
-            } else {
-                const img1 = siteImgUrl ? getSafeImageUrl(siteImgUrl, siteName) : fallbackImg;
-                galleryData = [
-                    { url: img1, cap: 'Homepage Overview' },
-                    { url: img1, cap: 'Core Features' },
-                    { url: img1, cap: 'User Dashboard' },
-                    { url: img1, cap: 'Mobile Responsive View' }
-                ];
-            }
-
-            if (galleryData) {
-                const gallerySection = document.createElement('section');
-                gallerySection.className = 'site-gallery-section';
-                gallerySection.innerHTML = `
-                    <div class="container">
-                        <div class="section-header">
-                            <h2>Project <span>Gallery</span></h2>
-                            <p>Visual highlights of the ${siteName} digital experience.</p>
-                        </div>
-                        <div class="gallery-grid">
-                            ${galleryData.map(img => `
-                                <div class="gallery-item">
-                                    <img src="${img.url}" alt="${img.cap}" referrerPolicy="no-referrer">
-                                    <div class="gallery-caption">${img.cap}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                // Insert after the page header
-                const pageHeader = document.querySelector('.page-header');
-                if (pageHeader && pageHeader.parentNode) {
-                    pageHeader.parentNode.insertBefore(gallerySection, pageHeader.nextSibling);
-                }
             }
 
             // Scroll to the top to ensure the header is visible
