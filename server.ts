@@ -64,8 +64,11 @@ async function startServer() {
     const host = req.headers.host || "";
     const isMainDomain = MAIN_DOMAINS.some(d => host === d || host.split(':')[0] === d);
     
+    console.log(`[DEBUG] Request: ${req.path}, Host: ${host}, isMainDomain: ${isMainDomain}`);
+
     // Pass through API, assets, and Vite internal paths
     if (req.path.startsWith("/api") || req.path.startsWith("/src") || req.path.startsWith("/@vite") || req.path.includes(".")) {
+      console.log(`[DEBUG] Passing through: ${req.path}`);
       return next();
     }
 
