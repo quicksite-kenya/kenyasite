@@ -2401,13 +2401,20 @@ body.is-admin .admin-only.block {
     }
 }
 
-@media (max-width: 576px) {
-    .hero h1 {
-        font-size: 2.8rem;
-    }
+@media (max-width: 768px) {
+    h1 { font-size: 2.2rem !important; }
+    h2 { font-size: 1.8rem !important; }
+    h3 { font-size: 1.5rem !important; }
     
-    .featured-info h2 {
-        font-size: 2.5rem;
+    /* Ensure pricing cards stack nicely but are not too squeezed */
+    .pricing-card {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding: 0 15px;
     }
 }
 

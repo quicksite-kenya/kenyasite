@@ -307,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Populate Modal
                             document.getElementById('editClientId').value = docId;
                             document.getElementById('editPaymentStatus').value = data.paymentStatus || 'Unpaid';
+                            document.getElementById('editPlan').value = data.plan || 'Starter Presence';
                             document.getElementById('editEnvStatus').value = data.status || 'Draft';
                             document.getElementById('editSubdomain').value = data.subdomain || '';
                             
@@ -353,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     try {
                          const updates = {
                              paymentStatus: document.getElementById('editPaymentStatus').value,
+                             plan: document.getElementById('editPlan').value,
                              status: document.getElementById('editEnvStatus').value,
                              subdomain: document.getElementById('editSubdomain').value
                          };
