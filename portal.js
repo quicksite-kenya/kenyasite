@@ -163,7 +163,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (unpaidWarning) unpaidWarning.style.display = 'none';
                     if (previewLinkBox) previewLinkBox.style.opacity = '1';
                     
-                    const link = data.customDomain || (data.subdomain ? `${data.subdomain}.quicksitekenya.co.ke` : 'Pending Generation');
+                    // Show preview token link if status is Preview
+                    let link;
+                    if (data.status === 'Preview' && data.previewToken) {
+                        const sub = data.subdomain || 'pending';
+                        link = `https://${sub}.quicksitekenya.co.ke/preview?token=${data.previewToken}`;
+                    } else {
+                        link = data.customDomain || (data.subdomain ? `${data.subdomain}.quicksitekenya.co.ke` : 'Pending Generation');
+                    }
+                    
                     siteUrl.innerText = link;
                     visitLinkBtn.href = link.startsWith('http') ? link : `https://${link}`;
                     visitLinkBtn.classList.remove('disabled');
@@ -217,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         newBtn.classList.remove('disabled');
                         newBtn.addEventListener('click', () => {
                             const message = encodeURIComponent(`Hello QuickSite team, I have just paid ${cost} for my ${plan} package using M-PESA. My registered email is ${user.email}. Please verify my payment.`);
-                            window.open(`https://wa.me/254712345678?text=${message}`, '_blank');
+                            window.open(`https://wa.me/254708691648?text=${message}`, '_blank');
                         });
                     }
                 }

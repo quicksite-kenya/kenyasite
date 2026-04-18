@@ -70,7 +70,12 @@ service cloud.firestore {
       allow list: if isVerifiedAdmin() || (resource.data.status == 'Live') || (isSignedIn() && resource.data.clientEmail == request.auth.token.email);
       
       allow create: if isVerifiedAdmin() || (isSignedIn() && request.resource.data.clientEmail == request.auth.token.email && isValidClientSite(request.resource.data) && request.resource.data.createdAt == request.time);
-      allow update: if isVerifiedAdmin() && isValidClientSite(request.resource.data) && 
+      allow update: if isVerifiedAdmin() && (
+                      // Allow full site updates (must be valid)
+                      isValidClientSite(request.resource.data) || 
+                      // Allow partial updates to status/preview fields
+                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'previewToken', 'previewExpiresAt'])
+                    ) && 
                     request.resource.data.createdAt == resource.data.createdAt;
       allow delete: if isVerifiedAdmin();
     }
