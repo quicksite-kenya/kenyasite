@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Site | QuickSite Kenya</title>
+    <!-- Dynamic Favicon -->
+    <link rel="icon" type="image/png" id="favIcon" href="https://img.icons8.com/fluency/48/000000/diamond--v1.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link id="dynamicFont" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
+    
+    <style id="templateStyles">
+        :root {
+            --primary: #d4af37;
+            --bg: #0a0a0a;
+            --text: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        nav { padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        
+        .hero { padding: 100px 0; text-align: center; background-size: cover; background-position: center; position: relative; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 1; }
+        .hero-content { position: relative; z-index: 2; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.25rem; opacity: 0.9; max-width: 700px; margin: 0 auto 30px; }
+        
+        .btn { display: inline-block; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; cursor: pointer; border: none; }
+        .btn-primary { background: var(--primary); color: #000; }
+        .btn-primary:hover { transform: scale(1.05); }
+        
+        section { padding: 80px 0; }
+        .section-title { text-align: center; margin-bottom: 50px; }
+        .section-title h2 { font-size: 2.5rem; color: var(--primary); margin-bottom: 10px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .card h3 { margin-bottom: 15px; color: var(--primary); }
+        .price { font-size: 1.5rem; font-weight: 700; display: block; margin-top: 15px; }
+        
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .about-img img { width: 100%; border-radius: 20px; }
+        
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .gallery-item img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        
+        footer { padding: 50px 0; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
+        .footer-col h4 { margin-bottom: 20px; color: var(--primary); }
+        .footer-col p { margin-bottom: 10px; opacity: 0.7; }
+        
+        .whatsapp-float { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #25d366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 10px 25px rgba(37,211,102,0.3); z-index: 1000; text-decoration: none; }
+        
+        /* Preview Banner */
+        #previewBanner { position: fixed; top: 0; left: 0; width: 100%; background: var(--primary); color: black; text-align: center; padding: 10px; font-weight: 700; z-index: 9999; display: none; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .about-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+  <script type="module" crossorigin src="./assets/site-DJNpY6Cz.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
+</head>
+<body>
+    <div id="previewBanner">LIVE PREVIEW MODE — Updates publish instantly from dashboard</div>
+    
+    <nav>
+        <div class="container nav-content">
+            <a href="#" class="logo" id="siteLogoText">BusinessName</a>
+            <div class="nav-links">
+                <a href="#services" class="btn btn-sm" style="color: white;">Services</a>
+                <a href="#contact" class="btn btn-primary btn-sm">Contact Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero" id="siteHero">
+        <div class="container hero-content">
+            <h1 id="siteTitle">Main Headline</h1>
+            <p id="siteTagline">Engaging tagline for your service business.</p>
+            <a href="#contact" class="btn btn-primary">Book Consultation</a>
+        </div>
+    </header>
+
+    <section id="services">
+        <div class="container">
+            <div class="section-title">
+                <span id="servicesBadge">Our Expertise</span>
+                <h2 id="servicesTitle">What We <span>Offer</span></h2>
+            </div>
+            <div class="grid" id="servicesGrid">
+                <!-- Services injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="features" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose <span>Us</span></h2>
+            </div>
+            <div class="grid" id="featuresGrid">
+                 <!-- Features injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="about" style="background: rgba(255,255,255,0.02);">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Why Choose <span id="aboutName" style="color: var(--primary);">Us</span>?</h2>
+                    <p id="aboutContent">Detailed about text goes here.</p>
+                </div>
+                <div class="about-img" id="aboutImgContainer">
+                    <img src="https://images.unsplash.com/photo-1600880210839-4f444c136329?auto=format&fit=crop&w=800&q=80" alt="About Us">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our <span>Work</span></h2>
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Transparent <span>Pricing</span></h2>
+            </div>
+            <div class="grid" id="pricingGrid">
+                 <!-- Pricing injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Client <span>Love</span></h2>
+            </div>
+            <div class="grid" id="testimonialsGrid">
+                 <!-- Testimonials injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="cta" style="display: none; padding: 100px 0; text-align: center;">
+        <div class="container">
+            <div style="background: var(--primary, #d4af37); padding: 80px 40px; border-radius: 40px; color: white;">
+                <h2 id="ctaTitle" style="font-size: 3rem; margin-bottom: 30px;">Ready to Start?</h2>
+                <a href="#contact" id="ctaBtn" class="btn" style="background: white; color: var(--primary, #d4af37); font-weight: 800; padding: 20px 40px; border-radius: 20px;">Get Started Now</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>Connect <span>With Us</span></h2>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h3>Contact Information</h3>
+                    <p id="contactAddress">📍 Neighborhood, Nairobi</p>
+                    <p id="contactPhone">📞 +254 700 000000</p>
+                    <p id="contactEmail">📧 contact@business.com</p>
+                    
+                    <div style="margin-top: 30px;">
+                        <a href="#" id="callBtn" class="btn btn-primary" style="width: 100%; text-align: center; margin-bottom: 10px;">Call Now</a>
+                        <a href="#" id="waBtn" class="btn btn-primary" style="width: 100%; text-align: center; background: #25d366; color: white;">Message on WhatsApp</a>
+                    </div>
+                </div>
+                <div class="card" id="mapContainer" style="padding: 0; overflow: hidden; min-height: 300px;">
+                    <!-- Map iframe here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4 id="footerName">BusinessName</h4>
+                    <p id="footerTagline">Smart solutions for growth.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Links</h4>
+                    <p><a href="#services" style="color: inherit; text-decoration: none;">Services</a></p>
+                    <p><a href="#about" style="color: inherit; text-decoration: none;">About</a></p>
+                    <p><a href="#contact" style="color: inherit; text-decoration: none;">Contact</a></p>
+                </div>
+                <div class="footer-col">
+                    <h4>Social</h4>
+                    <p>WhatsApp</p>
+                    <p>Instagram</p>
+                    <p>Facebook</p>
+                </div>
+            </div>
+            <div style="margin-top: 50px; text-align: center; opacity: 0.5; font-size: 0.8rem;">
+                <p>&copy; 2026 <span id="copyName">BusinessName</span>.</p>
+                <div id="poweredByTag" style="margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span style="opacity: 0.6;">Powered by</span>
+                    <a href="https://quicksitekenya.co.ke" target="_blank" style="color: inherit; text-decoration: none; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px;">QuickSite Kenya</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="whatsapp-float" id="floatWaBtn">
+        <i data-lucide="phone"></i>
+    </a>
+
+    <!-- Firebase SDKs (Modular) -->
+    
+</body>
+</html>
