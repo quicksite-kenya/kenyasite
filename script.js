@@ -1193,13 +1193,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 const contentType = response.headers.get("content-type");
+                const text = await response.text();
+                console.log(">>> [DEBUG] Server status:", response.status);
+                console.log(">>> [DEBUG] Server content-type:", contentType);
+                console.log(">>> [DEBUG] Server response body:", text);
+
                 let result;
                 if (contentType && contentType.indexOf("application/json") !== -1) {
-                    result = await response.json();
+                    try {
+                        result = JSON.parse(text);
+                    } catch (e) {
+                        throw new Error("Server returned invalid JSON: " + text.substring(0, 50));
+                    }
                 } else {
-                    const text = await response.text();
-                    console.error("Non-JSON response received:", text);
-                    throw new Error("Server returned non-JSON response.");
+                    throw new Error("Server returned non-JSON response type: " + contentType + ". Content: " + text.substring(0, 50));
                 }
 
                 if (!response.ok) {
