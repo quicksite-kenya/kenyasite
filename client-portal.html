@@ -100,10 +100,10 @@
             }
         }
     </style>
-  <script type="module" crossorigin src="./assets/clientPortal-DVne8t5N.js"></script>
+  <script type="module" crossorigin src="./assets/clientPortal-DN3K0eT6.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="./assets/firebase-Cz_WkmMP.js">
-  <link rel="stylesheet" crossorigin href="./assets/firebase-BTavleeq.css">
+  <link rel="modulepreload" crossorigin href="./assets/firebase-BeHs9lFx.js">
+  <link rel="stylesheet" crossorigin href="./assets/firebase-BrXs4NDe.css">
 </head>
 <body>
     <div id="app-wrapper">
@@ -112,8 +112,13 @@
                 <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
                 <ul class="nav-links">
                     <li><a href="index.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
                     <li><a href="client-portal.html" class="active">Client Portal</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="packages.html">Packages</a></li>
+                    <li><a href="portfolio.html">Portfolio</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
                     <li id="adminNavLi" style="display: none;"><a href="#admin-dashboard" id="adminNavLink" style="color: var(--primary-color); font-weight: 700;">Admin</a></li>
                 </ul>
                 <div class="hamburger">
@@ -377,16 +382,26 @@
                         
                         <div class="form-group">
                             <label>Payment Status</label>
-                            <select id="editPaymentStatus" class="form-input">
+                            <select id="editPaymentStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
                                 <option value="Unpaid">Unpaid</option>
                                 <option value="Paid">Paid</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
+                            <label>Plan</label>
+                            <select id="editPlan" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                <option value="Starter Presence">Starter Presence</option>
+                                <option value="Business Growth">Business Growth</option>
+                                <option value="Pro Conversion System">Pro Conversion System</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
                             <label>Environment Status</label>
-                            <select id="editEnvStatus" class="form-input">
+                            <select id="editEnvStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
                                 <option value="Draft">Draft (Offline)</option>
+                                <option value="Preview">Preview</option>
                                 <option value="Live">Live (Published)</option>
                             </select>
                         </div>
