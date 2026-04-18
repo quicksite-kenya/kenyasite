@@ -153,8 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (unpaidWarning) unpaidWarning.style.display = 'block';
                     if (previewLinkBox) previewLinkBox.style.opacity = '0.3';
                     if (amountDueDisplay) {
-                        amountDueDisplay.innerText = plan.includes('Starter') ? 'KES 2,299' 
-                            : (plan.includes('Growth') ? 'KES 5,799' : 'KES 11,499');
+                        amountDueDisplay.innerText = plan.includes('Starter') ? 'KES 2,300' 
+                            : (plan.includes('Growth') ? 'KES 2,800' : 'KES 3,500');
                     }
                     visitLinkBtn.classList.add('disabled');
                     visitLinkBtn.href = "#";
@@ -192,9 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const billingMpesaInstructions = document.getElementById('billingMpesaInstructions');
 
                 const costMap = {
-                    'Starter Presence': 'KES 6,999',
-                    'Business Growth': 'KES 9,999',
-                    'Pro Conversion System': 'KES 14,999'
+                    'Starter Presence': 'KES 11,999',
+                    'Business Growth': 'KES 14,999',
+                    'Pro Conversion System': 'KES 19,999'
                 };
                 const cost = costMap[plan] || 'KES 11,499';
 
