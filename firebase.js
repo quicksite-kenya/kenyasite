@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, setPersistence, browserLocalPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth, setPersistence, browserSessionPersistence, inMemoryPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { initializeFirestore, doc, getDocFromServer, serverTimestamp } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import firebaseConfig from './firebase-applet-config.json';
@@ -17,8 +17,12 @@ export const storage = getStorage(app);
 
 // Use standard getAuth but set persistence explicitly
 export const auth = getAuth(app);
-setPersistence(auth, browserLocalPersistence).catch(err => {
-    console.error("Error setting persistence:", err);
+
+// Attempt to use Session Persistence (prevents "tracking cookie" style blocks in many modern browsers inside iframes)
+// If that throws an error (very strict block), fallback to Memory Persistence immediately.
+setPersistence(auth, browserSessionPersistence).catch(err => {
+    console.warn("Session persistence blocked, falling back to inMemory persistence to bypass iframe tracker blockers:", err);
+    setPersistence(auth, inMemoryPersistence).catch(e => console.error("Memory persistence failed:", e));
 });
 
 if (!auth) {
@@ -55,6 +59,9 @@ export const signInWithEmail = async (email, password) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
     return result.user;
   } catch (error) {
+    if (error.code === 'auth/network-request-failed') {
+      console.error("AD-BLOCKER DETECTED: Firebase Auth requests are being blocked by an extension or browser shield.");
+    }
     console.error("Error signing in with Email. Code:", error.code, "Message:", error.message);
     throw error;
   }
@@ -70,6 +77,9 @@ export const signUpWithEmail = async (email, password) => {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     return result.user;
   } catch (error) {
+    if (error.code === 'auth/network-request-failed') {
+      console.error("AD-BLOCKER DETECTED: Firebase Auth requests are being blocked by an extension or browser shield.");
+    }
     console.error("Error signing up with Email. Code:", error.code, "Message:", error.message);
     throw error;
   }

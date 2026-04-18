@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Portal | QuickSite Kenya</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/48/000000/diamond--v1.png">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
+
+    <style>
+        .portal-header {
+            padding: 120px 0 60px;
+            text-align: center;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .portal-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .portal-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-published { background: rgba(0, 255, 0, 0.1); color: #00ff00; border: 1px solid rgba(0, 255, 0, 0.2); }
+        .status-preview { background: rgba(0, 150, 255, 0.1); color: #0096ff; border: 1px solid rgba(0, 150, 255, 0.2); }
+        .status-development { background: rgba(255, 200, 0, 0.1); color: #ffc800; border: 1px solid rgba(255, 200, 0, 0.2); }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+        }
+
+        .feature-list li i {
+            color: #00ff00;
+            width: 16px;
+            height: 16px;
+        }
+
+        .preview-link-box {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-top: 20px;
+        }
+
+        .preview-link-box code {
+            color: white;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app-wrapper">
+        <nav id="navbar">
+            <div class="container">
+                <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="client-portal.html" class="active">Client Portal</a></li>
+                    <li id="adminNavLi" style="display: none;"><a href="#admin-dashboard" id="adminNavLink" style="color: var(--primary-color); font-weight: 700;">Admin</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+
+        <header class="portal-header">
+            <div class="container">
+                <div class="hero-badge reveal">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>SaaS Portal</span>
+                </div>
+                <h1 id="welcomeText">Welcome back, Client</h1>
+                <p>Manage your QuickSite assets and subscriptions.</p>
+            </div>
+        </header>
+
+        <section class="portal-content" style="padding-bottom: 100px;">
+            <div class="container">
+                <!-- Login State -->
+                <div id="portalLoginState" style="max-width: 400px; margin: 0 auto; text-align: center;">
+                    <div class="portal-card">
+                        <h3 id="formTitle" style="justify-content: center;">Client Sign In</h3>
+                        <p id="formDesc" style="font-size: 0.9rem; color: #ccc; margin-bottom: 20px;">Please sign in to access your digital assets and subscription details.</p>
+                        <form id="clientLoginForm">
+                            <input type="email" id="clientEmail" placeholder="Email Address" required style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 8px; color: white;">
+                            <input type="password" id="clientPassword" placeholder="Password" required style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 8px; color: white;">
+                            <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">Access Dashboard</button>
+                        </form>
+                        <p style="margin-top: 20px; font-size: 0.85rem; color: #aaa;">
+                            <span id="toggleModeText">Don't have an account?</span> 
+                            <a href="#" id="toggleModeBtn" style="color: var(--primary-color); font-weight: bold; text-decoration: none;">Sign Up</a>
+                        </p>
+                        
+                        <div id="authNetworkNote" style="display: none; margin-top: 20px; padding: 20px; background: rgba(255, 77, 77, 0.2); border: 2px solid #ff4d4d; border-radius: 16px; text-align: left; box-shadow: 0 15px 40px rgba(255, 77, 77, 0.2); animation: pulse-red 2s infinite;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                <div style="width: 40px; height: 40px; background: #ff4d4d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">!</div>
+                                <div>
+                                    <p style="font-size: 0.9rem; color: #ff4d4d; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Security Requests Blocked</p>
+                                    <p style="font-size: 0.7rem; color: #ccc; margin: 0;">Ad-Blocker or Firewall Detected</p>
+                                </div>
+                            </div>
+                            
+                            <p style="font-size: 0.8rem; color: #eee; line-height: 1.6; margin-bottom: 15px;">Your browser is actively killing our security handshake. To sign in or create an account, you <b>must</b> allow these traffic nodes:</p>
+                            
+                            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                                <p style="font-size: 0.65rem; color: var(--primary-color); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Whitelisted Domains Required:</p>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <code style="background: #111; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">identitytoolkit.googleapis.com</code>
+                                    <code style="background: #111; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">securetoken.googleapis.com</code>
+                                    <code style="background: #111; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">firebaseinstallations.googleapis.com</code>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                    <p style="font-size: 0.7rem; font-weight: 700; color: white; margin-bottom: 4px;">Brave Browser</p>
+                                    <p style="font-size: 0.65rem; color: #aaa;">Click the Lion icon → Turn Shields OFF</p>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
+                                    <p style="font-size: 0.7rem; font-weight: 700; color: white; margin-bottom: 4px;">uBlock/AdBlock</p>
+                                    <p style="font-size: 0.65rem; color: #aaa;">Click icon → Power Button (Turn Off)</p>
+                                </div>
+                            </div>
+                            
+                            <button onclick="window.open(window.location.href, '_blank')" style="width: 100%; margin-top: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                                Try in New Tab (Bypasses some iframe blocks)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard State -->
+                <div id="portalDashboardState" style="display: none;">
+                    
+                    <!-- View when client is already assigned a package -->
+                    <div id="hasPackageView">
+                        
+                        <!-- Unpaid State Warning -->
+                        <div id="unpaidWarning" style="display: none; background: rgba(255, 200, 0, 0.1); border: 1px solid rgba(255, 200, 0, 0.3); padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                            <h4 style="color: #ffc800; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><i data-lucide="alert-triangle" style="width: 20px;"></i> Activation Pending Payment</h4>
+                            <p style="font-size: 0.9rem; color: #eee; margin-bottom: 15px;">Your digital environment has been reserved. To complete setup and activate your live preview, please complete your package payment.</p>
+                            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
+                                <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 5px;">M-PESA TILL NUMBER: <strong style="color: white; font-size: 1rem;">123456</strong> (QuickSite Kenya)</p>
+                                <p style="font-size: 0.85rem; color: #ccc;">Amount due: <strong id="amountDueDisplay" style="color: white; font-size: 1rem;">KES XXX</strong></p>
+                                <p style="font-size: 0.75rem; color: #aaa; margin-top: 10px;">*Once paid, send confirmation to our WhatsApp line.</p>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-grid">
+                            <!-- Package Info -->
+                            <div class="portal-card">
+                                <h3><i data-lucide="package"></i> Subscription Details</h3>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                    <div>
+                                        <span style="display: block; font-size: 0.8rem; color: #aaa; text-transform: uppercase;">Active Plan</span>
+                                        <strong style="font-size: 1.2rem; color: white;" id="dashPlanName">Fetching...</strong>
+                                    </div>
+                                    <span class="status-badge" id="dashPlanStatus">...</span>
+                                </div>
+                                
+                                <h4>Included Features:</h4>
+                                <ul class="feature-list" id="dashFeatures">
+                                    <li><i data-lucide="loader"></i> Loading features...</li>
+                                </ul>
+                            </div>
+
+                            <!-- Web Asset Info -->
+                            <div class="portal-card">
+                                <h3><i data-lucide="globe"></i> Your Web Asset</h3>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                    <span style="color: #aaa;">Status</span>
+                                    <span class="status-badge" id="dashSiteStatus">...</span>
+                                </div>
+
+                                <p style="font-size: 0.9rem; color: #ccc;">Your live preview environment:</p>
+                                
+                                <div class="preview-link-box">
+                                    <code id="dashSiteUrl">Connecting...</code>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button class="btn btn-secondary" style="padding: 8px;" id="copyLinkBtn">
+                                            <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
+                                        </button>
+                                        <a href="#" target="_blank" class="btn btn-primary" style="padding: 8px; min-height: auto;" id="visitLinkBtn">
+                                            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 20px; font-size: 0.8rem; color: #aaa; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px;">
+                                    <strong>Need changes?</strong> For major content updates, please reach out via WhatsApp with your dedicated support line.
+                                </div>
+                            </div>
+
+                            <!-- Billing Info -->
+                            <div class="portal-card">
+                                <h3><i data-lucide="credit-card"></i> Billing & Payments</h3>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                    <div>
+                                        <span style="display: block; font-size: 0.8rem; color: #aaa; text-transform: uppercase;">Amount Due</span>
+                                        <strong style="font-size: 1.2rem; color: white;" id="dashBillingAmount">Fetching...</strong>
+                                    </div>
+                                    <span class="status-badge" id="dashBillingStatus">...</span>
+                                </div>
+
+                                <div id="billingMpesaInstructions" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
+                                    <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 10px;"><strong>Pay via M-PESA</strong></p>
+                                    <ol style="font-size: 0.8rem; color: #aaa; padding-left: 15px; margin: 0; line-height: 1.6;">
+                                        <li>Go to M-PESA > Lipa na M-PESA</li>
+                                        <li>Select Buy Goods and Services</li>
+                                        <li>Enter Till: <strong style="color: white;">123456</strong></li>
+                                        <li>Enter Amount: <strong style="color: white;" id="dashBillingMpesaAmount">...</strong></li>
+                                    </ol>
+                                </div>
+
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: center; margin-bottom: 10px;" id="confirmPaymentBtn">
+                                    <i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Verify Payment
+                                </button>
+                                <p style="font-size: 0.75rem; color: #888; text-align: center;">Clicking verify will open a WhatsApp confirmation prompt.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- View when client needs to pick a package -->
+                    <div id="noPackageView" style="display: none; text-align: center;">
+                        <h2 style="font-size: 2rem; color: white; margin-bottom: 15px;">Welcome to QuickSite</h2>
+                        <p style="color: #ccc; max-width: 600px; margin: 0 auto 40px;">Select a package below to start building your digital presence. Once selected, our team will immediately begin setting up your environment.</p>
+
+                        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); text-align: left;">
+                            
+                            <!-- Starter -->
+                            <div class="portal-card" style="display: flex; flex-direction: column;">
+                                <h3 style="color: white; margin-bottom: 5px;">Starter Presence</h3>
+                                <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 20px;">KES 300 / mo <span style="font-size: 0.8rem; color: #aaa; font-weight: normal;">(+1,999 setup)</span></p>
+                                <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
+                                    <li style="margin-bottom: 10px;">✓ 1-Page Business Website</li>
+                                    <li style="margin-bottom: 10px;">✓ Free Subdomain</li>
+                                    <li style="margin-bottom: 10px;">✓ WhatsApp Integration</li>
+                                </ul>
+                                <button class="btn btn-secondary select-package-btn" data-package="Starter Presence" style="margin-top: auto; width: 100%; justify-content: center;">Choose Starter</button>
+                            </div>
+
+                            <!-- Growth -->
+                            <div class="portal-card" style="display: flex; flex-direction: column; border-color: var(--primary-color); position: relative;">
+                                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: white; padding: 2px 10px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">POPULAR</div>
+                                <h3 style="color: white; margin-bottom: 5px;">Business Growth</h3>
+                                <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 20px;">KES 800 / mo <span style="font-size: 0.8rem; color: #aaa; font-weight: normal;">(+4,999 setup)</span></p>
+                                <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
+                                    <li style="margin-bottom: 10px;">✓ 5–7 Page Website</li>
+                                    <li style="margin-bottom: 10px;">✓ Custom Domain Support</li>
+                                    <li style="margin-bottom: 10px;">✓ Lead Capture System</li>
+                                    <li style="margin-bottom: 10px;">✓ SEO Setup & Google Maps</li>
+                                </ul>
+                                <button class="btn btn-primary select-package-btn" data-package="Business Growth" style="margin-top: auto; width: 100%; justify-content: center;">Choose Growth</button>
+                            </div>
+
+                            <!-- Pro -->
+                            <div class="portal-card" style="display: flex; flex-direction: column;">
+                                <h3 style="color: white; margin-bottom: 5px;">Pro Conversion</h3>
+                                <p style="color: var(--primary-color); font-weight: bold; margin-bottom: 20px;">KES 1,500 / mo <span style="font-size: 0.8rem; color: #aaa; font-weight: normal;">(+9,999 setup)</span></p>
+                                <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
+                                    <li style="margin-bottom: 10px;">✓ Booking System setup</li>
+                                    <li style="margin-bottom: 10px;">✓ CRM customer tracking</li>
+                                    <li style="margin-bottom: 10px;">✓ Analytics dashboard</li>
+                                </ul>
+                                <button class="btn btn-primary select-package-btn" data-package="Pro Conversion System" style="margin-top: auto; width: 100%; justify-content: center;">Choose Pro</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 40px;">
+                        <button id="clientLogoutBtn" class="btn btn-secondary">Sign Out Focus Session</button>
+                    </div>
+                </div>
+
+<!-- Admin Master View -->
+                <div id="adminPortalView" style="display: none; padding-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="color: white; font-size: 1.5rem;"><i data-lucide="shield" style="display: inline; vertical-align: text-bottom;"></i> Admin: Client Management</h2>
+                        <button id="adminPortalLogoutBtn" class="btn btn-secondary" style="padding: 10px;">Sign Out</button>
+                    </div>
+                    
+                    <div class="portal-card" style="overflow-x: auto; padding: 20px;">
+                        <table style="width: 100%; text-align: left; color: white; border-collapse: collapse; min-width: 800px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); color: var(--primary-color);">
+                                    <th style="padding: 15px 10px;">Client Email</th>
+                                    <th style="padding: 15px 10px;">Plan</th>
+                                    <th style="padding: 15px 10px;">Payment</th>
+                                    <th style="padding: 15px 10px;">Status</th>
+                                    <th style="padding: 15px 10px;">Preview URL</th>
+                                    <th style="padding: 15px 10px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminClientTableBody" style="font-size: 0.9rem;">
+                                <!-- Populated by JS -->
+                                <tr>
+                                    <td colspan="6" style="padding: 20px; text-align: center; color: #aaa;">Loading clients...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Admin Edit Modal -->
+                <div id="adminEditModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+                    <div style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                        <h3 style="color: white; margin-bottom: 20px; font-size: 1.3rem;">Manage Client Entry</h3>
+                        
+                        <input type="hidden" id="editClientId">
+                        
+                        <div class="form-group">
+                            <label>Payment Status</label>
+                            <select id="editPaymentStatus" class="form-input">
+                                <option value="Unpaid">Unpaid</option>
+                                <option value="Paid">Paid</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Environment Status</label>
+                            <select id="editEnvStatus" class="form-input">
+                                <option value="Draft">Draft (Offline)</option>
+                                <option value="Live">Live (Published)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label>Subdomain Prefix (e.g., 'johns-bakery')</label>
+                            <input type="text" id="editSubdomain" class="form-input" placeholder="johns-bakery">
+                        </div>
+
+                        <div style="background: rgba(212,175,55,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.2); margin-bottom: 25px;">
+                            <h4 style="color: var(--primary-color); margin-bottom: 10px; font-size: 0.95rem;">Generate 25-Min Preview Link</h4>
+                            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 10px;">Create a secure temporary link to send to the client via WhatsApp.</p>
+                            <button id="generatePreviewLinkBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 8px;">Generate Link</button>
+                            <input type="text" id="previewLinkOutput" class="form-input" style="margin-top: 10px; display: none; font-size: 0.8rem;" readonly>
+                        </div>
+                        
+                        <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                            <button id="closeAdminEditModal" class="btn btn-secondary" style="background: transparent; border: none;">Cancel</button>
+                            <button id="saveAdminEditBtn" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Use same footer -->
+        <footer style="text-align: center; padding: 30px; border-top: 1px solid var(--glass-border); margin-top: 50px;">
+            <p>&copy; 2026 QuickSite Kenya. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script type="module" src="portal.js"></script>
+</body>
+</html>

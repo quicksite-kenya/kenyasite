@@ -57,6 +57,32 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  // --- MULTI-DOMAIN SAAS ROUTING LOGIC ---
+  const MAIN_DOMAINS = ["quicksitekenya.co.ke", "quicksite.co.ke", "localhost:3000", "127.0.0.1:3000"];
+  
+  app.use(async (req, res, next) => {
+    const host = req.headers.host || "";
+    const isMainDomain = MAIN_DOMAINS.some(d => host === d || host.split(':')[0] === d);
+    
+    // Pass through API, assets, and Vite internal paths
+    if (req.path.startsWith("/api") || req.path.startsWith("/src") || req.path.startsWith("/@vite") || req.path.includes(".")) {
+      return next();
+    }
+
+    if (!isMainDomain) {
+      console.log(`[Multi-Tenant Routing] Evaluating host: ${host}`);
+      
+      // Serve site.html which handles the client-side tenant lookup and rendering.
+      // This allows for a fast SPA experience and leverages the client-side Firebase logic already in place.
+      if (process.env.NODE_ENV === "production") {
+        return res.sendFile(path.join(process.cwd(), "dist", "site.html"));
+      } else {
+        return res.sendFile(path.join(process.cwd(), "site.html"));
+      }
+    }
+    next();
+  });
+
   // Gemini AI Chat Endpoint
   app.post("/api/chat", async (req, res) => {
     const { message, history } = req.body;
@@ -70,7 +96,19 @@ async function startServer() {
       const genAI = new GoogleGenAI({ apiKey });
       const model = (genAI as any).getGenerativeModel({ 
         model: "gemini-1.5-flash",
-        systemInstruction: "You are the QuickSite Kenya AI Evolution Consultant. You are elite, professional, and helpful. Your goal is to help Kenyan businesses architect their digital prestige. CRITICAL: If a user expresses interest in a project or consultation, you MUST encourage them to provide their Name and Email. Inform them that their details will be sent directly to the Elite Human Team and will appear in the Private Admin Dashboard for immediate action. The email notification system is now FULLY ACTIVE. All inquiries are also saved to our secure Elite Database for the admin to access. If they provide contact info, acknowledge it professionally and assure them of a response within 24 hours."
+        systemInstruction: `You are the QuickSite Kenya AI Evolution Consultant. You are elite, professional, and helpful. 
+        
+        Our business model is subscription-based (SaaS). We provide high-converting websites on Vercel infrastructure.
+        
+        OUR PRICING TIERS:
+        1. Starter Presence: KES 1,999 Setup + KES 300 Monthly. Best for small businesses needing a 1-page site and WhatsApp integration.
+        2. Business Growth: KES 4,999 Setup + KES 800 Monthly. Includes 5-7 pages, Custom Domain support, Lead Capture system, and SEO setup.
+        3. Pro Conversion System: KES 9,999 Setup + KES 1,500 Monthly. Includes Booking System, CRM, Advanced Analytics, and AI Content tools.
+        4. Enterprise SaaS System: KES 25,000+ Setup + Negotiable Monthly (KES 3k-10k). For multi-location businesses and white-label needs.
+        
+        CRITICAL: If a user expresses interest in a project or consultation, you MUST encourage them to provide their Name and Email. Inform them that their details will be sent directly to the Elite Human Team and will appear in the Private Admin Dashboard for immediate action. 
+        
+        If they provide contact info, acknowledge it professionally and assure them of a response within 24 hours to discuss their chosen subscription plan.`
       });
 
       const chat = model.startChat({

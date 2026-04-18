@@ -132,6 +132,143 @@
         }
       },
       "required": ["title", "subtitle", "content", "img", "date", "category", "createdAt"]
+    },
+    "clientSites": {
+      "title": "Client Website",
+      "description": "A dynamic website managed for a client.",
+      "type": "object",
+      "properties": {
+        "clientName": { "type": "string" },
+        "clientEmail": { "type": "string", "format": "email" },
+        "plan": {
+          "type": "string",
+          "enum": ["Starter Online Presence", "Customer Generator", "Growth System"]
+        },
+        "template": {
+          "type": "string",
+          "enum": ["Default", "Salon & Beauty", "Fitness & Gym", "Restaurant & Cafe", "Legal & Consulting", "Medical & Health", "Universal Professional"]
+        },
+        "businessName": { "type": "string" },
+        "tagline": { "type": "string" },
+        "aboutText": { "type": "string" },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "price": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "hero": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "subtitle": { "type": "string" },
+            "cta": { "type": "string" }
+          }
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "desc": { "type": "string" },
+              "icon": { "type": "string" }
+            }
+          }
+        },
+        "testimonials": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "quote": { "type": "string" }
+            }
+          }
+        },
+        "pricing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "plan": { "type": "string" },
+              "price": { "type": "string" },
+              "features": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "cta": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "btn": { "type": "string" }
+          }
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "phone": { "type": "string" },
+            "whatsapp": { "type": "string" },
+            "email": { "type": "string" },
+            "address": { "type": "string" },
+            "mapUrl": { "type": "string" }
+          }
+        },
+        "images": {
+          "type": "object",
+          "properties": {
+            "logo": { "type": "string" },
+            "hero": { "type": "string" },
+            "gallery": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Draft", "Live"]
+        },
+        "customDomain": { 
+          "type": "string",
+          "description": "Primary custom domain for the client."
+        },
+        "custom_domains": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of all mapped custom domains (e.g. ['elitegym.com', 'www.elitegym.com'])."
+        },
+        "subdomain": {
+          "type": "string",
+          "description": "The unique subdomain handle (e.g. gym)."
+        },
+        "template_type": {
+          "type": "string",
+          "description": "The type of template to render."
+        },
+        "subscriptionPlan": {
+          "type": "string",
+          "enum": ["Starter Presence", "Business Growth", "Pro Conversion System", "Enterprise SaaS System"],
+          "description": "The active subscription tier."
+        },
+        "paymentStatus": {
+          "type": "string",
+          "enum": ["Paid", "Unpaid", "Grace Period", "Cancelled"],
+          "description": "Current billing status."
+        },
+        "setupFee": { "type": "number" },
+        "monthlyFee": { "type": "number" },
+        "featuresEnabled": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of unlocked features for this client."
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["clientName", "businessName", "template", "plan", "status", "createdAt"]
     }
   },
   "firestore": {
@@ -146,6 +283,10 @@
     "/blogPosts/{postId}": {
       "schema": "blogPosts",
       "description": "Collection of blog posts and news updates."
+    },
+    "/clientSites/{siteId}": {
+      "schema": "clientSites",
+      "description": "Collection of dynamic client websites."
     }
   }
 }

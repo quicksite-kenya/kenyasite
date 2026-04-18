@@ -540,6 +540,297 @@ document.addEventListener('DOMContentLoaded', async () => {
     const portfolioGrid = document.getElementById('portfolioSections');
     const featuredProjectsContainer = document.getElementById('featuredProjectsContainer');
 
+    // --- Client Manager Logic ---
+    const clientsModal = document.getElementById('clientsModal');
+    const manageClientsBtn = document.getElementById('manageClientsBtn');
+    const closeClientsModal = document.getElementById('closeClientsModal');
+    const clientsList = document.getElementById('clientsList');
+    const addNewClientBtn = document.getElementById('addNewClientBtn');
+
+    const siteEditorModal = document.getElementById('siteEditorModal');
+    const closeSiteEditorModal = document.getElementById('closeSiteEditorModal');
+    const siteEditorForm = document.getElementById('siteEditorForm');
+    const previewSiteBtn = document.getElementById('previewSiteBtn');
+
+    if (manageClientsBtn) {
+        manageClientsBtn.onclick = () => {
+            clientsModal.style.display = 'block';
+            loadClientsList();
+        };
+    }
+
+    if (closeClientsModal) closeClientsModal.onclick = () => clientsModal.style.display = 'none';
+    if (closeSiteEditorModal) closeSiteEditorModal.onclick = () => siteEditorModal.style.display = 'none';
+
+    if (addNewClientBtn) {
+        addNewClientBtn.onclick = () => openSiteEditor();
+    }
+
+    // Tab Logic
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => {
+        btn.onclick = () => {
+            const target = btn.getAttribute('data-tab');
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById(target).style.display = 'block';
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+    });
+
+    // --- Ad-Blocker Proactive Detection ---
+    const checkAdBlocker = async () => {
+        const domains = [
+            'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword',
+            'https://securetoken.googleapis.com/v1/token',
+            'https://firebaseinstallations.googleapis.com/v1/projects/'
+        ];
+        
+        try {
+            // We use 'head' to minimize data usage, but even a failed preflight is enough to detect a block
+            await Promise.all(domains.map(url => 
+                fetch(url, { method: 'HEAD', mode: 'no-cors' }).catch(e => { throw e; })
+            ));
+            console.log("Security Handshake domains are reachable.");
+        } catch (err) {
+            console.warn("AD-BLOCKER ALERT: Critical security domains are being blocked by your browser.");
+            window.securityBlocked = true;
+            
+            // Show the warning note immediately if it exists
+            const networkNote = document.getElementById('authNetworkNote');
+            if (networkNote) {
+                networkNote.style.display = 'block';
+            }
+        }
+    };
+    checkAdBlocker();
+
+    const loadClientsList = () => {
+        if (!clientsList) return;
+        clientsList.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Syncing clients...</p></div>';
+
+        onSnapshot(query(collection(db, 'clientSites'), orderBy('createdAt', 'desc')), (snapshot) => {
+            clientsList.innerHTML = '';
+            if (snapshot.empty) {
+                clientsList.innerHTML = '<p style="text-align: center; padding: 20px; opacity: 0.5;">No active clients yet. Start by adding one!</p>';
+                return;
+            }
+
+            snapshot.forEach(docSnap => {
+                const client = docSnap.data();
+                const id = docSnap.id;
+                
+                // Determine the correct tenant URL
+                let tenantUrl = `site.html?id=${id}`;
+                if (client.status === 'Live') {
+                    if (client.custom_domains && client.custom_domains.length > 0) {
+                        tenantUrl = `https://${client.custom_domains[0]}`;
+                    } else if (client.subdomain) {
+                        tenantUrl = `https://${client.subdomain}.quicksitekenya.co.ke`;
+                    }
+                }
+
+                const item = document.createElement('div');
+                item.className = 'client-item';
+                item.innerHTML = `
+                    <div class="client-info">
+                        <h4>${client.businessName} <span style="font-size: 0.7rem; opacity: 0.5; font-weight: 400;">(${client.clientName})</span></h4>
+                        <p>${client.subscriptionPlan || client.plan} | Template: ${client.template}</p>
+                        <div class="client-badges">
+                            <span class="client-badge plan">${client.subscriptionPlan || client.plan}</span>
+                            <span class="client-badge status-${(client.status || 'Draft').toLowerCase()}">${client.status || 'Draft'}</span>
+                        </div>
+                    </div>
+                    <div class="client-actions">
+                        <a href="${tenantUrl}" target="_blank" class="btn btn-primary btn-sm" style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2);"><i data-lucide="external-link"></i></a>
+                        <button class="btn btn-secondary btn-sm edit-client-btn" data-id="${id}"><i data-lucide="edit"></i> Manage</button>
+                        <button class="btn btn-primary btn-sm delete-client-btn" data-id="${id}" style="background: #ff4444; border-color: #ff4444;"><i data-lucide="trash-2"></i></button>
+                    </div>
+                `;
+                clientsList.appendChild(item);
+
+                item.querySelector('.edit-client-btn').onclick = () => openSiteEditor(id, client);
+                let isDeleting = false;
+                const deleteBtn = item.querySelector('.delete-client-btn');
+                deleteBtn.onclick = async () => {
+                    if (!isDeleting) {
+                        // First click asks for confirmation by changing the button text
+                        isDeleting = true;
+                        deleteBtn.innerHTML = 'Click to Confirm Removal';
+                        deleteBtn.style.background = 'darkred';
+                        setTimeout(() => {
+                            // Reset after 3 seconds if not clicked
+                            if(isDeleting) {
+                                isDeleting = false;
+                                deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
+                                deleteBtn.style.background = '#ff4444';
+                                if (window.lucide) window.lucide.createIcons();
+                            }
+                        }, 3000);
+                    } else {
+                        // Second click executes delete
+                        try {
+                            await deleteDoc(doc(db, 'clientSites', id));
+                            showToast('Client removed successfully.');
+                            // The onSnapshot listener will automatically remove it from the DOM
+                        } catch (err) {
+                            showToast('Failed to delete: ' + err.message, 'error');
+                        }
+                    }
+                };
+            });
+            if (window.lucide) window.lucide.createIcons();
+        });
+    };
+
+    const openSiteEditor = (id = null, data = null) => {
+        document.getElementById('editSiteId').value = id || '';
+        document.getElementById('siteEditorTitle').innerHTML = id ? `Edit <span>${data.businessName}</span>` : 'Add New <span>Client Site</span>';
+        
+        // Populate inputs
+        document.getElementById('clientNameInput').value = data ? data.clientName || '' : '';
+        document.getElementById('businessNameInput').value = data ? data.businessName || '' : '';
+        document.getElementById('planInput').value = data ? data.plan || 'Starter Online Presence' : 'Starter Online Presence';
+        document.getElementById('templateInput').value = data ? data.template || 'Default' : 'Default';
+        document.getElementById('taglineInput').value = data ? data.tagline || '' : '';
+        document.getElementById('aboutTextInput').value = data ? data.aboutText || '' : '';
+        document.getElementById('statusInput').value = data ? data.status || 'Draft' : 'Draft';
+        
+        // Services
+        document.getElementById('servicesInput').value = data && data.services ? data.services.map(s => `${s.name} | ${s.price} | ${s.description}`).join('\n') : '';
+        
+        // Contact
+        document.getElementById('phoneInput').value = data && data.contact ? data.contact.phone || '' : '';
+        document.getElementById('whatsappInput').value = data && data.contact ? data.contact.whatsapp || '' : '';
+        document.getElementById('addressInput').value = data && data.contact ? data.contact.address || '' : '';
+        document.getElementById('mapUrlInput').value = data && data.contact ? data.contact.mapUrl || '' : '';
+        
+        // Media
+        document.getElementById('heroImageInput').value = data && data.images ? data.images.hero || '' : '';
+        document.getElementById('logoImageInput').value = data && data.images ? data.images.logo || '' : '';
+        document.getElementById('galleryImagesInput').value = data && data.images && data.images.gallery ? data.images.gallery.join('\n') : '';
+        
+        // Hosting & Domains
+        document.getElementById('customDomainInput').value = data ? data.customDomain || '' : '';
+        document.getElementById('subdomainInput').value = data ? data.subdomain || '' : '';
+        document.getElementById('customDomainsListInput').value = data && data.custom_domains ? data.custom_domains.join(', ') : '';
+        
+        // Advanced Universal Template Fields
+        document.getElementById('heroSettingsInput').value = data && data.hero ? `${data.hero.title || ''} | ${data.hero.subtitle || ''} | ${data.hero.cta || ''}` : '';
+        document.getElementById('featuresInput').value = data && data.features ? data.features.map(f => `${f.title} | ${f.desc} | ${f.icon}`).join('\n') : '';
+        document.getElementById('testimonialsInput').value = data && data.testimonials ? data.testimonials.map(t => `${t.name} | ${t.quote}`).join('\n') : '';
+        document.getElementById('pricingInput').value = data && data.pricing ? data.pricing.map(p => `${p.plan} | ${p.price} | ${p.features.join(', ')}`).join('\n') : '';
+        document.getElementById('ctaSettingsInput').value = data && data.cta ? `${data.cta.title || ''} | ${data.cta.btn || ''}` : '';
+        
+        // Billing & Subscriptions
+        document.getElementById('subscriptionPlanInput').value = data ? data.subscriptionPlan || 'Starter Presence' : 'Starter Presence';
+        document.getElementById('paymentStatusInput').value = data ? data.paymentStatus || 'Unpaid' : 'Unpaid';
+        document.getElementById('setupFeeInput').value = data ? data.setupFee || 0 : 0;
+        document.getElementById('monthlyFeeInput').value = data ? data.monthlyFee || 0 : 0;
+        document.getElementById('featuresEnabledInput').value = data && data.featuresEnabled ? data.featuresEnabled.join(', ') : '';
+
+        siteEditorModal.style.display = 'block';
+    };
+
+    if (siteEditorForm) {
+        siteEditorForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editSiteId').value;
+            const submitBtn = siteEditorForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Publishing Instant Update...';
+
+            const servicesRaw = document.getElementById('servicesInput').value.split('\n');
+            const services = servicesRaw.filter(line => line.includes('|')).map(line => {
+                const parts = line.split('|');
+                return { name: parts[0].trim(), price: parts[1].trim(), description: (parts[2] || '').trim() };
+            });
+
+            const siteData = {
+                clientName: document.getElementById('clientNameInput').value,
+                businessName: document.getElementById('businessNameInput').value,
+                plan: document.getElementById('planInput').value,
+                template: document.getElementById('templateInput').value,
+                tagline: document.getElementById('taglineInput').value,
+                aboutText: document.getElementById('aboutTextInput').value,
+                contact: {
+                    phone: document.getElementById('phoneInput').value,
+                    whatsapp: document.getElementById('whatsappInput').value,
+                    address: document.getElementById('addressInput').value,
+                    mapUrl: document.getElementById('mapUrlInput').value
+                },
+                customDomain: document.getElementById('customDomainInput').value,
+                custom_domains: document.getElementById('customDomainsListInput').value.split(',').map(d => d.trim()).filter(d => d),
+                subdomain: document.getElementById('subdomainInput').value,
+                template_type: document.getElementById('templateInput').value,
+                // SaaS Billing Fields
+                subscriptionPlan: document.getElementById('subscriptionPlanInput').value,
+                paymentStatus: document.getElementById('paymentStatusInput').value,
+                setupFee: parseFloat(document.getElementById('setupFeeInput').value) || 0,
+                monthlyFee: parseFloat(document.getElementById('monthlyFeeInput').value) || 0,
+                featuresEnabled: document.getElementById('featuresEnabledInput').value.split(',').map(f => f.trim()).filter(f => f),
+                // Advanced Template Fields
+                hero: {
+                    title: document.getElementById('heroSettingsInput').value.split('|')[0]?.trim() || '',
+                    subtitle: document.getElementById('heroSettingsInput').value.split('|')[1]?.trim() || '',
+                    cta: document.getElementById('heroSettingsInput').value.split('|')[2]?.trim() || ''
+                },
+                features: document.getElementById('featuresInput').value.split('\n').filter(l => l.includes('|')).map(l => {
+                    const [title, desc, icon] = l.split('|').map(s => s.trim());
+                    return { title, desc, icon: icon || 'check' };
+                }),
+                testimonials: document.getElementById('testimonialsInput').value.split('\n').filter(l => l.includes('|')).map(l => {
+                    const [name, quote] = l.split('|').map(s => s.trim());
+                    return { name, quote };
+                }),
+                pricing: document.getElementById('pricingInput').value.split('\n').filter(l => l.includes('|')).map(l => {
+                    const [plan, price, featuresStr] = l.split('|').map(s => s.trim());
+                    return { plan, price, features: featuresStr ? featuresStr.split(',').map(f => f.trim()) : [] };
+                }),
+                cta: {
+                    title: document.getElementById('ctaSettingsInput').value.split('|')[0]?.trim() || '',
+                    btn: document.getElementById('ctaSettingsInput').value.split('|')[1]?.trim() || ''
+                },
+                images: {
+                    hero: document.getElementById('heroImageInput').value,
+                    logo: document.getElementById('logoImageInput').value,
+                    gallery: document.getElementById('galleryImagesInput').value.split('\n').filter(l => l.trim())
+                },
+                services: services,
+                status: document.getElementById('statusInput').value,
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                if (id) {
+                    await updateDoc(doc(db, 'clientSites', id), siteData);
+                    showToast('Website Updated Live!');
+                } else {
+                    siteData.createdAt = serverTimestamp();
+                    await addDoc(collection(db, 'clientSites'), siteData);
+                    showToast('New Client Site Created!');
+                }
+                siteEditorModal.style.display = 'none';
+            } catch (err) {
+                handleFirestoreError(err, id ? OperationType.UPDATE : OperationType.CREATE, 'clientSites');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Save → Website Live';
+            }
+        };
+    }
+
+    if (previewSiteBtn) {
+        previewSiteBtn.onclick = () => {
+            const id = document.getElementById('editSiteId').value;
+            if (!id) {
+                showToast('Save the site first to generate a preview link.', 'info');
+                return;
+            }
+            window.open(`site.html?id=${id}&preview=true`, '_blank');
+        };
+    }
+
     // --- Category Selector Logic ---
     const initCategorySelector = () => {
         const selector = document.getElementById('categorySelector');
@@ -758,7 +1049,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Mobile Menu Toggle
     if (hamburger && navLinks) {
-        hamburger.addEventListener('click', () => {
+        hamburger.addEventListener('click', (e) => {
+            e.stopPropagation();
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
             
@@ -773,6 +1065,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     spans[0].style.transform = 'none';
                     spans[1].style.opacity = '1';
                     spans[2].style.transform = 'none';
+                }
+            }
+        });
+
+        // Close on click outside
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && !navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+                const spans = hamburger.querySelectorAll('span');
+                if (spans.length >= 3) {
+                    spans.forEach(span => span.style.transform = 'none');
+                    spans[1].style.opacity = '1';
                 }
             }
         });
@@ -820,11 +1125,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const serviceParam = urlParams.get('service');
         const interestParam = urlParams.get('interest');
+        const packageParam = urlParams.get('package');
 
         if (serviceParam) {
             const serviceSelect = document.getElementById('contactService');
             if (serviceSelect) {
                 serviceSelect.value = serviceParam;
+            }
+        }
+
+        if (packageParam) {
+            const serviceSelect = document.getElementById('contactService');
+            if (serviceSelect) {
+                serviceSelect.value = packageParam;
+            }
+            const messageField = document.getElementById('contactMessage');
+            if (messageField) {
+                let packageName = '';
+                if (packageParam === 'starter') packageName = 'Starter Online Presence';
+                if (packageParam === 'generator') packageName = 'Customer Generator';
+                if (packageParam === 'growth') packageName = 'Growth System';
+                
+                messageField.value = `I am interested in the "${packageName}" package. I would like to get started as soon as possible.`;
             }
         }
 
@@ -950,12 +1272,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // If inquiry is less than 10 seconds old, show notification
                 if (Date.now() - createdAt < 10000) {
                     showToast(`New Inquiry from ${data.name}!`, 'success');
-                    // Play a subtle sound if possible or just the toast
                 }
             }
             isInitialLoad = false;
         }, (error) => {
             console.error("Global Inquiries Listener Error:", error);
+            if (error.code === 'permission-denied') {
+                console.warn("Permission denied for global inquiries listener. Dashboard UI may be limited.");
+            }
         });
     };
 
@@ -1280,6 +1604,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Admin Login Logic
     let isAdmin = false;
+
+    // Marketplace Unsubscribe Logic
     let marketplaceUnsubscribe = null;
     let sliderUnsubscribe = null;
 
@@ -1305,6 +1631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const adminSection = document.getElementById('admin-dashboard');
         const adminNavLi = document.getElementById('adminNavLi');
         const manageBlogBtn = document.getElementById('manageBlogBtn');
+        const manageClientsBtn = document.getElementById('manageClientsBtn');
         
         // Update navbar link
         if (adminNavLi) {
@@ -1313,6 +1640,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (manageBlogBtn) {
             manageBlogBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+        }
+
+        if (manageClientsBtn) {
+            manageClientsBtn.style.display = isAdmin ? 'inline-flex' : 'none';
         }
 
         // Update body class
@@ -1330,7 +1661,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     userIndicator.style.marginTop = '10px';
                     adminSection.querySelector('.container').appendChild(userIndicator);
                 }
-                userIndicator.innerText = `Logged in as: ${userEmail || 'Administrator'}`;
+                const currentUser = auth.currentUser;
+                const isVerified = currentUser && currentUser.emailVerified;
+                userIndicator.innerHTML = `Logged in as: ${userEmail || 'Administrator'} ${isVerified ? '<span style="color: #00ff00;">(Verified)</span>' : '<span style="color: #d4af37;">(Unverified / Development Mode)</span>'}`;
             }
         } else {
             document.body.classList.remove('is-admin');
@@ -1446,7 +1779,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             // This check ensures that only authorized emails get admin UI privileges locally.
             const adminEmails = ['michaelmulili41@gmail.com', 'michael.mulili@quicksite.com', 'michael.michael@quicksite.com', 'quicksitekenya@gmail.com'];
             if (adminEmails.includes(userEmail)) {
-                console.log("Admin access granted for:", userEmail);
+                if (!user.emailVerified) {
+                    console.info("Admin access: Operating in unverified developer mode.", userEmail);
+                }
+                
+                console.log("Admin access locally recognized for:", userEmail);
                 isAdmin = true;
                 document.body.classList.add('is-admin');
                 
@@ -1574,6 +1911,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         networkNote.style.display = 'block';
                         networkNote.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                     }
+                    alert("⚠️ FIREBASE BLOCKED BY BROWSER ⚠️\n\nYou are inside an iframe and your browser's privacy shields are blocking the login.\n\nWe will now explicitly break out of the iframe and auto-open the application in a new tab for you to log in securely. Please hit Sign In on the new tab.");
+                    window.open(window.location.href, '_blank');
                 } else {
                     showToast('Sign In failed: ' + err.message, 'error');
                 }
