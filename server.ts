@@ -168,47 +168,28 @@ async function startServer() {
     const { name, email, service, message } = req.body;
 
     if (!name || !email || !service || !message) {
-      console.warn(">>> [API] Missing fields in request:", { name, email, service, message });
+      console.warn(">>> [API] Missing fields:", { name, email, service, message });
       return res.status(400).json({ error: "Missing required fields" });
     }
 
     // Set a safety timeout for the entire request handler
     const requestTimeout = setTimeout(() => {
       if (!res.headersSent) {
-        console.error(">>> [API] Request handler timed out (safety trigger)");
-        res.status(504).json({ error: "Request timed out on server" });
+        console.error(">>> [API] Request handler timed out");
+        res.status(504).json({ error: "Request timed out" });
       }
-    }, 12000); // 12s safety timeout
-
-    // Helper to wrap a promise with a timeout
-    const withTimeout = (promise: Promise<any>, ms: number, taskName: string) => {
-      const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(`${taskName} timed out after ${ms}ms`)), ms)
-      );
-      return Promise.race([promise, timeout]);
-    };
+    }, 12000); 
 
     try {
-      console.log(">>> [API] Initializing DB...");
       const db = getDb();
-      
       const resendKey = process.env.RESEND_API_KEY;
-      // Default to the requested email
       const emailTo = process.env.CONTACT_EMAIL || "quicksitekenya@gmail.com";
-
-      console.log(`>>> [API] Processing consultation from ${email}. Target notification: ${emailTo}`);
       
-      if (!resendKey) {
-        console.warn(">>> [API] RESEND_API_KEY is missing. Email notification will be skipped. Please set it in the Settings menu.");
-      }
-
-      // Define the tasks
       const tasks: Promise<any>[] = [];
 
       // Task 1: Firestore Save
       let firestorePromise = Promise.resolve(false);
       if (db) {
-        console.log(">>> [API] Saving to Firestore 'inquiries' collection...");
         const consultationData = {
           name,
           email,
@@ -218,30 +199,13 @@ async function startServer() {
           source: "server-api",
           status: "New"
         };
-
+        
         firestorePromise = withTimeout(
-          addDoc(collection(db, "inquiries"), consultationData)
-            .then((docRef) => {
-              console.log(">>> [API] Firestore save successful. Doc ID:", docRef.id);
-              return true;
-            }),
+          addDoc(collection(db, "inquiries"), consultationData).then(() => true),
           8000,
           "Firestore Save"
-        ).catch(async (err) => {
-          console.error(">>> [API] Firestore save failed:", err.message || err);
-          
-          // If it's a permission error on a named database, try the default one
-          if (firebaseConfig.firestoreDatabaseId && (err.message?.includes('PERMISSION_DENIED') || err.code === 7 || err.code === 'permission-denied')) {
-            console.log(">>> [API] Attempting fallback to default database...");
-            try {
-              const defaultDb = getFirestore(getFirebaseApp());
-              await addDoc(collection(defaultDb, "inquiries"), consultationData);
-              console.log(">>> [API] Fallback save successful.");
-              return true;
-            } catch (fallbackErr) {
-              console.error(">>> [API] Fallback save also failed:", fallbackErr);
-            }
-          }
+        ).catch((err) => {
+          console.error("Firestore save failed:", err);
           return false;
         });
         
@@ -251,59 +215,41 @@ async function startServer() {
       // Task 2: Email Send
       let emailPromise = Promise.resolve(false);
       if (resendKey) {
-        console.log(">>> [API] Preparing email via Resend...");
         const resend = new Resend(resendKey);
         emailPromise = withTimeout(
           resend.emails.send({
             from: "QuickSite <onboarding@resend.dev>",
             to: emailTo,
             subject: `New Consultation Inquiry: ${service}`,
-            html: `
-              <h3>New Inquiry Received</h3>
-              <p><strong>Name:</strong> ${name}</p>
-              <p><strong>Email:</strong> ${email}</p>
-              <p><strong>Service:</strong> ${service}</p>
-              <p><strong>Message:</strong></p>
-              <p>${message}</p>
-            `,
-          }).then(() => {
-            console.log(">>> [API] Email sent successfully.");
-            return true;
-          }),
+            html: `<h3>New Inquiry</h3><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Service:</strong> ${service}</p><p><strong>Message:</strong></p><p>${message}</p>`,
+          }).then(() => true),
           8000,
           "Email Send"
         ).catch(err => {
-          console.error(">>> [API] Email failed or timed out:", err.message || err);
+          console.error("Email failed:", err);
           return false;
         });
         
         tasks.push(emailPromise);
       }
 
-      // Wait for at least the Firestore save to complete (or fail) before responding
-      // This ensures data integrity while keeping the response fast
       await Promise.allSettled(tasks);
-      
       const [firestoreSuccess, emailSent] = await Promise.all([firestorePromise, emailPromise]);
-
       clearTimeout(requestTimeout);
       
       if (!res.headersSent) {
         if (firestoreSuccess || emailSent) {
-          res.status(200).json({ 
+          return res.status(200).json({ 
             success: true, 
-            message: "Inquiry received successfully",
-            emailSent,
-            firestoreSaved: firestoreSuccess,
-            warning: !resendKey ? "Email notification skipped (API key missing)" : null
+            message: "Inquiry received successfully"
           });
         } else {
-          res.status(500).json({ error: "Failed to process inquiry. Please try again later." });
+          return res.status(500).json({ error: "Failed to process inquiry" });
         }
       }
     } catch (error) {
       clearTimeout(requestTimeout);
-      console.error(">>> [API] Critical error processing consultation:", error);
+      console.error(">>> [API] Critical error:", error);
       if (!res.headersSent) {
         res.status(500).json({ error: "Internal server error" });
       }
@@ -324,6 +270,14 @@ async function startServer() {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
+
+  // Final emergency error handler for API routes
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(">>> [API] Unhandled server error:", err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
