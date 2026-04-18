@@ -58,7 +58,7 @@ async function startServer() {
   app.use(express.json());
 
   // --- MULTI-DOMAIN SAAS ROUTING LOGIC ---
-  const MAIN_DOMAINS = ["quicksitekenya.co.ke", "quicksite.co.ke", "localhost:3000", "127.0.0.1:3000"];
+  const MAIN_DOMAINS = ["quicksitekenya.co.ke", "quicksite.co.ke", "localhost:3000", "127.0.0.1:3000", "ais-dev-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app", "ais-pre-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app"];
   
   app.use(async (req, res, next) => {
     const host = req.headers.host || "";
