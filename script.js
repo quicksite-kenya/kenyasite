@@ -1192,10 +1192,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     body: JSON.stringify(data)
                 });
 
-                const result = await response.json();
+                const contentType = response.headers.get("content-type");
+                let result;
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    result = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.error("Non-JSON response received:", text);
+                    throw new Error("Server returned non-JSON response.");
+                }
 
                 if (!response.ok) {
-                    throw new Error(result.error || 'Failed to submit inquiry');
+                    throw new Error(result?.error || 'Failed to submit inquiry');
                 }
                 
                 contactForm.innerHTML = `
