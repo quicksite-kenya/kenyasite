@@ -39,7 +39,7 @@ service cloud.firestore {
       // Basic core fields check
       return data.keys().hasAll(['clientName', 'businessName', 'template', 'plan', 'status', 'createdAt']) &&
              data.businessName is string && data.businessName.size() <= 100 &&
-             data.status in ['Draft', 'Live'];
+             data.status in ['Draft', 'Preview', 'Live'];
     }
 
     // --- Resource Routes ---

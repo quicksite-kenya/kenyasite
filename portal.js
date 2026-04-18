@@ -184,9 +184,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const billingMpesaInstructions = document.getElementById('billingMpesaInstructions');
 
                 const costMap = {
-                    'Starter Presence': 'KES 2,299',
-                    'Business Growth': 'KES 5,799',
-                    'Pro Conversion System': 'KES 11,499'
+                    'Starter Presence': 'KES 6,999',
+                    'Business Growth': 'KES 9,999',
+                    'Pro Conversion System': 'KES 14,999'
                 };
                 const cost = costMap[plan] || 'KES 11,499';
 
