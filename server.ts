@@ -57,6 +57,12 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  // --- GLOBAL REQUEST LOGGER ---
+  app.use((req, res, next) => {
+    console.log(`[GLOBAL LOG] ${req.method} ${req.originalUrl}`);
+    next();
+  });
+
   // --- MULTI-DOMAIN SAAS ROUTING LOGIC ---
   const MAIN_DOMAINS = ["quicksitekenya.co.ke", "quicksite.co.ke", "localhost:3000", "127.0.0.1:3000", "ais-dev-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app", "ais-pre-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app"];
   
@@ -64,11 +70,8 @@ async function startServer() {
     const host = req.headers.host || "";
     const isMainDomain = MAIN_DOMAINS.some(d => host === d || host.split(':')[0] === d);
     
-    console.log(`[DEBUG] Request: ${req.path}, Host: ${host}, isMainDomain: ${isMainDomain}`);
-
     // Pass through API, assets, and Vite internal paths
     if (req.path.startsWith("/api") || req.path.startsWith("/src") || req.path.startsWith("/@vite") || req.path.includes(".")) {
-      console.log(`[DEBUG] Passing through: ${req.path}`);
       return next();
     }
 
