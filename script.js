@@ -938,7 +938,7 @@ INSTRUCTIONS:
 - If multiple templates could fit, choose the one that feels most premium and visually appropriate
 - Ensure the copy is high-converting and specifically tailored to the Kenyan market. Use local nuances if appropriate.
 
-Respond EXACTLY with a JSON object matching this structure:
+Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap in markdown blocks. DO NOT include any conversational prefixes.
 {
   "template": "LUXURY_DARK | CORPORATE_CLEAN | STARTUP_MODERN | BOLD_FITNESS",
   "templateReason": "short explanation of why this template fits the business",
@@ -976,8 +976,13 @@ Respond EXACTLY with a JSON object matching this structure:
             const output = responseData.output;
             if (!output) throw new Error("Backend returned empty response.");
             
-            const cleanedJson = output.replace(/```json/g, "").replace(/```/g, "").trim();
-            const content = JSON.parse(cleanedJson);
+            // Extract the pure JSON block to avoid conversational prefixes
+            const jsonMatch = output.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+               throw new Error("Invalid output format returned by AI.");
+            }
+            
+            const content = JSON.parse(jsonMatch[0]);
 
             // Map Image keywords to real high-res placeholders
             if (content.heroImage) content.heroImageUrl = `https://picsum.photos/seed/${String(content.heroImage).replace(/\s+/g, '')}/1920/1080`;
