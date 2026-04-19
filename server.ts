@@ -225,6 +225,82 @@ async function startServer() {
     }
   });
 
+  // AI Content Generator API Route
+  app.post("/api/generate-design", async (req, res) => {
+    console.log(">>> [API] Received design generation request");
+    const { promptText, systemInstruction } = req.body;
+
+    if (!promptText) {
+      return res.status(400).json({ error: "Missing promptText" });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: "GEMINI_API_KEY not found on server." });
+    }
+
+    try {
+      // Dynamic import to avoid module issues
+      const { GoogleGenAI } = await import("@google/genai");
+      const ai = new GoogleGenAI({ apiKey });
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: promptText,
+        config: {
+          systemInstruction: systemInstruction || "You are an elite web designer.",
+          responseMimeType: "application/json"
+        }
+      });
+      
+      const output = response.text;
+      if (!output) throw new Error("AI returned empty response.");
+      
+      return res.status(200).json({ output });
+    } catch (error: any) {
+      console.error(">>> [API] AI Generation error:", error);
+      return res.status(500).json({ error: error.message || "Failed to generate AI content" });
+    }
+  });
+
+  // AI Chatbot API Route
+  app.post("/api/ai-chat", async (req, res) => {
+    console.log(">>> [API] Chatbot inquiry received");
+    const { message, chatHistory } = req.body;
+    
+    if (!message) return res.status(400).json({ error: "Missing message" });
+    
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY not found on server" });
+    
+    try {
+      const { GoogleGenAI } = await import("@google/genai");
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const systemInstruction = `You are the Elite Digital Evolution Consultant for QuickSite Kenya.
+QuickSite Kenya is a premier web design agency in Nairobi providing 48-hour turnarounds for professional service businesses.
+Our packages include:
+1. Starter Presence: KES 11,999 Setup + KES 2,300 Monthly.
+2. Business Growth: KES 14,999 Setup + KES 2,800 Monthly.
+3. Pro Conversion System: KES 19,999 Setup + KES 3,500 Monthly.
+4. Enterprise SaaS System: KES 25,000+ Setup.
+
+CRITICAL: If a user expresses interest, encourage them to provide their Name and Email so the human team can follow up.`;
+      
+      const chat = ai.chats.create({
+        model: "gemini-3-flash-preview",
+        config: { systemInstruction },
+        history: chatHistory || []
+      });
+      
+      const result = await chat.sendMessage({ message });
+      return res.status(200).json({ text: result.text });
+    } catch (error: any) {
+      console.error(">>> [API] AI Chatbot error:", error);
+      return res.status(500).json({ error: error.message || "Chat failed" });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({

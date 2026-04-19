@@ -71,35 +71,26 @@ const initAIConsultation = () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         try {
-            // Frontend Gemini Integration
-            const apiKey = process.env.GEMINI_API_KEY;
-            if (!apiKey) throw new Error("GEMINI_API_KEY not found.");
-
-            const ai = new GoogleGenAI({ apiKey });
+            // Send payload to backend
+            const payload = {
+                message: text,
+                chatHistory: chatHistory
+            };
             
-            const systemInstruction = `You are the Elite Digital Evolution Consultant for QuickSite Kenya.
-QuickSite Kenya is a premier web design agency in Nairobi providing 48-hour turnarounds for professional service businesses.
-Our packages include:
-1. Starter Presence: KES 11,999 Setup + KES 2,300 Monthly.
-2. Business Growth: KES 14,999 Setup + KES 2,800 Monthly.
-3. Pro Conversion System: KES 19,999 Setup + KES 3,500 Monthly.
-4. Enterprise SaaS System: KES 25,000+ Setup.
-
-CRITICAL: If a user expresses interest, encourage them to provide their Name and Email so the human team can follow up.`;
-
-            const chat = ai.chats.create({
-                model: "gemini-3-flash-preview",
-                config: {
-                    systemInstruction: systemInstruction,
-                },
-                history: chatHistory
-            });
-
-            const result = await chat.sendMessage({
-                message: text
+            const reqUrl = window.location.origin.includes('localhost') ? 'http://localhost:3000/api/ai-chat' : '/api/ai-chat';
+            const response = await fetch(reqUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
             });
             
-            const responseText = result.text;
+            const responseData = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(responseData.error || "Server error");
+            }
+            
+            const responseText = responseData.text;
             
             // Remove typing indicator
             typingIndicator.remove();
@@ -908,43 +899,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            // Initialize AI directly on frontend per security guidelines
-            const apiKey = process.env.GEMINI_API_KEY;
-            if (!apiKey) throw new Error("GEMINI_API_KEY not found in environment.");
-
-            const ai = new GoogleGenAI({ apiKey });
-            
-            const prompt = `You are an elite web designer and copywriter for QuickSite Kenya.
-Generate a professional website content structure for a business based on the following context:
-
-BUSINESS NAME: ${businessName}
-TEMPLATE: ${template}
-PROJECT BRIEF: ${brief}
-CONTACT INFO: ${phone ? 'Phone: ' + phone : ''} ${whatsapp ? 'WhatsApp: ' + whatsapp : ''} ${address ? 'Address: ' + address : ''}
-EXISTING TAGLINE: ${existingTagline}
-EXISTING ABOUT: ${existingAbout}
-
-GOAL: Create a high-converting, professional website concept. 
-If contact info or vision details are provided, incorporate them NATURALLY but improve the wording to be elite and persuasive.
-
-Respond ONLY with a JSON object containing:
-{
-  "hero": { "title": "...", "subtitle": "..." },
-  "heroImage": "...", // visual vibe for Hero
-  "aboutImage": "...", // visual vibe for About section
-  "servicesImage": "...", // visual vibe for Services section
-  "aboutText": "...", // Professional, persuasive story
-  "services": [ { "name": "...", "description": "...", "price": "..." }, ... (up to 4) ],
-  "features": [ { "icon": "zap|sparkles|shield|star|phone", "title": "...", "desc": "..." }, ... (up to 4) ],
-  "pricing": [ { "plan": "...", "price": "...", "features": ["...", "..."] }, ... (up to 3) ],
-  "testimonials": [ { "name": "...", "quote": "..." }, ... (up to 3) ],
-  "tagline": "...", // A punchy 1-sentence brand promise
-  "cta": { "title": "...", "btn": "..." }
-}
-
-Ensure the copy is high-converting and specifically tailored to the Kenyan market. Use local nuances (Nairobi, Mombasa, specific Kenyan business culture) if appropriate.
-The image keywords should be descriptive enough to get a relevant high-quality image.`;
-
             const promptText = `Generate a website content object in JSON format based on the following context:
 
 BUSINESS NAME: ${businessName}
@@ -1001,17 +955,26 @@ Respond EXACTLY with a JSON object matching this structure:
   "cta": { "title": "Ready to Start?", "btn": "Contact Us Now" }
 }`;
 
-            const response = await ai.models.generateContent({
-                model: "gemini-3-flash-preview",
-                contents: promptText,
-                config: {
-                    systemInstruction: "You are an elite web designer and copywriter for QuickSite Kenya.",
-                    responseMimeType: "application/json"
-                }
+            const payload = {
+                promptText: promptText,
+                systemInstruction: "You are an elite web designer and copywriter for QuickSite Kenya."
+            };
+
+            const reqUrl = window.location.origin.includes('localhost') ? 'http://localhost:3000/api/generate-design' : '/api/generate-design';
+            const response = await fetch(reqUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
             });
-            const output = response.text;
+
+            const responseData = await response.json();
             
-            if (!output) throw new Error("AI returned empty response.");
+            if (!response.ok) {
+                throw new Error(responseData.error || "Server processing error");
+            }
+            
+            const output = responseData.output;
+            if (!output) throw new Error("Backend returned empty response.");
             
             const cleanedJson = output.replace(/```json/g, "").replace(/```/g, "").trim();
             const content = JSON.parse(cleanedJson);
