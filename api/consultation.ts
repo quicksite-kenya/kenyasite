@@ -1,25 +1,34 @@
 import { Resend } from "resend";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
-import firebaseConfig from "../firebase-applet-config.json" assert { type: "json" };
 
 // Initialize Firebase App
 let firebaseApp;
-function getFirebaseApp() {
+async function getFirebaseApp() {
   if (firebaseApp) return firebaseApp;
   try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+    const firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
     firebaseApp = initializeApp(firebaseConfig);
     return firebaseApp;
   } catch (err) {
+    console.warn("Failed to init Firebase", err);
     return null;
   }
 }
 
 // Get Firestore Database
-function getDb() {
-  const app = getFirebaseApp();
+async function getDb() {
+  const app = await getFirebaseApp();
   if (!app) return null;
   try {
+    const fs = await import('fs');
+    const path = await import('path');
+    const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+    const firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    
     if (firebaseConfig.firestoreDatabaseId) {
       return getFirestore(app, firebaseConfig.firestoreDatabaseId);
     }
@@ -66,13 +75,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const db = getDb();
+    const db = await getDb();
     const resendKey = process.env.RESEND_API_KEY;
     const emailTo = process.env.CONTACT_EMAIL || "quicksitekenya@gmail.com";
     
     const tasks = [];
 
-    // Task 1: Firestore Save
+    // Task 1: Firestore Save via Web SDK
     let firestorePromise = Promise.resolve(false);
     if (db) {
       const consultationData = {
@@ -87,7 +96,7 @@ export default async function handler(req, res) {
       
       firestorePromise = withTimeout(
         addDoc(collection(db, "inquiries"), consultationData).then(() => true),
-        8000,
+        6000,
         "Firestore Save"
       ).catch((err) => {
         console.error("Firestore save failed:", err);
@@ -108,7 +117,7 @@ export default async function handler(req, res) {
           subject: `New Consultation Inquiry: ${service}`,
           html: `<h3>New Inquiry</h3><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Service:</strong> ${service}</p><p><strong>Message:</strong></p><p>${message}</p>`,
         }).then(() => true),
-        8000,
+        6000,
         "Email Send"
       ).catch(err => {
         console.error("Email failed:", err);
@@ -124,7 +133,9 @@ export default async function handler(req, res) {
     if (firestoreSuccess || emailSent) {
       return res.status(200).json({ 
         success: true, 
-        message: "Inquiry received successfully"
+        message: "Inquiry received successfully",
+        firestore: firestoreSuccess,
+        email: emailSent
       });
     } else {
       return res.status(500).json({ error: "Failed to process inquiry" });
