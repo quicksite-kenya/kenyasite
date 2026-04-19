@@ -944,8 +944,14 @@ Respond ONLY with a JSON object containing:
 Ensure the copy is high-converting and specifically tailored to the Kenyan market. Use local nuances (Nairobi, Mombasa, specific Kenyan business culture) if appropriate.
 The image keywords should be descriptive enough to get a relevant high-quality image.`;
 
-            const response = await ai.getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent(prompt);
-            const output = response.response.text();
+            const response = await ai.models.generateContent({
+                model: "gemini-3-flash-preview",
+                contents: prompt,
+                config: {
+                    responseMimeType: "application/json"
+                }
+            });
+            const output = response.text;
             
             if (!output) throw new Error("AI returned empty response.");
             

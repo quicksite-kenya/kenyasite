@@ -304,9 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (previewLinkBox) previewLinkBox.style.opacity = '1';
                     
                     let link;
-                    if (data.status === 'Preview' && data.previewToken) {
-                        const sub = data.subdomain || 'pending';
-                        link = `https://${sub}.quicksitekenya.co.ke/preview?token=${data.previewToken}`;
+                    if (data.status === 'Preview') {
+                        link = `${window.location.origin}/site.html?id=${docSnap.id}&preview=true`;
                     } else {
                         link = data.customDomain || (data.subdomain ? `${data.subdomain}.quicksitekenya.co.ke` : 'Pending Generation');
                     }
@@ -561,8 +560,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 await updateDoc(doc(db, 'clientSites', docId), { previewToken: token, status: 'Preview' });
-                const sub = document.getElementById('editSubdomain').value || 'pending';
-                const finalLink = `https://${sub}.quicksitekenya.co.ke/preview?token=${token}`;
+
+                const finalLink = `${window.location.origin}/site.html?id=${docId}&preview=true`;
                 
                 if (previewOutput) {
                     previewOutput.value = finalLink;
