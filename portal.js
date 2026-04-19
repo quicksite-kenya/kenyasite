@@ -1,5 +1,5 @@
 import { auth, db, signInWithEmail, signUpWithEmail, logOut } from './firebase.js';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -110,8 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
             loginState.style.display = 'none';
             dashboardState.style.display = 'none';
             welcomeText.innerHTML = `Welcome Admin, <span>${user.email.split('@')[0]}</span>`;
-            document.getElementById('adminPortalView').style.display = 'block';
-            loadAdminClients();
+            const adminView = document.getElementById('adminPortalView');
+            if (adminView) {
+                adminView.style.display = 'block';
+                loadAdminClients();
+            }
             return;
         }
 
@@ -120,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         welcomeText.innerHTML = `Welcome back, <span>${user.email.split('@')[0]}</span>`;
 
         try {
-            // Fetch Client's Web Asset using relationship logic
+            // Fetch Client's Web Asset
             const q = query(collection(db, 'clientSites'), where('clientEmail', '==', user.email));
             const snapshot = await getDocs(q);
 
@@ -131,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const previewLinkBox = document.querySelector('.preview-link-box');
 
             if (snapshot.empty) {
-                // No site assigned yet, show selection view
                 if (hasPackageView) hasPackageView.style.display = 'none';
                 if (noPackageView) noPackageView.style.display = 'block';
             } else {
@@ -141,20 +143,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docSnap = snapshot.docs[0];
                 const data = docSnap.data();
                 
-                // Package Data
                 const plan = data.plan || 'Starter Presence';
                 planName.innerText = plan;
                 const isPaid = data.paymentStatus === 'Paid';
                 planStatus.innerText = isPaid ? 'Active' : 'Unpaid';
                 planStatus.className = `status-badge ${isPaid ? 'status-published' : 'status-development'}`;
 
-                // Unpaid logic
                 if (!isPaid) {
                     if (unpaidWarning) unpaidWarning.style.display = 'block';
                     if (previewLinkBox) previewLinkBox.style.opacity = '0.3';
                     if (amountDueDisplay) {
-                        amountDueDisplay.innerText = plan.includes('Starter') ? 'KES 2,300' 
-                            : (plan.includes('Growth') ? 'KES 2,800' : 'KES 3,500');
+                        amountDueDisplay.innerText = plan.includes('Starter') ? 'KES 2,300' : (plan.includes('Growth') ? 'KES 2,800' : 'KES 3,500');
                     }
                     visitLinkBtn.classList.add('disabled');
                     visitLinkBtn.href = "#";
@@ -163,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (unpaidWarning) unpaidWarning.style.display = 'none';
                     if (previewLinkBox) previewLinkBox.style.opacity = '1';
                     
-                    // Show preview token link if status is Preview
                     let link;
                     if (data.status === 'Preview' && data.previewToken) {
                         const sub = data.subdomain || 'pending';
@@ -177,20 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     visitLinkBtn.classList.remove('disabled');
                 }
 
-                // Render Features
                 const features = packages[plan] || packages['Starter Presence'];
                 featureList.innerHTML = features.map(f => `<li><i data-lucide="check-circle"></i> ${f}</li>`).join('');
 
                 siteStatus.innerText = data.status || 'Development';
                 siteStatus.className = `status-badge ${data.status === 'Live' ? 'status-published' : 'status-preview'}`;
 
-                // Billing Logic
                 const billingAmount = document.getElementById('dashBillingAmount');
                 const billingStatus = document.getElementById('dashBillingStatus');
-                const billingMpesaAmt = document.getElementById('dashBillingMpesaAmount');
-                const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
-                const billingMpesaInstructions = document.getElementById('billingMpesaInstructions');
-
                 const costMap = {
                     'Starter Presence': 'KES 11,999',
                     'Business Growth': 'KES 14,999',
@@ -204,409 +196,270 @@ document.addEventListener('DOMContentLoaded', () => {
                     billingStatus.className = `status-badge ${isPaid ? 'status-published' : 'status-development'}`;
                 }
                 
-                if (billingMpesaInstructions) {
-                    billingMpesaInstructions.style.display = isPaid ? 'none' : 'block';
-                }
-
-                if (billingMpesaAmt) billingMpesaAmt.innerText = cost;
-
+                const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
                 if (confirmPaymentBtn) {
-                    // Remove existing listeners if necessary by cloning (clean way here)
                     const newBtn = confirmPaymentBtn.cloneNode(true);
                     confirmPaymentBtn.parentNode.replaceChild(newBtn, confirmPaymentBtn);
                     
                     if (isPaid) {
                         newBtn.innerText = 'Payment Complete';
                         newBtn.disabled = true;
-                        newBtn.classList.add('disabled');
                     } else {
                         newBtn.innerHTML = '<i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Verify Payment';
-                        newBtn.disabled = false;
-                        newBtn.classList.remove('disabled');
                         newBtn.addEventListener('click', () => {
-                            const message = encodeURIComponent(`Hello QuickSite team, I have just paid ${cost} for my ${plan} package using M-PESA. My registered email is ${user.email}. Please verify my payment.`);
+                            const message = encodeURIComponent(`Hello, I paid ${cost} for my ${plan}. Email: ${user.email}`);
                             window.open(`https://wa.me/254708691648?text=${message}`, '_blank');
                         });
                     }
                 }
             }
-
             if (window.lucide) window.lucide.createIcons();
-
         } catch (error) {
-            console.error("Error fetching client data:", error);
-            planName.innerText = 'Connection Error';
+            console.error("Dashboard error:", error);
         }
     };
 
     // --- Admin Functionality ---
     const loadAdminClients = async () => {
-        const tableBody = document.getElementById('adminClientTableBody');
-        if (!tableBody) return;
+        const cardsContainer = document.getElementById('adminClientCards');
+        if (!cardsContainer) return;
 
         try {
             const q = query(collection(db, 'clientSites'));
             const snapshot = await getDocs(q);
 
             if (snapshot.empty) {
-                tableBody.innerHTML = '<tr><td colspan="6" style="padding: 20px; text-align: center; color: #aaa;">No clients registered yet.</td></tr>';
+                cardsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #555;">No records found.</div>';
                 return;
             }
 
-            tableBody.innerHTML = '';
+            cardsContainer.innerHTML = '';
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
                 const id = docSnap.id;
+                const link = data.customDomain || (data.subdomain ? `https://${data.subdomain}.quicksitekenya.co.ke` : '#');
+                const status = data.status || 'Draft';
+                const plan = data.plan || 'Starter Presence';
                 
-                const link = data.customDomain || (data.subdomain ? `${data.subdomain}.quicksitekenya.co.ke` : 'Pending');
-                const isPaid = data.paymentStatus === 'Paid';
-                
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
-                
-                tr.innerHTML = `
-                    <td style="padding: 15px 10px; color: white;">
-                        <strong>${data.clientName || 'Client'}</strong><br>
-                        <span style="font-size: 0.75rem; color: #ccc;">${data.clientEmail}</span>
-                    </td>
-                    <td style="padding: 15px 10px; color: #ccc;">${data.plan || 'N/A'}</td>
-                    <td style="padding: 15px 10px;">
-                        <span class="status-badge ${isPaid ? 'status-published' : 'status-development'}" style="font-size: 0.6rem;">
-                            ${data.paymentStatus || 'Unpaid'}
-                        </span>
-                    </td>
-                    <td style="padding: 15px 10px;">
-                        <span class="status-badge ${data.status === 'Live' ? 'status-published' : 'status-preview'}" style="font-size: 0.6rem;">
-                            ${data.status || 'Draft'}
-                        </span>
-                    </td>
-                    <td style="padding: 15px 10px; color: var(--primary-color); font-family: monospace;">${link}</td>
-                    <td style="padding: 15px 10px;">
-                        <button class="btn btn-secondary admin-edit-client" data-id="${id}" style="padding: 5px 10px; font-size: 0.7rem;">Manage</button>
-                    </td>
+                const card = document.createElement('div');
+                card.className = "client-card"; // Added class for potential styling
+                card.style.cssText = `
+                    background: rgba(255,255,255,0.03);
+                    border: 1px solid rgba(255,255,255,0.05);
+                    border-radius: 16px;
+                    padding: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    transition: all 0.3s ease;
+                    margin-bottom: 12px;
                 `;
-                tableBody.appendChild(tr);
+                
+                card.innerHTML = `
+                    <div>
+                        <h4 style="color: var(--primary-color); font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">${data.businessName || 'Elite Business'} <span style="font-weight: normal; color: #777; font-size: 0.8rem;">(${data.clientEmail?.split('@')[0]})</span></h4>
+                        <p style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">${plan} | ${data.template || 'Default'}</p>
+                        <div style="display: flex; gap: 6px;">
+                            <span style="background: rgba(212,175,55,0.1); color: var(--primary-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">${plan}</span>
+                            <span style="background: rgba(255,255,255,0.05); color: #aaa; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;">${status}</span>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="${link}" target="_blank" class="btn btn-icon" style="background: rgba(255,255,255,0.05); width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--primary-color);">
+                            <i data-lucide="external-link" style="width: 18px;"></i>
+                        </a>
+                        <button class="btn btn-primary admin-edit-client" data-id="${id}" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">Manage</button>
+                        <button class="btn admin-delete-client" data-id="${id}" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; padding: 10px; border-radius: 8px;">
+                            <i data-lucide="trash-2" style="width: 18px;"></i>
+                        </button>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
             });
 
-            // Re-bind Action buttons
-            document.querySelectorAll('.admin-edit-client').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const docId = e.target.getAttribute('data-id');
-                    const modal = document.getElementById('adminEditModal');
-                    if (!modal) return;
-                    
-                    e.target.innerText = 'Loading...';
-                    
-                    try {
-                        const docRef = doc(db, 'clientSites', docId);
-                        const docSnap = await getDoc(docRef);
-                        
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            
-                            // Populate Modal
-                            document.getElementById('editClientId').value = docId;
-                            document.getElementById('editPaymentStatus').value = data.paymentStatus || 'Unpaid';
-                            document.getElementById('editPlan').value = data.plan || 'Starter Presence';
-                            document.getElementById('editEnvStatus').value = data.status || 'Draft';
-                            document.getElementById('editSubdomain').value = data.subdomain || '';
-                            document.getElementById('editTemplate').value = data.template || 'Starter Presence';
-                            document.getElementById('editBusinessName').value = data.businessName || '';
-                            document.getElementById('editHeroTitle').value = data.hero?.title || '';
-                            document.getElementById('editHeroSubtitle').value = data.hero?.subtitle || '';
-                            document.getElementById('editCustomDomain').value = data.customDomain || (data.custom_domains ? data.custom_domains[0] : '');
-
-                            // Reset Link Output
-                            const output = document.getElementById('previewLinkOutput');
-                            if(output) {
-                                output.style.display = 'none';
-                                output.value = '';
-                            }
-                            
-                            modal.style.display = 'flex';
-                        }
-                    } catch (err) {
-                        alert("Error fetching client data.");
-                        console.error(err);
-                    } finally {
-                         e.target.innerText = 'Manage';
-                    }
-                });
-            });
-
-            // Bind Modal Close
-            const closeBtn = document.getElementById('closeAdminEditModal');
-            const modal = document.getElementById('adminEditModal');
-            if (closeBtn && modal) {
-                // Remove old listeners to prevent duplicates
-                const newCloseBtn = closeBtn.cloneNode(true);
-                closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-                newCloseBtn.addEventListener('click', () => modal.style.display = 'none');
-            }
-            
-            // Bind Save
-            const saveBtn = document.getElementById('saveAdminEditBtn');
-            if (saveBtn) {
-                const newSaveBtn = saveBtn.cloneNode(true);
-                saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
-                newSaveBtn.addEventListener('click', async () => {
-                    const docId = document.getElementById('editClientId').value;
-                    if (!docId) return;
-                    
-                    newSaveBtn.innerText = 'Saving...';
-                    newSaveBtn.disabled = true;
-                    
-                    try {
-                         const updates = {
-                             paymentStatus: document.getElementById('editPaymentStatus').value,
-                             plan: document.getElementById('editPlan').value,
-                             status: document.getElementById('editEnvStatus').value,
-                             subdomain: document.getElementById('editSubdomain').value,
-                             template: document.getElementById('editTemplate').value,
-                             businessName: document.getElementById('editBusinessName').value,
-                             customDomain: document.getElementById('editCustomDomain').value,
-                             hero: {
-                               title: document.getElementById('editHeroTitle').value,
-                               subtitle: document.getElementById('editHeroSubtitle').value
-                             }
-                         };
-                         if (updates.customDomain) {
-                             updates.custom_domains = [updates.customDomain];
-                         }
-                         const docRef = doc(db, 'clientSites', docId);
-                         await updateDoc(docRef, updates);
-                         modal.style.display = 'none';
-                         loadAdminClients(); // Refresh table
-                    } catch(err) {
-                         alert("Error saving: " + err.message);
-                    } finally {
-                         newSaveBtn.innerText = 'Save Changes';
-                         newSaveBtn.disabled = false;
-                    }
-                });
-            }
-
-            // Bind Inject Elite Data
-            const injectBtn = document.getElementById('injectEliteDataBtn');
-            if (injectBtn) {
-                const newInjectBtn = injectBtn.cloneNode(true);
-                injectBtn.parentNode.replaceChild(newInjectBtn, injectBtn);
-                newInjectBtn.addEventListener('click', async () => {
-                     const docId = document.getElementById('editClientId').value;
-                     if (!docId) return;
-                     
-                     newInjectBtn.innerText = 'Injecting...';
-                     newInjectBtn.disabled = true;
-                     
-                     try {
-                         const updates = {
-                             featuresEnabled: ['Features', 'Pricing', 'Testimonials', 'CTA'],
-                             features: [
-                                 { icon: 'shield', title: 'Bank-Grade Security', desc: 'State of the art encryption to protect user data.' },
-                                 { icon: 'zap', title: 'Lightning Fast', desc: 'Edge delivery ensuring sub-second load times.' },
-                                 { icon: 'smartphone', title: 'Mobile First', desc: 'Flawless responsive design on all devices.' },
-                                 { icon: 'trending-up', title: 'SEO Optimized', desc: 'Rank higher automatically with structured semantics.' }
-                             ],
-                             pricing: [
-                                 { plan: 'Essential', price: 'KES 1,500', features: ['Basic Analytics', 'Standard Support', '5GB Storage'] },
-                                 { plan: 'Professional', price: 'KES 4,500', features: ['Advanced CRM', 'Priority Whatsapp', 'Unlimited Storage', 'Custom Domain'] }
-                             ],
-                             testimonials: [
-                                 { name: 'Sarah W.', quote: 'This completely revolutionized how we capture clients.' },
-                                 { name: 'David M.', quote: 'The conversion rate jumped 40% in our first week.' }
-                             ],
-                             cta: { title: 'Ready to Transform Your Business?', btn: 'Get Started Today' },
-                             images: {
-                                 gallery: [
-                                     'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80',
-                                     'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=800&q=80',
-                                     'https://images.unsplash.com/photo-1556761175-5973e04eb924?auto=format&fit=crop&w=800&q=80'
-                                 ]
-                             }
-                         };
-                         const docRef = doc(db, 'clientSites', docId);
-                         await updateDoc(docRef, updates);
-                         alert("Elite data payload injected successfully! Run 'Save Changes' if you altered inputs.");
-                     } catch(err) {
-                         alert("Error injecting data: " + err.message);
-                     } finally {
-                         newInjectBtn.innerHTML = '<i data-lucide="sparkles" style="width:14px;"></i> Inject Elite Demo Data';
-                         if (window.lucide) window.lucide.createIcons();
-                         newInjectBtn.disabled = false;
-                     }
-                });
-            }
-
-            // Bind Generate Preview Link
-            const genLinkBtn = document.getElementById('generatePreviewLinkBtn');
-            if (genLinkBtn) {
-                 const newGenBtn = genLinkBtn.cloneNode(true);
-                 genLinkBtn.parentNode.replaceChild(newGenBtn, genLinkBtn);
-                 newGenBtn.addEventListener('click', async () => {
-                     const docId = document.getElementById('editClientId').value;
-                     const output = document.getElementById('previewLinkOutput');
-                     if (!docId || !output) return;
-                     
-                     newGenBtn.innerText = 'Generating...';
-                     newGenBtn.disabled = true;
-                     
-                     try {
-                         // Generate a secure token and a 25 min expiry stamp
-                         const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                         const expiryMs = Date.now() + (25 * 60 * 1000); // 25 minutes
-                         
-                         const docRef = doc(db, 'clientSites', docId);
-                         await updateDoc(docRef, {
-                             previewToken: token,
-                             previewExpiresAt: expiryMs,
-                             status: 'Preview' // Auto-update status to preview
-                         });
-                         
-                         document.getElementById('editEnvStatus').value = 'Preview';
-                         
-                         const sub = document.getElementById('editSubdomain').value || 'pending';
-                         const link = `https://${sub}.quicksitekenya.co.ke/preview?token=${token}`;
-                         
-                         output.value = link;
-                         output.style.display = 'block';
-                         
-                         // Copy automatically
-                         navigator.clipboard.writeText(link);
-                         newGenBtn.innerText = 'Copied to Clipboard!';
-                         setTimeout(() => newGenBtn.innerText = 'Generate Link', 3000);
-                         
-                     } catch(err) {
-                         alert("Error generating link: " + err.message);
-                         newGenBtn.innerText = 'Generate Link';
-                     } finally {
-                         newGenBtn.disabled = false;
-                     }
-                 });
-            }
+            if (window.lucide) window.lucide.createIcons();
+            bindAdminActions();
 
         } catch (err) {
-            console.error("Error loading admin clients:", err);
-            tableBody.innerHTML = `<tr><td colspan="6" style="padding: 20px; text-align: center; color: #ff4d4d;">Failed to load clients.</td></tr>`;
+            console.error("Admin Load Error:", err);
         }
     };
 
-    const adminLogoutBtn = document.getElementById('adminPortalLogoutBtn');
-    if (adminLogoutBtn) {
-        adminLogoutBtn.addEventListener('click', async () => {
+    const bindAdminActions = () => {
+        document.querySelectorAll('.admin-edit-client').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const docId = btn.getAttribute('data-id');
+                const modal = document.getElementById('adminEditModal');
+                if (!modal) return;
+                
+                try {
+                    const docSnap = await getDoc(doc(db, 'clientSites', docId));
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        document.getElementById('editClientId').value = docId;
+                        document.getElementById('editPaymentStatus').value = data.paymentStatus || 'Unpaid';
+                        document.getElementById('editPlan').value = data.plan || 'Starter Presence';
+                        document.getElementById('editEnvStatus').value = data.status || 'Draft';
+                        document.getElementById('editSubdomain').value = data.subdomain || '';
+                        document.getElementById('editTemplate').value = data.template || '';
+                        document.getElementById('editBusinessName').value = data.businessName || '';
+                        document.getElementById('editHeroTitle').value = data.hero?.title || '';
+                        document.getElementById('editHeroSubtitle').value = data.hero?.subtitle || '';
+                        document.getElementById('editCustomDomain').value = data.customDomain || '';
+                        modal.style.display = 'flex';
+                    }
+                } catch (err) { alert("Load failed."); }
+            });
+        });
+
+        document.querySelectorAll('.admin-delete-client').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm("Delete this client environment?")) {
+                    await deleteDoc(doc(db, 'clientSites', btn.getAttribute('data-id')));
+                    loadAdminClients();
+                }
+            });
+        });
+    };
+
+    // Bind Admin Control Buttons
+    const saveEditBtn = document.getElementById('saveAdminEditBtn');
+    if (saveEditBtn) {
+        saveEditBtn.addEventListener('click', async () => {
+            const docId = document.getElementById('editClientId').value;
+            const updates = {
+                paymentStatus: document.getElementById('editPaymentStatus').value,
+                plan: document.getElementById('editPlan').value,
+                status: document.getElementById('editEnvStatus').value,
+                subdomain: document.getElementById('editSubdomain').value,
+                template: document.getElementById('editTemplate').value,
+                businessName: document.getElementById('editBusinessName').value,
+                customDomain: document.getElementById('editCustomDomain').value,
+                hero: {
+                    title: document.getElementById('editHeroTitle').value,
+                    subtitle: document.getElementById('editHeroSubtitle').value
+                },
+                updatedAt: serverTimestamp()
+            };
             try {
-                await logOut();
-            } catch (err) {
-                console.error("Logout error", err);
-            }
+                await updateDoc(doc(db, 'clientSites', docId), updates);
+                document.getElementById('adminEditModal').style.display = 'none';
+                loadAdminClients();
+            } catch (err) { alert("Save failed."); }
         });
     }
 
-    // Auth Listener
-    onAuthStateChanged(auth, (user) => {
-        updateDashboardUI(user);
-    });
+    const closeEditBtn = document.getElementById('closeAdminEditModal');
+    if (closeEditBtn) closeEditBtn.addEventListener('click', () => document.getElementById('adminEditModal').style.display = 'none');
 
-    // Login / Sign Up Form
+    const addClientBtn = document.getElementById('addNewClientBtn');
+    if (addClientBtn) addClientBtn.addEventListener('click', () => document.getElementById('createClientModal').style.display = 'flex');
+
+    const closeCreateBtn = document.getElementById('closeCreateClientModal');
+    if (closeCreateBtn) closeCreateBtn.addEventListener('click', () => document.getElementById('createClientModal').style.display = 'none');
+
+    const createForm = document.getElementById('createClientForm');
+    if (createForm) {
+        createForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                await addDoc(collection(db, 'clientSites'), {
+                    clientEmail: document.getElementById('newClientEmail').value,
+                    businessName: document.getElementById('newClientBusiness').value,
+                    plan: document.getElementById('newClientPlan').value,
+                    status: 'Draft',
+                    paymentStatus: 'Unpaid',
+                    createdAt: serverTimestamp()
+                });
+                createForm.reset();
+                document.getElementById('createClientModal').style.display = 'none';
+                loadAdminClients();
+            } catch (err) { alert("Create failed."); }
+        });
+    }
+
+    // Modal behavior for Elite Data Injection
+    const injectBtn = document.getElementById('injectEliteDataBtn');
+    if (injectBtn) {
+        injectBtn.addEventListener('click', async () => {
+            const docId = document.getElementById('editClientId').value;
+            if (!docId) return;
+            try {
+                await updateDoc(doc(db, 'clientSites', docId), {
+                    featuresEnabled: ['Features', 'Pricing', 'Testimonials', 'CTA'],
+                    features: [
+                        { icon: 'shield', title: 'Bank-Grade Security', desc: 'State of the art protection.' },
+                        { icon: 'zap', title: 'Lightning Fast', desc: 'Optimized for performance.' }
+                    ],
+                    cta: { title: 'Ready to Scale?', btn: 'Get Started' }
+                });
+                alert("Elite data injected.");
+            } catch (err) { alert("Inject failed."); }
+        });
+    }
+
+    const genLinkBtn = document.getElementById('generatePreviewLinkBtn');
+    if (genLinkBtn) {
+        genLinkBtn.addEventListener('click', async () => {
+            const docId = document.getElementById('editClientId').value;
+            const token = Math.random().toString(36).substring(7);
+            try {
+                await updateDoc(doc(db, 'clientSites', docId), { previewToken: token, status: 'Preview' });
+                const sub = document.getElementById('editSubdomain').value || 'pending';
+                document.getElementById('previewLinkOutput').value = `https://${sub}.quicksitekenya.co.ke/preview?token=${token}`;
+                document.getElementById('previewLinkOutput').style.display = 'block';
+            } catch (err) { alert("Link generation failed."); }
+        });
+    }
+
+    // Authentication listeners
+    onAuthStateChanged(auth, (user) => updateDashboardUI(user));
+
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const originalText = submitBtn.innerText;
-            submitBtn.innerText = 'Authenticating...';
-            submitBtn.disabled = true;
-
             try {
                 if (isSignUpMode) {
                     await signUpWithEmail(emailInput.value, passwordInput.value);
                 } else {
                     await signInWithEmail(emailInput.value, passwordInput.value);
                 }
-                // Listener will update UI
             } catch (err) {
-                if (err.code === 'auth/network-request-failed') {
-                    const networkNote = document.getElementById('authNetworkNote');
-                    if (networkNote) {
-                        networkNote.style.display = 'block';
-                        networkNote.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
-                    alert("⚠️ FIREBASE BLOCKED BY BROWSER ⚠️\n\nYou are inside an iframe and your browser's privacy shields are blocking the login.\n\nWe will now explicitly break out of the iframe and auto-open the application in a new tab for you to log in securely. Please hit Sign In on the new tab.");
-                    window.open(window.location.href, '_blank');
-                } else {
-                    alert((isSignUpMode ? "Sign-Up Failed: " : "Sign-In Failed: ") + err.message);
-                }
-            } finally {
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
+                alert("Auth Error: " + err.message);
+                if (err.code === 'auth/network-request-failed') window.open(window.location.href, '_blank');
             }
         });
     }
 
-    // Logout
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                await logOut();
-            } catch (err) {
-                console.error("Logout error", err);
-            }
-        });
-    }
+    if (logoutBtn) logoutBtn.addEventListener('click', () => logOut());
+    const adminLogoutBtn = document.getElementById('adminPortalLogoutBtn');
+    if (adminLogoutBtn) adminLogoutBtn.addEventListener('click', () => logOut());
 
-    // Package Selection
+    // Package Selection (For Clients)
     const packageBtns = document.querySelectorAll('.select-package-btn');
     packageBtns.forEach(btn => {
         btn.addEventListener('click', async (e) => {
             const selectedPackage = e.target.getAttribute('data-package');
             const user = auth.currentUser;
             if (!user) return;
-            
-            const originalText = e.target.innerText;
-            e.target.innerText = 'Setting up...';
-            e.target.disabled = true;
-
             try {
-                // Determine template based on package (basic default)
-                let template = 'Default';
-                if (selectedPackage === 'Starter Presence') template = 'Universal Professional';
-                
                 await addDoc(collection(db, 'clientSites'), {
-                    clientName: user.email.split('@')[0], // Base off email for now
+                    clientName: user.email.split('@')[0],
                     clientEmail: user.email,
                     plan: selectedPackage,
-                    template: template,
-                    businessName: 'My Business',
                     status: 'Draft',
                     paymentStatus: 'Unpaid',
                     createdAt: serverTimestamp()
                 });
-                
-                // Immediately refresh view
                 updateDashboardUI(user);
-            } catch (err) {
-                console.error("Error creating setup:", err);
-                e.target.innerText = 'Setup Failed!';
-                setTimeout(() => {
-                    e.target.innerText = originalText;
-                    e.target.disabled = false;
-                }, 3000);
-            }
+            } catch (err) { console.error(err); }
         });
     });
 
-    // Copy Link
     if (copyLinkBtn) {
         copyLinkBtn.addEventListener('click', () => {
-            if (siteUrl.innerText && !siteUrl.innerText.includes('Pending')) {
-                navigator.clipboard.writeText(siteUrl.innerText);
-                const icon = copyLinkBtn.querySelector('i');
-                const oldIcon = icon.getAttribute('data-lucide');
-                icon.setAttribute('data-lucide', 'check');
-                window.lucide.createIcons();
-                
-                setTimeout(() => {
-                    icon.setAttribute('data-lucide', oldIcon);
-                    window.lucide.createIcons();
-                }, 2000);
-            }
+            navigator.clipboard.writeText(siteUrl.innerText);
+            alert("Copied!");
         });
     }
 });

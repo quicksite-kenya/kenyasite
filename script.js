@@ -634,17 +634,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 item.className = 'client-item';
                 item.innerHTML = `
                     <div class="client-info">
-                        <h4>${client.businessName} <span style="font-size: 0.7rem; opacity: 0.5; font-weight: 400;">(${client.clientName})</span></h4>
-                        <p>${client.subscriptionPlan || client.plan} | Template: ${client.template}</p>
+                        <h4>${client.businessName || 'Elite Business'} <span style="font-size: 0.75rem; opacity: 0.4; font-weight: 400;">(${client.clientName || client.clientEmail?.split('@')[0]})</span></h4>
+                        <p>${client.subscriptionPlan || client.plan || 'Starter Presence'} | Template: ${client.template || 'Universal'}</p>
                         <div class="client-badges">
-                            <span class="client-badge plan">${client.subscriptionPlan || client.plan}</span>
+                            <span class="client-badge plan">${(client.subscriptionPlan || client.plan || 'Starter Presence')}</span>
                             <span class="client-badge status-${(client.status || 'Draft').toLowerCase()}">${client.status || 'Draft'}</span>
                         </div>
                     </div>
                     <div class="client-actions">
-                        <a href="${tenantUrl}" target="_blank" class="btn btn-primary btn-sm" style="background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.2);"><i data-lucide="external-link"></i></a>
-                        <button class="btn btn-secondary btn-sm edit-client-btn" data-id="${id}"><i data-lucide="edit"></i> Manage</button>
-                        <button class="btn btn-primary btn-sm delete-client-btn" data-id="${id}" style="background: #ff4444; border-color: #ff4444;"><i data-lucide="trash-2"></i></button>
+                        <a href="${tenantUrl}" target="_blank" class="btn btn-primary btn-icon" title="View Site" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.1); color: var(--primary-color);">
+                            <i data-lucide="external-link" style="width: 18px;"></i>
+                        </a>
+                        <button class="btn btn-secondary edit-client-btn" data-id="${id}" style="padding: 10px 18px; font-weight: 700; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="edit-3" style="width: 18px;"></i> Manage
+                        </button>
+                        <button class="btn btn-primary btn-icon delete-client-btn" data-id="${id}" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); color: #ef4444;" title="Delete Client">
+                            <i data-lucide="trash-2" style="width: 18px;"></i>
+                        </button>
                     </div>
                 `;
                 clientsList.appendChild(item);

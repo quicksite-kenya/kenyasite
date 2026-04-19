@@ -3660,3 +3660,89 @@ body.is-admin .admin-only.block {
     color: var(--bg-color);
     border-color: var(--primary-color);
 }
+
+/* Elite Client Manager Styles */
+.clients-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 0;
+}
+
+.client-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+}
+
+.client-item:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.client-info h4 {
+    color: var(--primary-color);
+    font-size: 1.15rem;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.client-info p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.client-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.client-badge {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.client-badge.plan {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.client-badge.status-live {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.client-badge.status-draft {
+    background: rgba(255, 255, 255, 0.05);
+    color: #888;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.client-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px !important;
+    min-height: auto !important;
+}
