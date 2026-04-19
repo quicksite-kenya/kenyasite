@@ -8,11 +8,14 @@ async function test() {
   const res = {
     setHeader: () => {},
     status: (code) => ({
-      json: (data) => console.log(code, data),
+      json: (data) => console.log(Date.now() - start, "ms |", code, data),
       end: () => console.log(code, "Ended")
     })
   };
+  const start = Date.now();
   await handler(req, res);
+  console.log("Total time:", Date.now() - start, "ms");
+  process.exit(0);
 }
 
 test();

@@ -1183,34 +1183,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             
             try {
-                // Use the server API to handle both Firestore save and Email notification
-                const response = await fetch('/api/consultation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const contentType = response.headers.get("content-type");
-                const text = await response.text();
-                console.log(">>> [DEBUG] Server status:", response.status);
-                console.log(">>> [DEBUG] Server content-type:", contentType);
-                console.log(">>> [DEBUG] Server response body:", text);
-
-                let result;
-                if (contentType && contentType.indexOf("application/json") !== -1) {
-                    try {
-                        result = JSON.parse(text);
-                    } catch (e) {
-                        throw new Error("Server returned invalid JSON: " + text.substring(0, 50));
-                    }
-                } else {
-                    throw new Error("Server returned non-JSON response type: " + contentType + ". Content: " + text.substring(0, 50));
-                }
-
-                if (!response.ok) {
-                    throw new Error(result?.error || 'Failed to submit inquiry');
+                // 1. Direct Firestore Save (Bypasses Vercel timeouts + works perfectly with Rules)
+                await addDoc(collection(db, "inquiries"), data);
+                
+                // 2. Ping Vercel API purely for Email notification
+                try {
+                    await fetch('/api/consultation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } catch(e) {
+                    console.warn("Email API ping failed, but DB saved successfully.", e);
                 }
                 
                 contactForm.innerHTML = `
