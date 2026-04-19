@@ -1142,17 +1142,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (packageParam) {
             const serviceSelect = document.getElementById('contactService');
-            if (serviceSelect) {
-                serviceSelect.value = packageParam;
-            }
             const messageField = document.getElementById('contactMessage');
-            if (messageField) {
-                let packageName = '';
-                if (packageParam === 'starter') packageName = 'Starter Online Presence';
-                if (packageParam === 'generator') packageName = 'Customer Generator';
-                if (packageParam === 'growth') packageName = 'Growth System';
-                
-                messageField.value = `I am interested in the "${packageName}" package. I would like to get started as soon as possible.`;
+            
+            let packageName = '';
+            let selectValue = '';
+            
+            if (packageParam === 'starter') {
+                packageName = 'Starter Presence';
+                selectValue = 'Starter Presence';
+            } else if (packageParam === 'growth') {
+                packageName = 'Business Growth';
+                selectValue = 'Business Growth';
+            } else if (packageParam === 'pro' || packageParam === 'generator') {
+                packageName = 'Pro Conversion System';
+                selectValue = 'Pro Conversion System';
+            } else if (packageParam === 'enterprise') {
+                packageName = 'Enterprise SaaS System';
+                selectValue = 'Enterprise SaaS';
+            }
+            
+            if (serviceSelect && selectValue) {
+                serviceSelect.value = selectValue;
+            }
+            
+            if (messageField && packageName) {
+                messageField.value = `I am interested in the elite "${packageName}" package and architecting a high-performance digital presence.`;
             }
         }
 

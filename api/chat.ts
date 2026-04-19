@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
   try {
     const genAI = new GoogleGenAI({ apiKey });
-    const model = genAI.getGenerativeModel({ 
+    const model = (genAI as any).getGenerativeModel({ 
       model: "gemini-1.5-flash",
       systemInstruction: `You are the QuickSite Kenya AI Evolution Consultant. You are elite, professional, and helpful. 
       

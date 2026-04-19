@@ -107,9 +107,9 @@ async function startServer() {
         Our business model is subscription-based (SaaS). We provide high-converting websites on Vercel infrastructure.
         
         OUR PRICING TIERS:
-        1. Starter Presence: KES 1,999 Setup + KES 300 Monthly. Best for small businesses needing a 1-page site and WhatsApp integration.
-        2. Business Growth: KES 4,999 Setup + KES 800 Monthly. Includes 5-7 pages, Custom Domain support, Lead Capture system, and SEO setup.
-        3. Pro Conversion System: KES 9,999 Setup + KES 1,500 Monthly. Includes Booking System, CRM, Advanced Analytics, and AI Content tools.
+        1. Starter Presence: KES 11,999 Setup + KES 2,300 Monthly. Best for small businesses needing a 1-page site and WhatsApp integration.
+        2. Business Growth: KES 14,999 Setup + KES 2,800 Monthly. Includes 5-7 pages, Custom Domain support, Lead Capture system, and SEO setup.
+        3. Pro Conversion System: KES 19,999 Setup + KES 3,500 Monthly. Includes Booking System, CRM, Advanced Analytics, and AI Content tools.
         4. Enterprise SaaS System: KES 25,000+ Setup + Negotiable Monthly (KES 3k-10k). For multi-location businesses and white-label needs.
         
         CRITICAL: If a user expresses interest in a project or consultation, you MUST encourage them to provide their Name and Email. Inform them that their details will be sent directly to the Elite Human Team and will appear in the Private Admin Dashboard for immediate action. 
@@ -167,6 +167,16 @@ async function startServer() {
       res.status(500).json({ error: "Failed to send test email." });
     }
   });
+
+  // Helper: Promise with native timeout
+  function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)
+      ),
+    ]);
+  }
 
   // API Routes
   app.post("/api/consultation", async (req, res) => {

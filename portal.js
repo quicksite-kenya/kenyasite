@@ -149,11 +149,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 planStatus.innerText = isPaid ? 'Active' : 'Unpaid';
                 planStatus.className = `status-badge ${isPaid ? 'status-published' : 'status-development'}`;
 
+                const costMap = {
+                    'Starter Presence': 'KES 11,999',
+                    'Business Growth': 'KES 14,999',
+                    'Pro Conversion System': 'KES 19,999'
+                };
+                const cost = costMap[plan] || 'KES 11,999';
+
                 if (!isPaid) {
                     if (unpaidWarning) unpaidWarning.style.display = 'block';
                     if (previewLinkBox) previewLinkBox.style.opacity = '0.3';
                     if (amountDueDisplay) {
-                        amountDueDisplay.innerText = plan.includes('Starter') ? 'KES 2,300' : (plan.includes('Growth') ? 'KES 2,800' : 'KES 3,500');
+                        amountDueDisplay.innerText = cost;
                     }
                     visitLinkBtn.classList.add('disabled');
                     visitLinkBtn.href = "#";
@@ -183,12 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const billingAmount = document.getElementById('dashBillingAmount');
                 const billingStatus = document.getElementById('dashBillingStatus');
-                const costMap = {
-                    'Starter Presence': 'KES 11,999',
-                    'Business Growth': 'KES 14,999',
-                    'Pro Conversion System': 'KES 19,999'
-                };
-                const cost = costMap[plan] || 'KES 11,499';
 
                 if (billingAmount) billingAmount.innerText = isPaid ? 'KES 0' : cost;
                 if (billingStatus) {
@@ -439,20 +440,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const packageBtns = document.querySelectorAll('.select-package-btn');
     packageBtns.forEach(btn => {
         btn.addEventListener('click', async (e) => {
-            const selectedPackage = e.target.getAttribute('data-package');
+            const selectedPackage = btn.getAttribute('data-package');
             const user = auth.currentUser;
             if (!user) return;
+            
+            const originalText = btn.innerText;
+            btn.innerText = 'Initializing...';
+            btn.disabled = true;
+
             try {
+                // Security rules require: clientName, businessName, template, plan, status, createdAt
                 await addDoc(collection(db, 'clientSites'), {
                     clientName: user.email.split('@')[0],
                     clientEmail: user.email,
+                    businessName: `${user.email.split('@')[0]}'s Elite Site`,
+                    template: 'Universal Professional', // Default template for client-initiated setup
                     plan: selectedPackage,
                     status: 'Draft',
                     paymentStatus: 'Unpaid',
                     createdAt: serverTimestamp()
                 });
                 updateDashboardUI(user);
-            } catch (err) { console.error(err); }
+            } catch (err) { 
+                console.error("Setup failed:", err);
+                btn.innerText = 'Setup Failed';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }, 3000);
+            }
         });
     });
 
