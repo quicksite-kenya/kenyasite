@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { GoogleGenAI } from "@google/genai";
 import { db, auth, logOut, signInWithEmail, signUpWithEmail, serverTimestamp, storage } from './firebase.js';
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, limit, updateDoc, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -70,19 +71,35 @@ const initAIConsultation = () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: text,
-                    history: chatHistory 
-                })
+            // Frontend Gemini Integration
+            const apiKey = process.env.GEMINI_API_KEY;
+            if (!apiKey) throw new Error("GEMINI_API_KEY not found.");
+
+            const ai = new GoogleGenAI({ apiKey });
+            
+            const systemInstruction = `You are the Elite Digital Evolution Consultant for QuickSite Kenya.
+QuickSite Kenya is a premier web design agency in Nairobi providing 48-hour turnarounds for professional service businesses.
+Our packages include:
+1. Starter Presence: KES 11,999 Setup + KES 2,300 Monthly.
+2. Business Growth: KES 14,999 Setup + KES 2,800 Monthly.
+3. Pro Conversion System: KES 19,999 Setup + KES 3,500 Monthly.
+4. Enterprise SaaS System: KES 25,000+ Setup.
+
+CRITICAL: If a user expresses interest, encourage them to provide their Name and Email so the human team can follow up.`;
+
+            const chat = ai.chats.create({
+                model: "gemini-3-flash-preview",
+                config: {
+                    systemInstruction: systemInstruction,
+                },
+                history: chatHistory
             });
 
-            if (!response.ok) throw new Error('Server response was not ok');
+            const result = await chat.sendMessage({
+                message: text
+            });
             
-            const data = await response.json();
-            const responseText = data.text;
+            const responseText = result.text;
             
             // Remove typing indicator
             typingIndicator.remove();
@@ -609,84 +626,94 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!clientsList) return;
         clientsList.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Syncing clients...</p></div>';
 
-        onSnapshot(query(collection(db, 'clientSites'), orderBy('createdAt', 'desc')), (snapshot) => {
-            clientsList.innerHTML = '';
-            if (snapshot.empty) {
-                clientsList.innerHTML = '<p style="text-align: center; padding: 20px; opacity: 0.5;">No active clients yet. Start by adding one!</p>';
-                return;
-            }
-
-            snapshot.forEach(docSnap => {
-                const client = docSnap.data();
-                const id = docSnap.id;
-                
-                // Determine the correct tenant URL
-                let tenantUrl = `site.html?id=${id}`;
-                if (client.status === 'Live') {
-                    if (client.custom_domains && client.custom_domains.length > 0) {
-                        tenantUrl = `https://${client.custom_domains[0]}`;
-                    } else if (client.subdomain) {
-                        tenantUrl = `https://${client.subdomain}.quicksitekenya.co.ke`;
-                    }
+        onSnapshot(query(collection(db, 'clientSites'), orderBy('createdAt', 'desc')), 
+            (snapshot) => {
+                clientsList.innerHTML = '';
+                if (snapshot.empty) {
+                    clientsList.innerHTML = '<p style="text-align: center; padding: 20px; opacity: 0.5;">No active clients yet. Start by adding one!</p>';
+                    return;
                 }
 
-                const item = document.createElement('div');
-                item.className = 'client-item';
-                item.innerHTML = `
-                    <div class="client-info">
-                        <h4>${client.businessName || 'Elite Business'} <span style="font-size: 0.75rem; opacity: 0.4; font-weight: 400;">(${client.clientName || client.clientEmail?.split('@')[0]})</span></h4>
-                        <p>${client.subscriptionPlan || client.plan || 'Starter Presence'} | Template: ${client.template || 'Universal'}</p>
-                        <div class="client-badges">
-                            <span class="client-badge plan">${(client.subscriptionPlan || client.plan || 'Starter Presence')}</span>
-                            <span class="client-badge status-${(client.status || 'Draft').toLowerCase()}">${client.status || 'Draft'}</span>
-                        </div>
-                    </div>
-                    <div class="client-actions">
-                        <a href="${tenantUrl}" target="_blank" class="btn btn-primary btn-icon" title="View Site" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.1); color: var(--primary-color);">
-                            <i data-lucide="external-link" style="width: 18px;"></i>
-                        </a>
-                        <button class="btn btn-secondary edit-client-btn" data-id="${id}" style="padding: 10px 18px; font-weight: 700; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="edit-3" style="width: 18px;"></i> Manage
-                        </button>
-                        <button class="btn btn-primary btn-icon delete-client-btn" data-id="${id}" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); color: #ef4444;" title="Delete Client">
-                            <i data-lucide="trash-2" style="width: 18px;"></i>
-                        </button>
-                    </div>
-                `;
-                clientsList.appendChild(item);
-
-                item.querySelector('.edit-client-btn').onclick = () => openSiteEditor(id, client);
-                let isDeleting = false;
-                const deleteBtn = item.querySelector('.delete-client-btn');
-                deleteBtn.onclick = async () => {
-                    if (!isDeleting) {
-                        // First click asks for confirmation by changing the button text
-                        isDeleting = true;
-                        deleteBtn.innerHTML = 'Click to Confirm Removal';
-                        deleteBtn.style.background = 'darkred';
-                        setTimeout(() => {
-                            // Reset after 3 seconds if not clicked
-                            if(isDeleting) {
-                                isDeleting = false;
-                                deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
-                                deleteBtn.style.background = '#ff4444';
-                                if (window.lucide) window.lucide.createIcons();
-                            }
-                        }, 3000);
-                    } else {
-                        // Second click executes delete
-                        try {
-                            await deleteDoc(doc(db, 'clientSites', id));
-                            showToast('Client removed successfully.');
-                            // The onSnapshot listener will automatically remove it from the DOM
-                        } catch (err) {
-                            showToast('Failed to delete: ' + err.message, 'error');
+                snapshot.forEach(docSnap => {
+                    const client = docSnap.data();
+                    const id = docSnap.id;
+                    
+                    // Determine the correct tenant URL
+                    let tenantUrl = `site.html?id=${id}`;
+                    if (client.status === 'Live') {
+                        if (client.custom_domains && client.custom_domains.length > 0) {
+                            tenantUrl = `https://${client.custom_domains[0]}`;
+                        } else if (client.subdomain) {
+                            tenantUrl = `https://${client.subdomain}.quicksitekenya.co.ke`;
                         }
                     }
-                };
-            });
-            if (window.lucide) window.lucide.createIcons();
-        });
+
+                    const item = document.createElement('div');
+                    item.className = 'client-item';
+                    item.innerHTML = `
+                        <div class="client-info">
+                            <h4>${client.businessName || 'Elite Business'} <span style="font-size: 0.75rem; opacity: 0.4; font-weight: 400;">(${client.clientName || client.clientEmail?.split('@')[0]})</span></h4>
+                            <p>${client.subscriptionPlan || client.plan || 'Starter Presence'} | Template: ${client.template || 'Universal'}</p>
+                            <div class="client-badges">
+                                <span class="client-badge plan">${(client.subscriptionPlan || client.plan || 'Starter Presence')}</span>
+                                <span class="client-badge status-${(client.status || 'Draft').toLowerCase()}">${client.status || 'Draft'}</span>
+                            </div>
+                        </div>
+                        <div class="client-actions">
+                            <a href="${tenantUrl}" target="_blank" class="btn btn-primary btn-icon" title="View Site" style="background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.1); color: var(--primary-color);">
+                                <i data-lucide="external-link" style="width: 18px;"></i>
+                            </a>
+                            <button class="btn btn-secondary edit-client-btn" data-id="${id}" style="padding: 10px 18px; font-weight: 700; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="edit-3" style="width: 18px;"></i> Manage
+                            </button>
+                            <button class="btn btn-primary btn-icon delete-client-btn" data-id="${id}" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); color: #ef4444;" title="Delete Client">
+                                <i data-lucide="trash-2" style="width: 18px;"></i>
+                            </button>
+                        </div>
+                    `;
+                    clientsList.appendChild(item);
+
+                    item.querySelector('.edit-client-btn').onclick = () => openSiteEditor(id, client);
+                    let isDeleting = false;
+                    const deleteBtn = item.querySelector('.delete-client-btn');
+                    deleteBtn.onclick = async () => {
+                        if (!isDeleting) {
+                            // First click asks for confirmation by changing the button text
+                            isDeleting = true;
+                            deleteBtn.innerHTML = 'Click to Confirm Removal';
+                            deleteBtn.style.background = 'darkred';
+                            setTimeout(() => {
+                                // Reset after 3 seconds if not clicked
+                                if(isDeleting) {
+                                    isDeleting = false;
+                                    deleteBtn.innerHTML = '<i data-lucide="trash-2"></i>';
+                                    deleteBtn.style.background = '#ff4444';
+                                    if (window.lucide) window.lucide.createIcons();
+                                }
+                            }, 3000);
+                        } else {
+                            // Second click executes delete
+                            try {
+                                await deleteDoc(doc(db, 'clientSites', id));
+                                showToast('Client removed successfully.');
+                                // The onSnapshot listener will automatically remove it from the DOM
+                            } catch (err) {
+                                showToast('Failed to delete: ' + err.message, 'error');
+                            }
+                        }
+                    };
+                });
+                if (window.lucide) window.lucide.createIcons();
+            },
+            (error) => {
+                console.error("Clients list listener error:", error);
+                if (error.code === 'permission-denied') {
+                    clientsList.innerHTML = '<p style="padding: 20px; text-align: center; color: #ff6666;">Access Denied: You do not have permission to view the client sites list.</p>';
+                } else {
+                    clientsList.innerHTML = '<p style="padding: 20px; text-align: center;">Failed to sync clients.</p>';
+                }
+            }
+        );
     };
 
     const openSiteEditor = (id = null, data = null) => {
@@ -713,6 +740,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Media
         document.getElementById('heroImageInput').value = data && data.images ? data.images.hero || '' : '';
+        document.getElementById('aboutImageInput').value = data && data.images ? data.images.about || '' : '';
+        document.getElementById('servicesImageInput').value = data && data.images ? data.images.services || '' : '';
         document.getElementById('logoImageInput').value = data && data.images ? data.images.logo || '' : '';
         document.getElementById('galleryImagesInput').value = data && data.images && data.images.gallery ? data.images.gallery.join('\n') : '';
         
@@ -734,6 +763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('setupFeeInput').value = data ? data.setupFee || 0 : 0;
         document.getElementById('monthlyFeeInput').value = data ? data.monthlyFee || 0 : 0;
         document.getElementById('featuresEnabledInput').value = data && data.featuresEnabled ? data.featuresEnabled.join(', ') : '';
+        document.getElementById('projectVisionInput').value = data ? data.projectVision || '' : '';
 
         siteEditorModal.style.display = 'block';
     };
@@ -775,6 +805,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setupFee: parseFloat(document.getElementById('setupFeeInput').value) || 0,
                 monthlyFee: parseFloat(document.getElementById('monthlyFeeInput').value) || 0,
                 featuresEnabled: document.getElementById('featuresEnabledInput').value.split(',').map(f => f.trim()).filter(f => f),
+                projectVision: document.getElementById('projectVisionInput').value,
                 // Advanced Template Fields
                 hero: {
                     title: document.getElementById('heroSettingsInput').value.split('|')[0]?.trim() || '',
@@ -799,6 +830,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 images: {
                     hero: document.getElementById('heroImageInput').value,
+                    about: document.getElementById('aboutImageInput').value,
+                    services: document.getElementById('servicesImageInput').value,
                     logo: document.getElementById('logoImageInput').value,
                     gallery: document.getElementById('galleryImagesInput').value.split('\n').filter(l => l.trim())
                 },
@@ -836,6 +869,153 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.open(`site.html?id=${id}&preview=true`, '_blank');
         };
     }
+
+    const aiGenBtn = document.getElementById('aiGenerateContentBtn');
+    const tabBriefGenerateBtn = document.getElementById('tabBriefGenerateBtn');
+
+    const triggerAIGeneration = async () => {
+        const brief = document.getElementById('projectVisionInput').value;
+        const businessName = document.getElementById('businessNameInput').value;
+        const template = document.getElementById('templateInput').value;
+        const docId = document.getElementById('editSiteId').value;
+        
+        // Gather extra context
+        const phone = document.getElementById('phoneInput').value;
+        const whatsapp = document.getElementById('whatsappInput').value;
+        const address = document.getElementById('addressInput').value;
+        const existingTagline = document.getElementById('taglineInput').value;
+        const existingAbout = document.getElementById('aboutTextInput').value;
+
+        if (!brief && !existingAbout) {
+            showToast("The Project Vision or About Business field is empty. AI needs a description to design from.", 'error');
+            return;
+        }
+
+        if (!docId) {
+            showToast("Please save this client first before using AI generation.", 'info');
+            return;
+        }
+
+        const originalBtnText = aiGenBtn ? aiGenBtn.innerHTML : 'AI Design';
+        if (aiGenBtn) {
+            aiGenBtn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 16px; display: inline-block; vertical-align: middle; margin-right: 5px;"></i> Engineering...';
+            aiGenBtn.disabled = true;
+        }
+        if (tabBriefGenerateBtn) {
+            tabBriefGenerateBtn.disabled = true;
+            tabBriefGenerateBtn.innerText = 'Engineering Site...';
+        }
+
+        try {
+            // Initialize AI directly on frontend per security guidelines
+            const apiKey = process.env.GEMINI_API_KEY;
+            if (!apiKey) throw new Error("GEMINI_API_KEY not found in environment.");
+
+            const ai = new GoogleGenAI({ apiKey });
+            
+            const prompt = `You are an elite web designer and copywriter for QuickSite Kenya.
+Generate a professional website content structure for a business based on the following context:
+
+BUSINESS NAME: ${businessName}
+TEMPLATE: ${template}
+PROJECT BRIEF: ${brief}
+CONTACT INFO: ${phone ? 'Phone: ' + phone : ''} ${whatsapp ? 'WhatsApp: ' + whatsapp : ''} ${address ? 'Address: ' + address : ''}
+EXISTING TAGLINE: ${existingTagline}
+EXISTING ABOUT: ${existingAbout}
+
+GOAL: Create a high-converting, professional website concept. 
+If contact info or vision details are provided, incorporate them NATURALLY but improve the wording to be elite and persuasive.
+
+Respond ONLY with a JSON object containing:
+{
+  "hero": { "title": "...", "subtitle": "..." },
+  "heroImage": "...", // visual vibe for Hero
+  "aboutImage": "...", // visual vibe for About section
+  "servicesImage": "...", // visual vibe for Services section
+  "aboutText": "...", // Professional, persuasive story
+  "services": [ { "name": "...", "description": "...", "price": "..." }, ... (up to 4) ],
+  "features": [ { "icon": "zap|sparkles|shield|star|phone", "title": "...", "desc": "..." }, ... (up to 4) ],
+  "pricing": [ { "plan": "...", "price": "...", "features": ["...", "..."] }, ... (up to 3) ],
+  "testimonials": [ { "name": "...", "quote": "..." }, ... (up to 3) ],
+  "tagline": "...", // A punchy 1-sentence brand promise
+  "cta": { "title": "...", "btn": "..." }
+}
+
+Ensure the copy is high-converting and specifically tailored to the Kenyan market. Use local nuances (Nairobi, Mombasa, specific Kenyan business culture) if appropriate.
+The image keywords should be descriptive enough to get a relevant high-quality image.`;
+
+            const response = await ai.getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent(prompt);
+            const output = response.response.text();
+            
+            if (!output) throw new Error("AI returned empty response.");
+            
+            const cleanedJson = output.replace(/```json/g, "").replace(/```/g, "").trim();
+            const content = JSON.parse(cleanedJson);
+
+            // Map Image keywords to real high-res placeholders
+            if (content.heroImage) content.heroImageUrl = `https://picsum.photos/seed/${content.heroImage.replace(/\s+/g, '')}/1920/1080`;
+            if (content.aboutImage) content.aboutImageUrl = `https://picsum.photos/seed/${content.aboutImage.replace(/\s+/g, '')}/1080/1080`;
+            if (content.servicesImage) content.servicesImageUrl = `https://picsum.photos/seed/${content.servicesImage.replace(/\s+/g, '')}/1280/720`;
+            
+            // Update Firestore
+            await updateDoc(doc(db, 'clientSites', docId), {
+                hero: content.hero,
+                aboutText: content.aboutText,
+                tagline: content.tagline,
+                services: content.services,
+                features: content.features,
+                pricing: content.pricing,
+                testimonials: content.testimonials,
+                cta: content.cta,
+                images: {
+                    hero: content.heroImageUrl || document.getElementById('heroImageInput').value,
+                    about: content.aboutImageUrl || document.getElementById('aboutImageInput').value,
+                    services: content.servicesImageUrl || document.getElementById('servicesImageInput').value,
+                    logo: document.getElementById('logoImageInput').value,
+                    gallery: document.getElementById('galleryImagesInput').value.split('\n').filter(l => l.trim())
+                },
+                featuresEnabled: ['Features', 'Pricing', 'Testimonials', 'CTA'],
+                updatedAt: serverTimestamp()
+            });
+
+            // Update UI fields
+            document.getElementById('heroSettingsInput').value = `${content.hero.title} | ${content.hero.subtitle} | Learn More`;
+            document.getElementById('taglineInput').value = content.tagline;
+            document.getElementById('aboutTextInput').value = content.aboutText;
+            document.getElementById('servicesInput').value = content.services.map(s => `${s.name} | ${s.price} | ${s.description}`).join('\n');
+            document.getElementById('featuresInput').value = content.features.map(f => `${f.title} | ${f.desc} | ${f.icon}`).join('\n');
+            document.getElementById('pricingInput').value = content.pricing.map(p => `${p.plan} | ${p.price} | ${p.features.join(', ')}`).join('\n');
+            document.getElementById('testimonialsInput').value = content.testimonials.map(t => `${t.name} | ${t.quote}`).join('\n');
+            document.getElementById('ctaSettingsInput').value = `${content.cta.title} | ${content.cta.btn}`;
+            
+            document.getElementById('heroImageInput').value = content.heroImageUrl || '';
+            document.getElementById('aboutImageInput').value = content.aboutImageUrl || '';
+            document.getElementById('servicesImageInput').value = content.servicesImageUrl || '';
+
+            showToast("Design complete! Switched to Content tab to review results.", 'success');
+            
+            // Auto switch to content tab
+            const contentTabBtn = document.querySelector('.tab-btn[data-tab="tab-content"]');
+            if (contentTabBtn) contentTabBtn.click();
+
+        } catch (err) {
+            console.error("AI Gen error:", err);
+            showToast("AI Generation failed. Check console for details.", 'error');
+        } finally {
+            if (aiGenBtn) {
+                aiGenBtn.innerHTML = originalBtnText;
+                aiGenBtn.disabled = false;
+            }
+            if (tabBriefGenerateBtn) {
+                tabBriefGenerateBtn.disabled = false;
+                tabBriefGenerateBtn.innerHTML = '<i data-lucide="brain-circuit"></i> Run AI Generation Phase';
+            }
+            if (window.lucide) window.lucide.createIcons();
+        }
+    };
+
+    if (aiGenBtn) aiGenBtn.onclick = triggerAIGeneration;
+    if (tabBriefGenerateBtn) tabBriefGenerateBtn.onclick = triggerAIGeneration;
 
     // --- Category Selector Logic ---
     const initCategorySelector = () => {

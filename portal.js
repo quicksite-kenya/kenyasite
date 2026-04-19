@@ -1,5 +1,5 @@
 import { auth, db, signInWithEmail, signUpWithEmail, logOut } from './firebase.js';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,6 +24,116 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSignUpMode = false;
     
     // --- Ad-Blocker Proactive Detection ---
+    // --- Elite Security Sentinel ---
+    const logSecurityAlert = async (type, severity, details, email = 'unknown') => {
+        try {
+            await addDoc(collection(db, 'security_logs'), {
+                type,
+                severity,
+                details,
+                email,
+                timestamp: serverTimestamp(),
+                userAgent: navigator.userAgent
+            });
+            if (severity === 'high' || severity === 'critical') {
+                showSecurityToast(`SECURITY ALERT: ${type} detected!`, 'error');
+            }
+        } catch (err) { console.warn("Sentinel failed to log:", err); }
+    };
+
+    const loadSecurityLogs = async () => {
+        const feed = document.getElementById('securityLogFeed');
+        const alertCount = document.getElementById('securityAlertCount');
+        if (!feed) return;
+
+        try {
+            const q = query(collection(db, 'security_logs'));
+            const snap = await getDocs(q);
+            
+            if (snap.empty) {
+                feed.innerHTML = '<div style="text-align: center; padding: 40px; color: #555;">No suspicious activity detected. Systems are green.</div>';
+                if (alertCount) alertCount.style.display = 'none';
+                return;
+            }
+
+            const logs = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (b.timestamp?.toMillis() || 0) - (a.timestamp?.toMillis() || 0));
+            
+            if (alertCount) {
+                alertCount.innerText = logs.length;
+                alertCount.style.display = 'inline-block';
+            }
+
+            feed.innerHTML = logs.map(log => `
+                <div style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 15px; align-items: flex-start;">
+                    <div style="width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; background: ${log.severity === 'high' || log.severity === 'critical' ? '#ff4d4d' : '#ffc107'}; box-shadow: 0 0 10px ${log.severity === 'high' ? '#ff4d4d' : '#ffc107'}; flex-shrink: 0;"></div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong style="color: white; font-size: 0.85rem;">${log.type}</strong>
+                            <span style="color: #666; font-size: 0.7rem;">${log.timestamp ? new Date(log.timestamp.toMillis()).toLocaleString() : 'Just now'}</span>
+                        </div>
+                        <p style="color: #aaa; font-size: 0.8rem; margin: 0;">${log.details}</p>
+                        <p style="color: #555; font-size: 0.65rem; margin-top: 4px;">Email Key: ${log.email}</p>
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (err) { console.error("Logs load failed:", err); }
+    };
+
+    const showSecurityToast = (msg, type = 'info') => {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed; top: 20px; right: 20px; z-index: 9999;
+            padding: 15px 25px; border-radius: 12px; background: ${type === 'error' ? '#7f1d1d' : '#1e3a8a'};
+            color: white; font-size: 0.9rem; font-weight: 600; border: 1px solid ${type === 'error' ? '#ef4444' : '#3b82f6'};
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); transform: translateX(150%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; align-items: center; gap: 10px;
+        `;
+        toast.innerHTML = `<i data-lucide="${type === 'error' ? 'shield-alert' : 'info'}" style="width: 20px;"></i> ${msg}`;
+        document.body.appendChild(toast);
+        if (window.lucide) window.lucide.createIcons();
+        requestAnimationFrame(() => toast.style.transform = 'translateX(0)');
+        setTimeout(() => {
+            toast.style.transform = 'translateX(150%)';
+            setTimeout(() => toast.remove(), 600);
+        }, 5000);
+    };
+
+    // Admin Tab Switching
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-tab');
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.admin-tab-btn').forEach(b => {
+                b.classList.remove('active');
+                b.style.color = '#888';
+                b.style.background = 'transparent';
+            });
+            
+            document.getElementById(`admin-${target}`).style.display = 'block';
+            btn.classList.add('active');
+            btn.style.color = 'white';
+            btn.style.background = 'rgba(255,255,255,0.05)';
+            
+            if (target === 'security-tab') loadSecurityLogs();
+            if (target === 'clients-tab') loadAdminClients();
+        });
+    });
+
+    const clearLogsBtn = document.getElementById('clearSecurityLogsBtn');
+    if (clearLogsBtn) {
+        clearLogsBtn.addEventListener('click', async () => {
+            if (confirm("Clear all security audit logs?")) {
+                try {
+                    const snap = await getDocs(collection(db, 'security_logs'));
+                    const promises = snap.docs.map(d => deleteDoc(doc(db, 'security_logs', d.id)));
+                    await Promise.all(promises);
+                    loadSecurityLogs();
+                } catch (err) { alert("Failed to clear logs."); }
+            }
+        });
+    }
+
     const checkAdBlocker = async () => {
         const domains = [
             'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword',
@@ -97,8 +207,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
+    // Global Sentinel Listener for Admins
+    let securityListener = null;
+
     const updateDashboardUI = async (user) => {
         if (!user) {
+            if (securityListener) {
+                securityListener();
+                securityListener = null;
+            }
             loginState.style.display = 'block';
             dashboardState.style.display = 'none';
             if (document.getElementById('adminPortalView')) document.getElementById('adminPortalView').style.display = 'none';
@@ -114,11 +231,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (adminView) {
                 adminView.style.display = 'block';
                 loadAdminClients();
+                loadSecurityLogs();
+                
+                // Active Sentinel Monitoring
+                if (!securityListener) {
+                    const qLogs = query(collection(db, 'security_logs'));
+                    securityListener = onSnapshot(qLogs, (snap) => {
+                        const newLogs = snap.docChanges().filter(change => change.type === 'added');
+                        if (newLogs.length > 0 && !snap.metadata.hasPendingWrites) {
+                            loadSecurityLogs();
+                            // Only notify for fresh alerts from others
+                            newLogs.forEach(change => {
+                                const log = change.doc.data();
+                                if (log.severity === 'high' || log.severity === 'critical') {
+                                    showSecurityToast(`REAL-TIME ALERT: ${log.type} detected!`, 'error');
+                                }
+                            });
+                        }
+                    });
+                }
             }
             return;
         }
-
-        loginState.style.display = 'none';
         dashboardState.style.display = 'block';
         welcomeText.innerHTML = `Welcome back, <span>${user.email.split('@')[0]}</span>`;
 
@@ -197,6 +331,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     billingStatus.className = `status-badge ${isPaid ? 'status-published' : 'status-development'}`;
                 }
                 
+                const projectVisionText = document.getElementById('clientProjectVision');
+                if (projectVisionText) projectVisionText.value = data.projectVision || '';
+
                 const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
                 if (confirmPaymentBtn) {
                     const newBtn = confirmPaymentBtn.cloneNode(true);
@@ -307,6 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('editHeroTitle').value = data.hero?.title || '';
                         document.getElementById('editHeroSubtitle').value = data.hero?.subtitle || '';
                         document.getElementById('editCustomDomain').value = data.customDomain || '';
+                        const editVision = document.getElementById('editProjectVision');
+                        if (editVision) editVision.value = data.projectVision || '';
                         modal.style.display = 'flex';
                     }
                 } catch (err) { alert("Load failed."); }
@@ -340,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: document.getElementById('editHeroTitle').value,
                     subtitle: document.getElementById('editHeroSubtitle').value
                 },
+                projectVision: document.getElementById('editProjectVision')?.value || '',
                 updatedAt: serverTimestamp()
             };
             try {
@@ -365,8 +505,10 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             try {
                 await addDoc(collection(db, 'clientSites'), {
+                    clientName: document.getElementById('newClientEmail').value.split('@')[0],
                     clientEmail: document.getElementById('newClientEmail').value,
                     businessName: document.getElementById('newClientBusiness').value,
+                    template: 'Default',
                     plan: document.getElementById('newClientPlan').value,
                     status: 'Draft',
                     paymentStatus: 'Unpaid',
@@ -386,30 +528,99 @@ document.addEventListener('DOMContentLoaded', () => {
             const docId = document.getElementById('editClientId').value;
             if (!docId) return;
             try {
+                // Ensure required base fields are present for security rules validation
                 await updateDoc(doc(db, 'clientSites', docId), {
                     featuresEnabled: ['Features', 'Pricing', 'Testimonials', 'CTA'],
                     features: [
-                        { icon: 'shield', title: 'Bank-Grade Security', desc: 'State of the art protection.' },
-                        { icon: 'zap', title: 'Lightning Fast', desc: 'Optimized for performance.' }
+                        { icon: 'shield', title: 'Bank-Grade Security', desc: 'Secure high-performance hosting on global CDNs.' },
+                        { icon: 'zap', title: 'Lightning Performance', desc: 'Optimized Vercel deployment for instant load times.' },
+                        { icon: 'smartphone', title: 'Mobile First', desc: 'Flawless experience on every device size.' },
+                        { icon: 'message-circle', title: 'WhastApp CRM', desc: 'Instant customer connection via WhatsApp.' }
                     ],
-                    cta: { title: 'Ready to Scale?', btn: 'Get Started' }
+                    cta: { title: 'Ready to Transform Your Business?', btn: 'Secure Your Slot' },
+                    template: 'Universal Professional', // Inject elite template too
+                    updatedAt: serverTimestamp()
                 });
-                alert("Elite data injected.");
+                alert("Elite data injected successfully.");
             } catch (err) { alert("Inject failed."); }
         });
     }
 
     const genLinkBtn = document.getElementById('generatePreviewLinkBtn');
+    const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
+    const previewOutput = document.getElementById('previewLinkOutput');
+
     if (genLinkBtn) {
         genLinkBtn.addEventListener('click', async () => {
             const docId = document.getElementById('editClientId').value;
             const token = Math.random().toString(36).substring(7);
+            const originalText = genLinkBtn.innerHTML;
+            
+            genLinkBtn.innerHTML = '<i data-lucide="loader" class="spin" style="width: 14px;"></i> Generating...';
+            genLinkBtn.disabled = true;
+
             try {
                 await updateDoc(doc(db, 'clientSites', docId), { previewToken: token, status: 'Preview' });
                 const sub = document.getElementById('editSubdomain').value || 'pending';
-                document.getElementById('previewLinkOutput').value = `https://${sub}.quicksitekenya.co.ke/preview?token=${token}`;
-                document.getElementById('previewLinkOutput').style.display = 'block';
-            } catch (err) { alert("Link generation failed."); }
+                const finalLink = `https://${sub}.quicksitekenya.co.ke/preview?token=${token}`;
+                
+                if (previewOutput) {
+                    previewOutput.value = finalLink;
+                    previewOutput.style.display = 'block';
+                }
+                
+                if (shareWhatsAppBtn) {
+                    shareWhatsAppBtn.style.display = 'flex';
+                    shareWhatsAppBtn.onclick = () => {
+                        const businessName = document.getElementById('editBusinessName').value || 'your website';
+                        const message = encodeURIComponent(`Hello! Your elite preview for ${businessName} is ready for review: ${finalLink}\n\nNote: This link is temporary.`);
+                        window.open(`https://wa.me/?text=${message}`, '_blank');
+                    };
+                }
+
+                if (window.lucide) window.lucide.createIcons();
+            } catch (err) { 
+                console.error("Link gen failed:", err);
+                alert("Link generation failed."); 
+            } finally {
+                genLinkBtn.innerHTML = originalText;
+                genLinkBtn.disabled = false;
+                if (window.lucide) window.lucide.createIcons();
+            }
+        });
+    }
+
+    const saveVisionBtn = document.getElementById('saveVisionBtn');
+    if (saveVisionBtn) {
+        saveVisionBtn.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const vision = document.getElementById('clientProjectVision').value;
+            const successMsg = document.getElementById('visionSuccess');
+            
+            try {
+                const q = query(collection(db, 'clientSites'), where('clientEmail', '==', user.email));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    const docId = snap.docs[0].id;
+                    await updateDoc(doc(db, 'clientSites', docId), { 
+                        projectVision: vision,
+                        updatedAt: serverTimestamp()
+                    });
+                    if (successMsg) {
+                        successMsg.style.display = 'block';
+                        setTimeout(() => successMsg.style.display = 'none', 3000);
+                    }
+                } else {
+                    alert("Could not find your project record. Please reach out to support if this persists.");
+                }
+            } catch (err) {
+                console.error("Vision save failed:", err);
+                // Reveal more info for debugging
+                const errMsg = err.message || "Unknown error";
+                alert(`Failed to save project brief. Details: ${errMsg}`);
+            }
         });
     }
 
@@ -417,15 +628,22 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, (user) => updateDashboardUI(user));
 
     if (loginForm) {
+        let authFailures = 0;
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const email = emailInput.value;
             try {
                 if (isSignUpMode) {
-                    await signUpWithEmail(emailInput.value, passwordInput.value);
+                    await signUpWithEmail(email, passwordInput.value);
                 } else {
-                    await signInWithEmail(emailInput.value, passwordInput.value);
+                    await signInWithEmail(email, passwordInput.value);
                 }
+                authFailures = 0; // Reset on success
             } catch (err) {
+                authFailures++;
+                const severity = authFailures >= 3 ? 'high' : 'medium';
+                logSecurityAlert('Failed Authentication', severity, `Login failure for ${email}. Error: ${err.code}`, email);
+                
                 alert("Auth Error: " + err.message);
                 if (err.code === 'auth/network-request-failed') window.open(window.location.href, '_blank');
             }

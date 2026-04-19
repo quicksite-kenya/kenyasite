@@ -269,6 +269,20 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["clientName", "businessName", "template", "plan", "status", "createdAt"]
+    },
+    "security_logs": {
+      "title": "Security Alert Log",
+      "description": "Logs of failed logins, intrusion attempts, or critical errors.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "description": "Type of event (e.g. Brute Force, Unauthorized Access)." },
+        "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "details": { "type": "string" },
+        "email": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "userAgent": { "type": "string" }
+      },
+      "required": ["type", "severity", "details", "timestamp"]
     }
   },
   "firestore": {
@@ -287,6 +301,10 @@
     "/clientSites/{siteId}": {
       "schema": "clientSites",
       "description": "Collection of dynamic client websites."
+    },
+    "/security_logs/{logId}": {
+      "schema": "security_logs",
+      "description": "Audit logs for security events."
     }
   }
 }
