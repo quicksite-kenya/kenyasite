@@ -94,15 +94,26 @@
             font-size: 0.9rem;
         }
 
+        .admin-tab-btn.active {
+            color: white !important;
+            background: rgba(255,255,255,0.05) !important;
+            box-shadow: 0 4px 15px -3px rgba(0,0,0,0.3);
+        }
+        
+        .admin-tab-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.02);
+            color: #aaa;
+        }
+
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
-  <script type="module" crossorigin src="./assets/clientPortal-CHi8FaEg.js"></script>
+  <script type="module" crossorigin src="./assets/clientPortal-DEzXLzDt.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/firebase-applet-config-Ck6_0kXN.js">
-  <link rel="modulepreload" crossorigin href="./assets/firebase-Dy3uYFug.js">
+  <link rel="modulepreload" crossorigin href="./assets/firebase-BIUChNWT.js">
   <link rel="stylesheet" crossorigin href="./assets/firebase-C_h2CrCg.css">
 </head>
 <body>
@@ -289,6 +300,17 @@
                                 </button>
                                 <p style="font-size: 0.75rem; color: #888; text-align: center;">Clicking verify will open a WhatsApp confirmation prompt.</p>
                             </div>
+
+                            <!-- Project Vision -->
+                            <div class="portal-card">
+                                <h3><i data-lucide="pen-tool"></i> Project Vision</h3>
+                                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Describe the website you want designed. Our elite team will build exactly what you envision.</p>
+                                <textarea id="clientProjectVision" class="form-input" style="width: 100%; min-height: 120px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; margin-bottom: 15px; font-family: inherit; resize: vertical;" placeholder="e.g. I want a modern, high-converting landing page for my bakery..."></textarea>
+                                <button id="saveVisionBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;">
+                                    <i data-lucide="save" style="width: 16px; height: 16px;"></i> Update Project Brief
+                                </button>
+                                <div id="visionSuccess" style="display: none; color: #4ade80; font-size: 0.85rem; margin-top: 10px; text-align: center;">Project brief updated successfully!</div>
+                            </div>
                         </div>
                     </div>
 
@@ -374,26 +396,53 @@
 
 <!-- Admin Master View -->
                 <div id="adminPortalView" style="display: none; padding-top: 20px;">
-                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 40px; position: relative; min-height: 400px;">
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px; position: relative; min-height: 400px;">
                         
-                        <div style="text-align: center; margin-bottom: 40px;">
-                            <h2 style="color: white; font-size: 2.2rem; margin-bottom: 10px; font-weight: 800;">Client <span style="color: var(--primary-color);">Manager</span></h2>
-                            <p style="color: #aaa; font-size: 1.1rem;">Manage dynamic sites, templates, and content for your premium clients.</p>
-                        </div>
-
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                            <button id="addNewClientBtn" class="btn btn-primary" style="padding: 12px 25px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-radius: 12px;">
-                                <i data-lucide="plus" style="width: 20px;"></i> Add New Client
-                            </button>
+                            <div style="display: flex; gap: 10px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                                <button class="admin-tab-btn active" data-tab="clients-tab" style="padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: #888; background: transparent; transition: all 0.3s ease;">
+                                    <i data-lucide="users" style="width: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i> Client Manager
+                                </button>
+                                <button class="admin-tab-btn" data-tab="security-tab" style="padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: #888; background: transparent; transition: all 0.3s ease;">
+                                    <i data-lucide="shield-check" style="width: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i> Security Center
+                                    <span id="securityAlertCount" style="display: none; background: #ff4d4d; color: white; padding: 2px 6px; border-radius: 10px; font-size: 0.65rem; margin-left: 4px;">0</span>
+                                </button>
+                            </div>
                             <button id="adminPortalLogoutBtn" class="btn btn-secondary" style="background: rgba(255,255,255,0.05); border: none; color: #ccc;">Sign Out</button>
                         </div>
-                        
-                        <!-- Client List Container -->
-                        <div id="adminClientCards" style="display: grid; gap: 20px;">
-                            <!-- Populated by JS -->
-                            <div style="text-align: center; padding: 50px; color: #555;">
-                                <i data-lucide="loader" class="spin" style="width: 40px; margin-bottom: 10px;"></i>
-                                <p>Accessing Secure Database...</p>
+
+                        <!-- Clients Section -->
+                        <div id="admin-clients-tab" class="admin-tab-content">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                                <h3 style="color: white; margin: 0; font-size: 1.4rem;">Client <span style="color: var(--primary-color);">Environments</span></h3>
+                                <button id="addNewClientBtn" class="btn btn-primary" style="padding: 10px 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; border-radius: 10px; font-size: 0.9rem;">
+                                    <i data-lucide="plus" style="width: 18px;"></i> New Client
+                                </button>
+                            </div>
+                            
+                            <div id="adminClientCards" style="display: grid; gap: 15px;">
+                                <div style="text-align: center; padding: 50px; color: #555;">
+                                    <i data-lucide="loader" class="spin" style="width: 40px; margin-bottom: 10px;"></i>
+                                    <p>Accessing Secure Database...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Section -->
+                        <div id="admin-security-tab" class="admin-tab-content" style="display: none;">
+                            <div style="margin-bottom: 25px;">
+                                <h3 style="color: white; margin: 0; font-size: 1.4rem;">Elite <span style="color: #ff4d4d;">Security Sentinel</span></h3>
+                                <p style="color: #888; font-size: 0.85rem;">Real-time threat monitoring and access logs.</p>
+                            </div>
+
+                            <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,77,77,0.1); border-radius: 16px; overflow: hidden;">
+                                <div style="padding: 15px; background: rgba(255,77,77,0.05); border-bottom: 1px solid rgba(255,77,77,0.1); display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="color: #ff4d4d; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Recent Activity Logs</span>
+                                    <button id="clearSecurityLogsBtn" style="background: transparent; border: none; color: #666; font-size: 0.75rem; cursor: pointer;">Clear Logs</button>
+                                </div>
+                                <div id="securityLogFeed" style="padding: 0; max-height: 400px; overflow-y: auto;">
+                                    <div style="text-align: center; padding: 40px; color: #555;">No suspicious activity detected. Systems are green.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -441,46 +490,50 @@
                         
                         <input type="hidden" id="editClientId">
                         
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label>Payment Status</label>
-                                <select id="editPaymentStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                    <option value="Unpaid">Unpaid</option>
-                                    <option value="Paid">Paid</option>
-                                </select>
+                        <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                                <h4 style="color: white; margin: 0; font-size: 1rem;">Core Logistics</h4>
                             </div>
                             
-                            <div class="form-group">
-                                <label>Plan</label>
-                                <select id="editPlan" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                    <option value="Starter Presence">Starter Presence</option>
-                                    <option value="Business Growth">Business Growth</option>
-                                    <option value="Pro Conversion System">Pro Conversion System</option>
-                                </select>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label>Payment Status</label>
+                                    <select id="editPaymentStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                        <option value="Unpaid">Unpaid</option>
+                                        <option value="Paid">Paid</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Subscription Plan</label>
+                                    <select id="editPlan" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                        <option value="Starter Presence">Starter Presence</option>
+                                        <option value="Business Growth">Business Growth</option>
+                                        <option value="Pro Conversion System">Pro Conversion System</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group">
-                                <label>Environment Status</label>
-                                <select id="editEnvStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                    <option value="Draft">Draft (Offline)</option>
-                                    <option value="Preview">Preview</option>
-                                    <option value="Live">Live (Published)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Design Template</label>
-                                <select id="editTemplate" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                    <option value="Starter Presence">Starter Presence</option>
-                                    <option value="Universal Professional">Universal Professional</option>
-                                    <option value="Salon & Beauty">Salon & Beauty</option>
-                                    <option value="Fitness & Gym">Fitness & Gym</option>
-                                    <option value="Restaurant & Cafe">Restaurant & Cafe</option>
-                                    <option value="Medical & Health">Medical & Health</option>
-                                    <option value="Legal & Consulting">Legal & Consulting</option>
-                                </select>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>Environment Status</label>
+                                    <select id="editEnvStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                        <option value="Draft">Draft (Offline)</option>
+                                        <option value="Preview">Preview</option>
+                                        <option value="Live">Live (Published)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Design Template</label>
+                                    <select id="editTemplate" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                        <option value="Starter Presence">Starter Presence</option>
+                                        <option value="Universal Professional">Universal Professional</option>
+                                        <option value="Salon & Beauty">Salon & Beauty</option>
+                                        <option value="Fitness & Gym">Fitness & Gym</option>
+                                        <option value="Restaurant & Cafe">Restaurant & Cafe</option>
+                                        <option value="Medical & Health">Medical & Health</option>
+                                        <option value="Legal & Consulting">Legal & Consulting</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -489,31 +542,55 @@
                             <input type="text" id="editBusinessName" class="form-input" placeholder="e.g. John's Elite Bakery">
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Hero Title (Main Headline)</label>
-                            <input type="text" id="editHeroTitle" class="form-input" placeholder="e.g. The Best Baking Experience">
-                        </div>
+                        <!-- Content sections suggested for removal by admin - now optional behind toggle -->
+                        <details style="margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; background: rgba(0,0,0,0.2);">
+                            <summary style="cursor: pointer; color: #888; font-size: 0.85rem; padding: 5px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+                                <i data-lucide="chevron-down" style="width: 14px;"></i> Advanced Content & Design Configuration
+                            </summary>
+                            
+                            <div style="padding-top: 15px;">
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label>Hero Title (Main Headline)</label>
+                                    <input type="text" id="editHeroTitle" class="form-input" placeholder="e.g. The Best Baking Experience">
+                                </div>
 
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Hero Subtitle</label>
-                            <input type="text" id="editHeroSubtitle" class="form-input" placeholder="e.g. Artisan breads and pastries delivered fresh daily.">
-                        </div>
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label>Hero Subtitle</label>
+                                    <input type="text" id="editHeroSubtitle" class="form-input" placeholder="e.g. Artisan breads and pastries delivered fresh daily.">
+                                </div>
 
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Subdomain Prefix (e.g., 'johns-bakery')</label>
-                            <input type="text" id="editSubdomain" class="form-input" placeholder="johns-bakery">
-                        </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div class="form-group">
+                                        <label>Subdomain Prefix</label>
+                                        <input type="text" id="editSubdomain" class="form-input" placeholder="johns-bakery">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Custom Domain</label>
+                                        <input type="text" id="editCustomDomain" class="form-input" placeholder="www.yourdomain.com">
+                                    </div>
+                                </div>
 
-                        <div class="form-group" style="margin-bottom: 25px;">
-                            <label>Custom Domain (e.g., www.johnsbakery.com)</label>
-                            <input type="text" id="editCustomDomain" class="form-input" placeholder="www.yourdomain.com">
-                        </div>
+                                <div class="form-group">
+                                    <label>Client Project Vision & Brief</label>
+                                    <textarea id="editProjectVision" class="form-input" style="width: 100%; min-height: 100px; background: #111; color: white; border: 1px solid #333; border-radius: 6px; padding: 10px; font-family: inherit; resize: vertical;" placeholder="Client's design instructions..."></textarea>
+                                </div>
+                            </div>
+                        </details>
 
                         <div style="background: rgba(212,175,55,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.2); margin-bottom: 25px;">
-                            <h4 style="color: var(--primary-color); margin-bottom: 10px; font-size: 0.95rem;">Generate 25-Min Preview Link</h4>
-                            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 10px;">Create a secure temporary link to send to the client via WhatsApp.</p>
-                            <button id="generatePreviewLinkBtn" class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 8px;">Generate Link</button>
-                            <input type="text" id="previewLinkOutput" class="form-input" style="margin-top: 10px; display: none; font-size: 0.8rem;" readonly>
+                            <h4 style="color: var(--primary-color); margin-bottom: 10px; font-size: 0.95rem;">Preview & Delivery</h4>
+                            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 15px;">Generate a secure temporary link and send it directly to your client via WhatsApp.</p>
+                            
+                            <div style="display: flex; gap: 10px;">
+                                <button id="generatePreviewLinkBtn" class="btn btn-secondary" style="flex: 2; justify-content: center; padding: 10px; font-weight: 700;">
+                                    <i data-lucide="link-2" style="width: 16px; margin-right: 8px;"></i> Generate Link
+                                </button>
+                                <button id="shareWhatsAppBtn" class="btn" style="flex: 1; background: #25D366; color: white; display: none; justify-content: center; align-items: center; border: none; padding: 10px; border-radius: 8px;">
+                                    <i data-lucide="message-circle" style="width: 16px; margin-right: 8px;"></i> Send
+                                </button>
+                            </div>
+                            
+                            <input type="text" id="previewLinkOutput" class="form-input" style="margin-top: 10px; display: none; font-size: 0.8rem; background: rgba(0,0,0,0.3);" readonly>
                         </div>
                         
                         <div style="display: flex; gap: 15px; justify-content: space-between; align-items: center;">

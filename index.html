@@ -86,8 +86,8 @@
     />
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
     <script type="module" crossorigin src="./assets/firebase-applet-config-Ck6_0kXN.js"></script>
-    <script type="module" crossorigin src="./assets/firebase-Dy3uYFug.js"></script>
-    <script type="module" crossorigin src="./assets/script-DVe47ApC.js"></script>
+    <script type="module" crossorigin src="./assets/firebase-BIUChNWT.js"></script>
+    <script type="module" crossorigin src="./assets/script-DvOOnEaT.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/firebase-C_h2CrCg.css">
   </head>
   <body>
@@ -1400,7 +1400,7 @@
                 <button
                   type="button"
                   class="tab-btn active"
-                  data-tab="tab-content"
+                  data-tab="tab-brief"
                   style="
                     background: none;
                     border: none;
@@ -1410,63 +1410,21 @@
                     border-bottom: 2px solid var(--primary-color);
                   "
                 >
+                  Project Brief
+                </button>
+                <button
+                  type="button"
+                  class="tab-btn"
+                  data-tab="tab-content"
+                  style="
+                    background: none;
+                    border: none;
+                    color: rgba(255, 255, 255, 0.6);
+                    padding: 10px 0;
+                    cursor: pointer;
+                  "
+                >
                   Content
-                </button>
-                <button
-                  type="button"
-                  class="tab-btn"
-                  data-tab="tab-contact"
-                  style="
-                    background: none;
-                    border: none;
-                    color: rgba(255, 255, 255, 0.6);
-                    padding: 10px 0;
-                    cursor: pointer;
-                  "
-                >
-                  Contact & Info
-                </button>
-                <button
-                  type="button"
-                  class="tab-btn"
-                  data-tab="tab-hosting"
-                  style="
-                    background: none;
-                    border: none;
-                    color: rgba(255, 255, 255, 0.6);
-                    padding: 10px 0;
-                    cursor: pointer;
-                  "
-                >
-                  Hosting & Domains
-                </button>
-                <button
-                  type="button"
-                  class="tab-btn"
-                  data-tab="tab-advanced"
-                  style="
-                    background: none;
-                    border: none;
-                    color: rgba(255, 255, 255, 0.6);
-                    padding: 10px 0;
-                    cursor: pointer;
-                  "
-                >
-                  Advanced Sections
-                </button>
-                <button
-                  type="button"
-                  class="tab-btn"
-                  data-tab="tab-billing"
-                  style="
-                    background: none;
-                    border: none;
-                    color: rgba(255, 255, 255, 0.6);
-                    padding: 10px 0;
-                    cursor: pointer;
-                  "
-                >
-                  Subscription & Billing
                 </button>
                 <button
                   type="button"
@@ -1482,10 +1440,67 @@
                 >
                   Media
                 </button>
+                <button
+                  type="button"
+                  class="tab-btn"
+                  data-tab="tab-hosting"
+                  style="
+                    background: none;
+                    border: none;
+                    color: rgba(255, 255, 255, 0.6);
+                    padding: 10px 0;
+                    cursor: pointer;
+                  "
+                >
+                  Hosting
+                </button>
+                <button
+                  type="button"
+                  class="tab-btn"
+                  data-tab="tab-advanced"
+                  style="
+                    background: none;
+                    border: none;
+                    color: rgba(255, 255, 255, 0.6);
+                    padding: 10px 0;
+                    cursor: pointer;
+                  "
+                >
+                  Advanced
+                </button>
+                <button
+                  type="button"
+                  class="tab-btn"
+                  data-tab="tab-billing"
+                  style="
+                    background: none;
+                    border: none;
+                    color: rgba(255, 255, 255, 0.6);
+                    padding: 10px 0;
+                    cursor: pointer;
+                  "
+                >
+                  Billing
+                </button>
               </div>
             </div>
 
-            <div id="tab-content" class="tab-content">
+            <div id="tab-brief" class="tab-content">
+              <div class="form-group">
+                <label>Client Project Vision & Brief</label>
+                <textarea id="projectVisionInput" rows="10" placeholder="Client's website description will appear here..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); color: white;"></textarea>
+                <p style="font-size: 0.65rem; opacity: 0.5; margin-top: 5px">This is what the client submitted via their portal. Use this to guide your design.</p>
+              </div>
+              <div style="background: rgba(129, 140, 248, 0.05); padding: 20px; border-radius: 12px; border: 1px dashed rgba(129, 140, 248, 0.2); margin-top: 20px; text-align: center;">
+                  <h4 style="color: #818cf8; margin-bottom: 10px;">Ready to automate?</h4>
+                  <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 20px;">The AI will analyze the brief and populate all content, tags, and media automatically.</p>
+                  <button type="button" id="tabBriefGenerateBtn" class="btn" style="background: var(--primary-color); color: black; font-weight: 700; padding: 12px 30px; display: inline-flex; align-items: center; gap: 10px;">
+                      <i data-lucide="brain-circuit"></i> Run AI Generation Phase
+                  </button>
+              </div>
+            </div>
+
+            <div id="tab-content" class="tab-content" style="display: none">
               <div class="form-group">
                 <label>Business Tagline</label>
                 <input type="text" id="taglineInput" />
@@ -1591,6 +1606,14 @@
                   💡 Hosting Tip: Simply point the domain's A-record to our
                   server or add the domain to your Vercel project to activate.
                 </p>
+              </div>
+            </div>
+
+            <div id="tab-brief" class="tab-content" style="display: none">
+              <div class="form-group">
+                <label>Client Project Vision & Brief</label>
+                <textarea id="projectVisionInput" rows="10" placeholder="Client's website description will appear here..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.5); color: white;"></textarea>
+                <p style="font-size: 0.65rem; opacity: 0.5; margin-top: 5px">This is what the client submitted via their portal. Use this to guide your design.</p>
               </div>
             </div>
 
@@ -1730,7 +1753,15 @@
                 <input type="text" id="heroImageInput" />
               </div>
               <div class="form-group">
-                <label>Logo URL (Optionl)</label>
+                <label>About Section Image URL</label>
+                <input type="text" id="aboutImageInput" placeholder="Image displayed next to About Us text" />
+              </div>
+              <div class="form-group">
+                <label>Services Header Image URL</label>
+                <input type="text" id="servicesImageInput" placeholder="Contextual image for the services section" />
+              </div>
+              <div class="form-group">
+                <label>Logo URL (Optional)</label>
                 <input type="text" id="logoImageInput" />
               </div>
               <div class="form-group">
@@ -1742,6 +1773,14 @@
             <div style="display: flex; gap: 15px; margin-top: 30px">
               <button type="submit" class="btn btn-secondary" style="flex: 1">
                 Save → Website Live
+              </button>
+              <button
+                type="button"
+                id="aiGenerateContentBtn"
+                class="btn"
+                style="flex: 1; background: rgba(79, 70, 229, 0.1); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3);"
+              >
+                <i data-lucide="brain-circuit" style="width: 16px; display: inline-block; vertical-align: middle; margin-right: 5px;"></i> AI Design from Brief
               </button>
               <button
                 type="button"

@@ -9,67 +9,192 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link id="dynamicFont" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link id="dynamicFont" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
     
     <style id="templateStyles">
         :root {
             --primary: #d4af37;
-            --bg: #0a0a0a;
+            --primary-rgb: 212, 175, 55;
+            --bg: #030303;
             --text: #ffffff;
-            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-muted: rgba(255,255,255,0.6);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --container-width: 1100px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
         
-        nav { padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        /* Navigation */
+        nav { 
+            padding: 20px 0; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            background: rgba(3, 3, 3, 0.7); 
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
         .nav-content { display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .logo { font-size: 1.25rem; font-weight: 800; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { text-decoration: none; font-size: 0.9rem; font-weight: 500; color: var(--text); transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
         
-        .hero { padding: 100px 0; text-align: center; background-size: cover; background-position: center; position: relative; }
-        .hero::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.6); z-index: 1; }
-        .hero-content { position: relative; z-index: 2; }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; }
-        .hero p { font-size: 1.25rem; opacity: 0.9; max-width: 700px; margin: 0 auto 30px; }
+        /* Hero Section */
+        .hero { 
+            padding: 160px 0 120px; 
+            text-align: center; 
+            background-size: cover; 
+            background-position: center; 
+            position: relative; 
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .hero::before { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            background: radial-gradient(circle at 50% 50%, rgba(3,3,3,0.4) 0%, rgba(3,3,3,0.9) 100%); 
+            z-index: 1; 
+        }
+        .hero-content { position: relative; z-index: 2; width: 100%; max-width: 800px; margin: 0 auto; }
+        .hero h1 { 
+            font-size: clamp(2.5rem, 8vw, 4.5rem); 
+            line-height: 1.1; 
+            font-weight: 800; 
+            margin-bottom: 24px; 
+            letter-spacing: -0.03em;
+        }
+        .hero p { 
+            font-size: clamp(1rem, 4vw, 1.25rem); 
+            color: var(--text-muted); 
+            max-width: 600px; 
+            margin: 0 auto 40px; 
+            line-height: 1.6;
+        }
         
-        .btn { display: inline-block; padding: 12px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; cursor: pointer; border: none; }
-        .btn-primary { background: var(--primary); color: #000; }
-        .btn-primary:hover { transform: scale(1.05); }
+        /* Buttons */
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 14px 32px; 
+            border-radius: var(--radius-md); 
+            text-decoration: none; 
+            font-weight: 600; 
+            transition: var(--transition); 
+            cursor: pointer; 
+            border: none;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .btn-primary { 
+            background: var(--primary); 
+            color: #000; 
+            box-shadow: 0 10px 20px -5px rgba(var(--primary-rgb), 0.3);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 20px 30px -10px rgba(var(--primary-rgb), 0.5);
+            background: #f1c40f; 
+        }
         
-        section { padding: 80px 0; }
-        .section-title { text-align: center; margin-bottom: 50px; }
-        .section-title h2 { font-size: 2.5rem; color: var(--primary); margin-bottom: 10px; }
+        /* Sections */
+        section { padding: 100px 0; position: relative; }
+        section:nth-child(even) { background: rgba(255,255,255,0.015); }
+        .section-title { text-align: center; margin-bottom: 64px; }
+        .section-title span { 
+            color: var(--primary); 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            font-size: 0.8rem; 
+            letter-spacing: 2px; 
+            display: block; 
+            margin-bottom: 12px; 
+        }
+        .section-title h2 { 
+            font-size: clamp(2rem, 5vw, 2.75rem); 
+            font-weight: 700; 
+            letter-spacing: -0.02em; 
+        }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .card { background: var(--card-bg); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .card h3 { margin-bottom: 15px; color: var(--primary); }
-        .price { font-size: 1.5rem; font-weight: 700; display: block; margin-top: 15px; }
+        /* Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .card { 
+            background: var(--card-bg); 
+            padding: 40px; 
+            border-radius: var(--radius-lg); 
+            border: 1px solid var(--glass-border); 
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(var(--primary-rgb), 0.3);
+            background: rgba(255,255,255,0.05);
+        }
+        .card h3 { font-size: 1.5rem; margin-bottom: 16px; font-weight: 600; color: var(--text); }
+        .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
+        .price { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: block; margin-top: auto; }
         
-        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
-        .about-img img { width: 100%; border-radius: 20px; }
+        /* About */
+        .about-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center; }
+        .about-text h2 { margin-bottom: 24px; font-size: 2.5rem; }
+        .about-img img { 
+            width: 100%; 
+            border-radius: var(--radius-lg); 
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.5);
+            display: block;
+        }
         
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
-        .gallery-item img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        /* Gallery */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .gallery-item { border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 1; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .gallery-item:hover img { transform: scale(1.1); }
         
-        footer { padding: 50px 0; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.1); }
-        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
-        .footer-col h4 { margin-bottom: 20px; color: var(--primary); }
-        .footer-col p { margin-bottom: 10px; opacity: 0.7; }
+        /* Footer */
+        footer { padding: 80px 0 40px; background: #010101; border-top: 1px solid var(--glass-border); }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; }
+        .footer-col h4 { margin-bottom: 20px; font-weight: 700; color: var(--text); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .footer-col p { margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem; }
+        .footer-col a { color: var(--text-muted); text-decoration: none; transition: 0.3s; }
+        .footer-col a:hover { color: var(--primary); }
         
-        .whatsapp-float { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #25d366; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 10px 25px rgba(37,211,102,0.3); z-index: 1000; text-decoration: none; }
+        .whatsapp-float { 
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
+            background: #25d366; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 24px; 
+            box-shadow: 0 10px 30px rgba(37,211,102,0.3); z-index: 1000; text-decoration: none; transition: 0.3s;
+        }
+        .whatsapp-float:hover { transform: scale(1.1) translateY(-5px); }
         
-        /* Preview Banner */
         #previewBanner { position: fixed; top: 0; left: 0; width: 100%; background: var(--primary); color: black; text-align: center; padding: 10px; font-weight: 700; z-index: 9999; display: none; }
         
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
+        @media (max-width: 991px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
             .about-grid { grid-template-columns: 1fr; }
         }
+        @media (max-width: 768px) {
+            .hero { padding: 120px 0 80px; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
     </style>
-  <script type="module" crossorigin src="./assets/site-DRApOYE_.js"></script>
+  <script type="module" crossorigin src="./assets/site-DHvBo4_b.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/firebase-applet-config-Ck6_0kXN.js">
 </head>
 <body>
@@ -79,8 +204,9 @@
         <div class="container nav-content">
             <a href="#" class="logo" id="siteLogoText">BusinessName</a>
             <div class="nav-links">
-                <a href="#services" class="btn btn-sm" style="color: white;">Services</a>
-                <a href="#contact" class="btn btn-primary btn-sm">Contact Us</a>
+                <a href="#services">Services</a>
+                <a href="#about">About</a>
+                <a href="#contact" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.8rem;">Contact Us</a>
             </div>
         </div>
     </nav>
@@ -88,16 +214,19 @@
     <header class="hero" id="siteHero">
         <div class="container hero-content">
             <h1 id="siteTitle">Main Headline</h1>
-            <p id="siteTagline">Engaging tagline for your service business.</p>
-            <a href="#contact" class="btn btn-primary">Book Consultation</a>
+            <p id="siteTagline">Engaging tagline for your service business in Nairobi.</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a href="#contact" class="btn btn-primary">Book Consultation</a>
+                <a href="#services" class="btn btn-outline" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;">Our Services</a>
+            </div>
         </div>
     </header>
 
     <section id="services">
         <div class="container">
             <div class="section-title">
-                <span id="servicesBadge">Our Expertise</span>
-                <h2 id="servicesTitle">What We <span>Offer</span></h2>
+                <span>Our Expertise</span>
+                <h2 id="servicesTitle">Professional Solutions</h2>
             </div>
             <div class="grid" id="servicesGrid">
                 <!-- Services injected here -->
@@ -108,6 +237,7 @@
     <section id="features" style="display: none;">
         <div class="container">
             <div class="section-title">
+                <span>Advantages</span>
                 <h2>Why Choose <span>Us</span></h2>
             </div>
             <div class="grid" id="featuresGrid">
@@ -116,12 +246,15 @@
         </div>
     </section>
 
-    <section id="about" style="background: rgba(255,255,255,0.02);">
+    <section id="about">
         <div class="container">
             <div class="about-grid">
                 <div class="about-text">
-                    <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Why Choose <span id="aboutName" style="color: var(--primary);">Us</span>?</h2>
-                    <p id="aboutContent">Detailed about text goes here.</p>
+                    <div class="section-title" style="text-align: left; margin-bottom: 24px;">
+                        <span>Our Story</span>
+                        <h2 style="font-size: 2.5rem;">Why Choose <span id="aboutName" style="color: var(--primary);">Us</span>?</h2>
+                    </div>
+                    <p id="aboutContent" style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.8;">Detailed about text goes here.</p>
                 </div>
                 <div class="about-img" id="aboutImgContainer">
                     <img src="https://images.unsplash.com/photo-1600880210839-4f444c136329?auto=format&fit=crop&w=800&q=80" alt="About Us">
@@ -130,10 +263,11 @@
         </div>
     </section>
 
-    <section id="gallery">
+    <section id="gallery" style="display: none;">
         <div class="container">
             <div class="section-title">
-                <h2>Our <span>Work</span></h2>
+                <span>Portfolio</span>
+                <h2>Our Recent <span>Work</span></h2>
             </div>
             <div class="gallery-grid" id="galleryGrid">
                 <!-- Gallery injected here -->
@@ -144,6 +278,7 @@
     <section id="pricing" style="display: none;">
         <div class="container">
             <div class="section-title">
+                <span>Packages</span>
                 <h2>Transparent <span>Pricing</span></h2>
             </div>
             <div class="grid" id="pricingGrid">
@@ -155,6 +290,7 @@
     <section id="testimonials" style="display: none;">
         <div class="container">
             <div class="section-title">
+                <span>Reviews</span>
                 <h2>Client <span>Love</span></h2>
             </div>
             <div class="grid" id="testimonialsGrid">
@@ -163,11 +299,11 @@
         </div>
     </section>
 
-    <section id="cta" style="display: none; padding: 100px 0; text-align: center;">
+    <section id="cta" style="display: none;">
         <div class="container">
-            <div style="background: var(--primary, #d4af37); padding: 80px 40px; border-radius: 40px; color: white;">
-                <h2 id="ctaTitle" style="font-size: 3rem; margin-bottom: 30px;">Ready to Start?</h2>
-                <a href="#contact" id="ctaBtn" class="btn" style="background: white; color: var(--primary, #d4af37); font-weight: 800; padding: 20px 40px; border-radius: 20px;">Get Started Now</a>
+            <div style="background: var(--primary); padding: 80px 40px; border-radius: 40px; color: #000; text-align: center;">
+                <h2 id="ctaTitle" style="font-size: 2.5rem; margin-bottom: 24px; font-weight: 800;">Ready to Elevate Your Business?</h2>
+                <a href="#contact" id="ctaBtn" class="btn" style="background: #000; color: #fff; font-weight: 700; padding: 18px 40px; border-radius: 16px;">Get Started Now</a>
             </div>
         </div>
     </section>
@@ -175,21 +311,22 @@
     <section id="contact">
         <div class="container">
             <div class="section-title">
+                <span>Inquiry</span>
                 <h2>Connect <span>With Us</span></h2>
             </div>
-            <div class="grid">
+            <div class="grid" style="grid-template-columns: 1fr 1fr; align-items: start;">
                 <div class="card">
                     <h3>Contact Information</h3>
                     <p id="contactAddress">📍 Neighborhood, Nairobi</p>
                     <p id="contactPhone">📞 +254 700 000000</p>
                     <p id="contactEmail">📧 contact@business.com</p>
                     
-                    <div style="margin-top: 30px;">
-                        <a href="#" id="callBtn" class="btn btn-primary" style="width: 100%; text-align: center; margin-bottom: 10px;">Call Now</a>
-                        <a href="#" id="waBtn" class="btn btn-primary" style="width: 100%; text-align: center; background: #25d366; color: white;">Message on WhatsApp</a>
+                    <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 12px;">
+                        <a href="#" id="callBtn" class="btn btn-primary" style="width: 100%;">Call Now</a>
+                        <a href="#" id="waBtn" class="btn" style="width: 100%; background: #25d366; color: white;">Message on WhatsApp</a>
                     </div>
                 </div>
-                <div class="card" id="mapContainer" style="padding: 0; overflow: hidden; min-height: 300px;">
+                <div class="card" id="mapContainer" style="padding: 0; overflow: hidden; min-height: 400px; border-radius: 24px;">
                     <!-- Map iframe here -->
                 </div>
             </div>
@@ -200,27 +337,27 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h4 id="footerName">BusinessName</h4>
-                    <p id="footerTagline">Smart solutions for growth.</p>
+                    <h4 id="footerName" style="color: var(--primary); font-size: 1.25rem;">BusinessName</h4>
+                    <p id="footerTagline">Professional web solutions for elite businesses.</p>
                 </div>
                 <div class="footer-col">
-                    <h4>Links</h4>
-                    <p><a href="#services" style="color: inherit; text-decoration: none;">Services</a></p>
-                    <p><a href="#about" style="color: inherit; text-decoration: none;">About</a></p>
-                    <p><a href="#contact" style="color: inherit; text-decoration: none;">Contact</a></p>
+                    <h4>Internal Links</h4>
+                    <p><a href="#services">Services</a></p>
+                    <p><a href="#about">About</a></p>
+                    <p><a href="#contact">Contact</a></p>
                 </div>
                 <div class="footer-col">
-                    <h4>Social</h4>
-                    <p>WhatsApp</p>
-                    <p>Instagram</p>
-                    <p>Facebook</p>
+                    <h4>Business Hours</h4>
+                    <p>Mon - Fri: 8:00 AM - 6:00 PM</p>
+                    <p>Sat: 9:00 AM - 3:00 PM</p>
+                    <p>Sun: Closed</p>
                 </div>
             </div>
-            <div style="margin-top: 50px; text-align: center; opacity: 0.5; font-size: 0.8rem;">
+            <div style="margin-top: 60px; text-align: center; opacity: 0.5; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px;">
                 <p>&copy; 2026 <span id="copyName">BusinessName</span>.</p>
-                <div id="poweredByTag" style="margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <span style="opacity: 0.6;">Powered by</span>
-                    <a href="https://quicksitekenya.co.ke" target="_blank" style="color: inherit; text-decoration: none; font-weight: 700; border: 1px solid rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px;">QuickSite Kenya</a>
+                <div id="poweredByTag" style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>Designed & Developed by</span>
+                    <a href="https://quicksitekenya.co.ke" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 700;">QuickSite Kenya</a>
                 </div>
             </div>
         </div>
@@ -231,6 +368,5 @@
     </a>
 
     <!-- Firebase SDKs (Modular) -->
-    
 </body>
 </html>
