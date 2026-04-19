@@ -372,40 +372,77 @@
 
                 <!-- Admin Edit Modal -->
                 <div id="adminEditModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-                    <div style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
-                        <h3 style="color: white; margin-bottom: 20px; font-size: 1.3rem;">Manage Client Entry</h3>
+                    <div style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                        <h3 style="color: white; margin-bottom: 20px; font-size: 1.3rem;">Manage Elite Client Website</h3>
                         
                         <input type="hidden" id="editClientId">
                         
-                        <div class="form-group">
-                            <label>Payment Status</label>
-                            <select id="editPaymentStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                <option value="Unpaid">Unpaid</option>
-                                <option value="Paid">Paid</option>
-                            </select>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label>Payment Status</label>
+                                <select id="editPaymentStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                    <option value="Unpaid">Unpaid</option>
+                                    <option value="Paid">Paid</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Plan</label>
+                                <select id="editPlan" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                    <option value="Starter Presence">Starter Presence</option>
+                                    <option value="Business Growth">Business Growth</option>
+                                    <option value="Pro Conversion System">Pro Conversion System</option>
+                                </select>
+                            </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label>Plan</label>
-                            <select id="editPlan" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                <option value="Starter Presence">Starter Presence</option>
-                                <option value="Business Growth">Business Growth</option>
-                                <option value="Pro Conversion System">Pro Conversion System</option>
-                            </select>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label>Environment Status</label>
+                                <select id="editEnvStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                    <option value="Draft">Draft (Offline)</option>
+                                    <option value="Preview">Preview</option>
+                                    <option value="Live">Live (Published)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Design Template</label>
+                                <select id="editTemplate" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                    <option value="Starter Presence">Starter Presence</option>
+                                    <option value="Universal Professional">Universal Professional</option>
+                                    <option value="Salon & Beauty">Salon & Beauty</option>
+                                    <option value="Fitness & Gym">Fitness & Gym</option>
+                                    <option value="Restaurant & Cafe">Restaurant & Cafe</option>
+                                    <option value="Medical & Health">Medical & Health</option>
+                                    <option value="Legal & Consulting">Legal & Consulting</option>
+                                </select>
+                            </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label>Environment Status</label>
-                            <select id="editEnvStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                <option value="Draft">Draft (Offline)</option>
-                                <option value="Preview">Preview</option>
-                                <option value="Live">Live (Published)</option>
-                            </select>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Business Name</label>
+                            <input type="text" id="editBusinessName" class="form-input" placeholder="e.g. John's Elite Bakery">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Hero Title (Main Headline)</label>
+                            <input type="text" id="editHeroTitle" class="form-input" placeholder="e.g. The Best Baking Experience">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Hero Subtitle</label>
+                            <input type="text" id="editHeroSubtitle" class="form-input" placeholder="e.g. Artisan breads and pastries delivered fresh daily.">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Subdomain Prefix (e.g., 'johns-bakery')</label>
+                            <input type="text" id="editSubdomain" class="form-input" placeholder="johns-bakery">
                         </div>
 
                         <div class="form-group" style="margin-bottom: 25px;">
-                            <label>Subdomain Prefix (e.g., 'johns-bakery')</label>
-                            <input type="text" id="editSubdomain" class="form-input" placeholder="johns-bakery">
+                            <label>Custom Domain (e.g., www.johnsbakery.com)</label>
+                            <input type="text" id="editCustomDomain" class="form-input" placeholder="www.yourdomain.com">
                         </div>
 
                         <div style="background: rgba(212,175,55,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.2); margin-bottom: 25px;">
@@ -415,9 +452,12 @@
                             <input type="text" id="previewLinkOutput" class="form-input" style="margin-top: 10px; display: none; font-size: 0.8rem;" readonly>
                         </div>
                         
-                        <div style="display: flex; gap: 15px; justify-content: flex-end;">
-                            <button id="closeAdminEditModal" class="btn btn-secondary" style="background: transparent; border: none;">Cancel</button>
-                            <button id="saveAdminEditBtn" class="btn btn-primary">Save Changes</button>
+                        <div style="display: flex; gap: 15px; justify-content: space-between; align-items: center;">
+                            <button id="injectEliteDataBtn" class="btn" style="background: #eef2ff; color: #4f46e5; border: none; font-size: 0.8rem; padding: 8px 15px;"><i data-lucide="sparkles" style="width:14px;"></i> Inject Elite Demo Data</button>
+                            <div style="display: flex; gap: 10px;">
+                                <button id="closeAdminEditModal" class="btn btn-secondary" style="background: transparent; border: none;">Cancel</button>
+                                <button id="saveAdminEditBtn" class="btn btn-primary">Save Changes</button>
+                            </div>
                         </div>
                     </div>
                 </div>

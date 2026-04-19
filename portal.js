@@ -310,7 +310,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             document.getElementById('editPlan').value = data.plan || 'Starter Presence';
                             document.getElementById('editEnvStatus').value = data.status || 'Draft';
                             document.getElementById('editSubdomain').value = data.subdomain || '';
-                            
+                            document.getElementById('editTemplate').value = data.template || 'Starter Presence';
+                            document.getElementById('editBusinessName').value = data.businessName || '';
+                            document.getElementById('editHeroTitle').value = data.hero?.title || '';
+                            document.getElementById('editHeroSubtitle').value = data.hero?.subtitle || '';
+                            document.getElementById('editCustomDomain').value = data.customDomain || (data.custom_domains ? data.custom_domains[0] : '');
+
                             // Reset Link Output
                             const output = document.getElementById('previewLinkOutput');
                             if(output) {
@@ -356,8 +361,18 @@ document.addEventListener('DOMContentLoaded', () => {
                              paymentStatus: document.getElementById('editPaymentStatus').value,
                              plan: document.getElementById('editPlan').value,
                              status: document.getElementById('editEnvStatus').value,
-                             subdomain: document.getElementById('editSubdomain').value
+                             subdomain: document.getElementById('editSubdomain').value,
+                             template: document.getElementById('editTemplate').value,
+                             businessName: document.getElementById('editBusinessName').value,
+                             customDomain: document.getElementById('editCustomDomain').value,
+                             hero: {
+                               title: document.getElementById('editHeroTitle').value,
+                               subtitle: document.getElementById('editHeroSubtitle').value
+                             }
                          };
+                         if (updates.customDomain) {
+                             updates.custom_domains = [updates.customDomain];
+                         }
                          const docRef = doc(db, 'clientSites', docId);
                          await updateDoc(docRef, updates);
                          modal.style.display = 'none';
@@ -368,6 +383,57 @@ document.addEventListener('DOMContentLoaded', () => {
                          newSaveBtn.innerText = 'Save Changes';
                          newSaveBtn.disabled = false;
                     }
+                });
+            }
+
+            // Bind Inject Elite Data
+            const injectBtn = document.getElementById('injectEliteDataBtn');
+            if (injectBtn) {
+                const newInjectBtn = injectBtn.cloneNode(true);
+                injectBtn.parentNode.replaceChild(newInjectBtn, injectBtn);
+                newInjectBtn.addEventListener('click', async () => {
+                     const docId = document.getElementById('editClientId').value;
+                     if (!docId) return;
+                     
+                     newInjectBtn.innerText = 'Injecting...';
+                     newInjectBtn.disabled = true;
+                     
+                     try {
+                         const updates = {
+                             featuresEnabled: ['Features', 'Pricing', 'Testimonials', 'CTA'],
+                             features: [
+                                 { icon: 'shield', title: 'Bank-Grade Security', desc: 'State of the art encryption to protect user data.' },
+                                 { icon: 'zap', title: 'Lightning Fast', desc: 'Edge delivery ensuring sub-second load times.' },
+                                 { icon: 'smartphone', title: 'Mobile First', desc: 'Flawless responsive design on all devices.' },
+                                 { icon: 'trending-up', title: 'SEO Optimized', desc: 'Rank higher automatically with structured semantics.' }
+                             ],
+                             pricing: [
+                                 { plan: 'Essential', price: 'KES 1,500', features: ['Basic Analytics', 'Standard Support', '5GB Storage'] },
+                                 { plan: 'Professional', price: 'KES 4,500', features: ['Advanced CRM', 'Priority Whatsapp', 'Unlimited Storage', 'Custom Domain'] }
+                             ],
+                             testimonials: [
+                                 { name: 'Sarah W.', quote: 'This completely revolutionized how we capture clients.' },
+                                 { name: 'David M.', quote: 'The conversion rate jumped 40% in our first week.' }
+                             ],
+                             cta: { title: 'Ready to Transform Your Business?', btn: 'Get Started Today' },
+                             images: {
+                                 gallery: [
+                                     'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80',
+                                     'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?auto=format&fit=crop&w=800&q=80',
+                                     'https://images.unsplash.com/photo-1556761175-5973e04eb924?auto=format&fit=crop&w=800&q=80'
+                                 ]
+                             }
+                         };
+                         const docRef = doc(db, 'clientSites', docId);
+                         await updateDoc(docRef, updates);
+                         alert("Elite data payload injected successfully! Run 'Save Changes' if you altered inputs.");
+                     } catch(err) {
+                         alert("Error injecting data: " + err.message);
+                     } finally {
+                         newInjectBtn.innerHTML = '<i data-lucide="sparkles" style="width:14px;"></i> Inject Elite Demo Data';
+                         if (window.lucide) window.lucide.createIcons();
+                         newInjectBtn.disabled = false;
+                     }
                 });
             }
 
