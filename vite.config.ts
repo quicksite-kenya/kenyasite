@@ -4,6 +4,9 @@ import {defineConfig} from 'vite';
 
 export default defineConfig({
   base: './',
+  define: {
+    'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY)
+  },
   plugins: [tailwindcss()],
   resolve: {
     alias: {
