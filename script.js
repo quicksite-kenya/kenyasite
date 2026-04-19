@@ -134,7 +134,8 @@ CRITICAL: If a user expresses interest, encourage them to provide their Name and
         } catch (error) {
             console.error("AI Chat Error:", error);
             if (typingIndicator.parentNode) typingIndicator.remove();
-            addMessage("I apologize, but my digital pathways are currently congested. Please try again or use our contact form.", 'bot');
+            const errMsg = error instanceof Error ? error.message : String(error);
+            addMessage("Error: " + errMsg, 'bot');
         } finally {
             input.disabled = false;
             sendBtn.disabled = false;
@@ -724,7 +725,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('clientNameInput').value = data ? data.clientName || '' : '';
         document.getElementById('businessNameInput').value = data ? data.businessName || '' : '';
         document.getElementById('planInput').value = data ? data.plan || 'Starter Online Presence' : 'Starter Online Presence';
-        document.getElementById('templateInput').value = data ? data.template || 'Default' : 'Default';
+        document.getElementById('templateInput').value = data ? data.template || 'CORPORATE_CLEAN' : 'CORPORATE_CLEAN';
         document.getElementById('taglineInput').value = data ? data.tagline || '' : '';
         document.getElementById('aboutTextInput').value = data ? data.aboutText || '' : '';
         document.getElementById('statusInput').value = data ? data.status || 'Draft' : 'Draft';
@@ -944,10 +945,67 @@ Respond ONLY with a JSON object containing:
 Ensure the copy is high-converting and specifically tailored to the Kenyan market. Use local nuances (Nairobi, Mombasa, specific Kenyan business culture) if appropriate.
 The image keywords should be descriptive enough to get a relevant high-quality image.`;
 
+            const promptText = `Generate a website content object in JSON format based on the following context:
+
+BUSINESS NAME: ${businessName}
+PROJECT BRIEF: ${brief}
+CONTACT INFO: ${phone ? 'Phone: ' + phone : ''} ${whatsapp ? 'WhatsApp: ' + whatsapp : ''} ${address ? 'Address: ' + address : ''}
+EXISTING TAGLINE: ${existingTagline}
+EXISTING ABOUT: ${existingAbout}
+
+You are an AI assistant responsible for selecting the most appropriate premium website template for a business AND generating all copy.
+
+Your template decision must be based on:
+- Business name
+- Industry
+- Services
+- Brand tone (if available)
+
+AVAILABLE TEMPLATES:
+1. LUXURY_DARK
+Best for: Real estate, Agencies, High-end brands, Luxury services
+Style: Dark gradient background, Red accents, Cinematic visuals, Bold typography
+
+2. CORPORATE_CLEAN
+Best for: Corporate companies, Consultants, Finance businesses, Professional services
+Style: White background, Blue accents, Structured layout, Clean and professional
+
+3. STARTUP_MODERN
+Best for: Tech startups, SaaS platforms, Apps, Digital products
+Style: Gradient backgrounds, Bright colors (purple/blue), Glassmorphism UI, Modern and innovative
+
+4. BOLD_FITNESS
+Best for: Gyms, Personal trainers, Sports brands, Fitness businesses
+Style: Dark theme, Neon accents, Strong typography, High-energy visuals
+
+INSTRUCTIONS:
+- Analyze the business type carefully
+- Match the business to the most suitable template out of the options above based on Project Brief, Content, Media and Advanced needs.
+- If multiple templates could fit, choose the one that feels most premium and visually appropriate
+- Ensure the copy is high-converting and specifically tailored to the Kenyan market. Use local nuances if appropriate.
+
+Respond EXACTLY with a JSON object matching this structure:
+{
+  "template": "LUXURY_DARK | CORPORATE_CLEAN | STARTUP_MODERN | BOLD_FITNESS",
+  "templateReason": "short explanation of why this template fits the business",
+  "hero": { "title": "Main Headline", "subtitle": "Supporting text" },
+  "heroImage": "Single keyword for hero image (e.g. workspace)",
+  "aboutImage": "Single keyword for about image (e.g. team)",
+  "servicesImage": "Single keyword for services image",
+  "aboutText": "A professional, persuasive story about the business",
+  "services": [ { "name": "Service Name", "description": "Short description", "price": "KES 5000" } ],
+  "features": [ { "icon": "check", "title": "Quality", "desc": "We perfectly deliver" } ],
+  "pricing": [ { "plan": "Basic", "price": "KES 1000", "features": ["Feature 1", "Feature 2"] } ],
+  "testimonials": [ { "name": "John Doe", "quote": "Amazing service!" } ],
+  "tagline": "A punchy 1-sentence brand promise",
+  "cta": { "title": "Ready to Start?", "btn": "Contact Us Now" }
+}`;
+
             const response = await ai.models.generateContent({
                 model: "gemini-3-flash-preview",
-                contents: prompt,
+                contents: promptText,
                 config: {
+                    systemInstruction: "You are an elite web designer and copywriter for QuickSite Kenya.",
                     responseMimeType: "application/json"
                 }
             });
@@ -959,20 +1017,38 @@ The image keywords should be descriptive enough to get a relevant high-quality i
             const content = JSON.parse(cleanedJson);
 
             // Map Image keywords to real high-res placeholders
-            if (content.heroImage) content.heroImageUrl = `https://picsum.photos/seed/${content.heroImage.replace(/\s+/g, '')}/1920/1080`;
-            if (content.aboutImage) content.aboutImageUrl = `https://picsum.photos/seed/${content.aboutImage.replace(/\s+/g, '')}/1080/1080`;
-            if (content.servicesImage) content.servicesImageUrl = `https://picsum.photos/seed/${content.servicesImage.replace(/\s+/g, '')}/1280/720`;
+            if (content.heroImage) content.heroImageUrl = `https://picsum.photos/seed/${String(content.heroImage).replace(/\s+/g, '')}/1920/1080`;
+            if (content.aboutImage) content.aboutImageUrl = `https://picsum.photos/seed/${String(content.aboutImage).replace(/\s+/g, '')}/1080/1080`;
+            if (content.servicesImage) content.servicesImageUrl = `https://picsum.photos/seed/${String(content.servicesImage).replace(/\s+/g, '')}/1280/720`;
             
+            // Safe fallbacks
+            const hero = content.hero || { title: "", subtitle: "" };
+            const cta = content.cta || { title: "", btn: "" };
+            const services = Array.isArray(content.services) ? content.services : [];
+            const features = Array.isArray(content.features) ? content.features : [];
+            const pricing = Array.isArray(content.pricing) ? content.pricing : [];
+            const testimonials = Array.isArray(content.testimonials) ? content.testimonials : [];
+            const aiTemplate = content.template || template;
+
+            // Ensure the dropdown reflects the AI's choice if it exists
+            const templateInputEl = document.getElementById('templateInput');
+            if (templateInputEl && content.template) {
+                // If the option doesn't exist yet, we might need to add it, but normally it should map.
+                templateInputEl.value = content.template;
+            }
+
             // Update Firestore
             await updateDoc(doc(db, 'clientSites', docId), {
-                hero: content.hero,
-                aboutText: content.aboutText,
-                tagline: content.tagline,
-                services: content.services,
-                features: content.features,
-                pricing: content.pricing,
-                testimonials: content.testimonials,
-                cta: content.cta,
+                template: aiTemplate,
+                templateReason: content.templateReason || "",
+                hero: hero,
+                aboutText: content.aboutText || existingAbout || "",
+                tagline: content.tagline || existingTagline || "",
+                services: services,
+                features: features,
+                pricing: pricing,
+                testimonials: testimonials,
+                cta: cta,
                 images: {
                     hero: content.heroImageUrl || document.getElementById('heroImageInput').value,
                     about: content.aboutImageUrl || document.getElementById('aboutImageInput').value,
@@ -985,14 +1061,14 @@ The image keywords should be descriptive enough to get a relevant high-quality i
             });
 
             // Update UI fields
-            document.getElementById('heroSettingsInput').value = `${content.hero.title} | ${content.hero.subtitle} | Learn More`;
-            document.getElementById('taglineInput').value = content.tagline;
-            document.getElementById('aboutTextInput').value = content.aboutText;
-            document.getElementById('servicesInput').value = content.services.map(s => `${s.name} | ${s.price} | ${s.description}`).join('\n');
-            document.getElementById('featuresInput').value = content.features.map(f => `${f.title} | ${f.desc} | ${f.icon}`).join('\n');
-            document.getElementById('pricingInput').value = content.pricing.map(p => `${p.plan} | ${p.price} | ${p.features.join(', ')}`).join('\n');
-            document.getElementById('testimonialsInput').value = content.testimonials.map(t => `${t.name} | ${t.quote}`).join('\n');
-            document.getElementById('ctaSettingsInput').value = `${content.cta.title} | ${content.cta.btn}`;
+            document.getElementById('heroSettingsInput').value = `${hero.title} | ${hero.subtitle} | Learn More`;
+            document.getElementById('taglineInput').value = content.tagline || existingTagline;
+            document.getElementById('aboutTextInput').value = content.aboutText || existingAbout;
+            document.getElementById('servicesInput').value = services.map(s => `${s.name} | ${s.price} | ${s.description}`).join('\n');
+            document.getElementById('featuresInput').value = features.map(f => `${f.title} | ${f.desc} | ${f.icon}`).join('\n');
+            document.getElementById('pricingInput').value = pricing.map(p => `${p.plan} | ${p.price} | ${(p.features || []).join(', ')}`).join('\n');
+            document.getElementById('testimonialsInput').value = testimonials.map(t => `${t.name} | ${t.quote}`).join('\n');
+            document.getElementById('ctaSettingsInput').value = `${cta.title} | ${cta.btn}`;
             
             document.getElementById('heroImageInput').value = content.heroImageUrl || '';
             document.getElementById('aboutImageInput').value = content.aboutImageUrl || '';
@@ -1006,7 +1082,8 @@ The image keywords should be descriptive enough to get a relevant high-quality i
 
         } catch (err) {
             console.error("AI Gen error:", err);
-            showToast("AI Generation failed. Check console for details.", 'error');
+            const errMsg = err instanceof Error ? err.message : String(err);
+            showToast("AI Gen failed: " + errMsg, 'error');
         } finally {
             if (aiGenBtn) {
                 aiGenBtn.innerHTML = originalBtnText;

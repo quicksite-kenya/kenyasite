@@ -229,7 +229,7 @@
         },
         "status": {
           "type": "string",
-          "enum": ["Draft", "Live"]
+          "enum": ["Draft", "Preview", "Live"]
         },
         "customDomain": { 
           "type": "string",
@@ -247,6 +247,10 @@
         "template_type": {
           "type": "string",
           "description": "The type of template to render."
+        },
+        "templateReason": {
+          "type": "string",
+          "description": "The reason the AI selected the specific template."
         },
         "subscriptionPlan": {
           "type": "string",
