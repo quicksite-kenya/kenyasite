@@ -2878,6 +2878,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                         <p>${post.subtitle}</p>
                         <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
                             <a href="blog-post.html?id=${postId}" class="btn btn-primary">Explore Article</a>
+                            ${post.link ? `<a href="${post.link}" class="btn btn-secondary" target="_blank">Visit Site</a>` : ''}
                             ${isAdmin ? `
                                 <button class="btn btn-secondary edit-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem;">Edit</button>
                                 <button class="btn btn-primary delete-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem; background: #ff4444; border-color: #ff4444;">Delete</button>
@@ -2934,6 +2935,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 document.getElementById('postTitleInput').value = post.title;
                 document.getElementById('postSubtitleInput').value = post.subtitle;
                 document.getElementById('postImgInput').value = post.img;
+                document.getElementById('postLinkInput').value = post.link || '';
                 document.getElementById('postCategoryInput').value = post.category || 'Insights';
                 document.getElementById('postContentInput').value = post.content;
                 blogPostModal.style.display = 'block';
@@ -3036,6 +3038,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                     title: document.getElementById('postTitleInput').value,
                     subtitle: document.getElementById('postSubtitleInput').value,
                     img: img,
+                    link: document.getElementById('postLinkInput').value,
                     category: document.getElementById('postCategoryInput').value,
                     content: document.getElementById('postContentInput').value,
                     date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
@@ -3095,6 +3098,18 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                     
                     // Update Body
                     if (bodyEl) bodyEl.innerHTML = post.content;
+                    
+                    // Add Visit Site button if link exists
+                    const navEl = document.querySelector('.post-navigation');
+                    if (post.link && navEl) {
+                        const visitBtn = document.createElement('a');
+                        visitBtn.href = post.link;
+                        visitBtn.className = 'btn btn-secondary';
+                        visitBtn.target = '_blank';
+                        visitBtn.innerText = 'Visit Site';
+                        visitBtn.style.marginLeft = '10px';
+                        navEl.appendChild(visitBtn);
+                    }
                     
                     if (window.lucide) window.lucide.createIcons();
                 } else {
