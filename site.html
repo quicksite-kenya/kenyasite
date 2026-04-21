@@ -312,20 +312,65 @@
                 <span>Inquiry</span>
                 <h2>Connect <span>With Us</span></h2>
             </div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; align-items: start;">
-                <div class="card">
-                    <h3>Contact Information</h3>
-                    <p id="contactAddress">📍 Neighborhood, Nairobi</p>
-                    <p id="contactPhone">📞 +254 700 000000</p>
-                    <p id="contactEmail">📧 contact@business.com</p>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); align-items: stretch; gap: 32px;">
+                <div class="card" style="display: flex; flex-direction: column;">
+                    <h3 style="font-size: 2rem; margin-bottom: 16px; font-weight: 800;">Get in Touch</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 1.05rem;">We're here to help and answer any question you might have. We look forward to hearing from you.</p>
                     
-                    <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 12px;">
-                        <a href="#" id="callBtn" class="btn btn-primary" style="width: 100%;">Call Now</a>
-                        <a href="#" id="waBtn" class="btn" style="width: 100%; background: #25d366; color: white;">Message on WhatsApp</a>
+                    <div style="display: flex; flex-direction: column; gap: 20px; flex-grow: 1; margin-bottom: 40px;">
+                        <div style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px;">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="map-pin" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Location</span>
+                                <span id="contactAddressText" style="font-weight: 600; font-size: 1.1rem;">Nairobi, Kenya</span>
+                            </div>
+                        </div>
+                        
+                        <a href="#" id="callBtnLink" style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px; text-decoration: none; color: var(--text); transition: var(--transition);">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="phone" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Direct Line</span>
+                                <span id="contactPhoneText" style="font-weight: 600; font-size: 1.1rem;">+254 700 000000</span>
+                            </div>
+                        </a>
+                        
+                        <div style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px;">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="mail" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Email Support</span>
+                                <span id="contactEmailText" style="font-weight: 600; font-size: 1.1rem;">contact@business.com</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" id="callBtn" class="btn btn-primary" style="flex: 1;"><i data-lucide="phone"></i> Call</a>
+                        <a href="#" id="waBtn" class="btn" style="flex: 2; background: #25D366; color: white;"><i data-lucide="message-circle" style="fill: white;"></i> Chat on WhatsApp</a>
                     </div>
                 </div>
-                <div class="card" id="mapContainer" style="padding: 0; overflow: hidden; min-height: 400px; border-radius: 24px;">
-                    <!-- Map iframe here -->
+                
+                <div class="card" style="padding: 0; min-height: 500px; border-radius: var(--radius-lg); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="padding: 30px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 16px; z-index: 2;">
+                        <div style="width: 48px; height: 48px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="compass"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.2rem;">Our Headquarters</h4>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Navigate to our office</p>
+                        </div>
+                    </div>
+                    <div id="mapContainer" style="flex-grow: 1; width: 100%; position: relative; background: #1a1a1a;">
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem;">
+                            Map Data Unavailable
+                        </div>
+                        <!-- Map iframe injected here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -368,7 +413,7 @@
     <!-- Firebase SDKs (Modular) -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
-        import { initializeFirestore, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+        import { initializeFirestore, doc, onSnapshot, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
         import firebaseConfig from './firebase-applet-config.json';
 
         async function init() {
@@ -381,6 +426,7 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const siteId = urlParams.get('id');
                 const isPreview = urlParams.get('preview') === 'true';
+                const hostname = window.location.hostname;
 
                 if (isPreview) document.getElementById('previewBanner').style.display = 'block';
 
@@ -545,38 +591,39 @@
                     }
 
                     if (data.contact) {
-                        document.getElementById('contactAddress').innerText = `📍 ${data.contact.address || 'Nairobi, Kenya'}`;
-                        document.getElementById('contactPhone').innerText = `📞 ${data.contact.phone || '+254 700 000000'}`;
-                        document.getElementById('contactEmail').innerText = `📧 ${data.contact.email || 'contact@business.com'}`;
+                        document.getElementById('contactAddressText').innerText = data.contact.address || 'Nairobi, Kenya';
+                        document.getElementById('contactPhoneText').innerText = data.contact.phone || '+254 700 000000';
+                        document.getElementById('contactEmailText').innerText = data.contact.email || 'contact@business.com';
                         document.getElementById('callBtn').href = `tel:${data.contact.phone}`;
+                        document.getElementById('callBtnLink').href = `tel:${data.contact.phone}`;
                         const waNumber = (data.contact.whatsapp || data.contact.phone || '').toString().replace(/\+/g, '').replace(/\s/g, '');
                         window.currentWaUrl = `https://wa.me/${waNumber}`;
                         document.getElementById('waBtn').href = window.currentWaUrl;
                         document.getElementById('floatWaBtn').href = window.currentWaUrl;
                         if (data.contact.mapUrl) {
-                            document.getElementById('mapContainer').innerHTML = `<iframe src="${data.contact.mapUrl}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerPolicy="no-referrer"></iframe>`;
+                            document.getElementById('mapContainer').innerHTML = `<iframe src="${data.contact.mapUrl}" width="100%" height="100%" style="border:0; position: absolute; inset:0;" allowfullscreen="" loading="lazy" referrerPolicy="no-referrer"></iframe>`;
                         }
                     }
 
-                    const gallery = document.getElementById('galleryGrid');
-                    gallery.innerHTML = '';
-                    if (data.images?.gallery && data.images.gallery.length > 0) {
-                        document.getElementById('gallery').style.display = 'block';
-                        data.images.gallery.forEach(img => {
-                            const item = document.createElement('div');
-                            item.className = 'gallery-item';
-                            item.innerHTML = `<img src="${img}" alt="Gallery Image" referrerPolicy="no-referrer">`;
-                            gallery.appendChild(item);
-                        });
-                    }
-
-                    window.applyTemplate(data.template);
-                    
                     const features = data.featuresEnabled || [];
-                    const plan = data.subscriptionPlan || 'Starter Presence';
+                    const plan = data.plan || data.subscriptionPlan || 'Business Growth';
+                    const isStarter = plan === 'Starter Presence';
 
-                    if (data.template === 'Universal Professional') {
-                        const featuresSection = document.getElementById('features');
+                    // Enforce plan section visibility
+                    const featuresSection = document.getElementById('features');
+                    const pricingSection = document.getElementById('pricing');
+                    const testimonialSection = document.getElementById('testimonials');
+                    const ctaSection = document.getElementById('cta');
+                    const gallerySection = document.getElementById('gallery');
+                    
+                    // Reset all to none first to ensure clean slate
+                    if(featuresSection) featuresSection.style.display = 'none';
+                    if(pricingSection) pricingSection.style.display = 'none';
+                    if(testimonialSection) testimonialSection.style.display = 'none';
+                    if(ctaSection) ctaSection.style.display = 'none';
+                    if(gallerySection) gallerySection.style.display = 'none';
+
+                    if (data.template === 'Universal Professional' && !isStarter) {
                         const featuresGrid = document.getElementById('featuresGrid');
                         if (data.features && data.features.length > 0) {
                             featuresSection.style.display = 'block';
@@ -592,8 +639,7 @@
                         }
                     }
 
-                    if (data.pricing && data.pricing.length > 0) {
-                        const pricingSection = document.getElementById('pricing');
+                    if (!isStarter && data.pricing && data.pricing.length > 0) {
                         const pricingGrid = document.getElementById('pricingGrid');
                         pricingSection.style.display = 'block';
                         pricingGrid.innerHTML = data.pricing.map(p => `
@@ -608,8 +654,7 @@
                         `).join('');
                     }
 
-                    if (data.testimonials && data.testimonials.length > 0) {
-                        const testimonialSection = document.getElementById('testimonials');
+                    if (!isStarter && data.testimonials && data.testimonials.length > 0) {
                         const testimonialGrid = document.getElementById('testimonialsGrid');
                         testimonialSection.style.display = 'block';
                         testimonialGrid.innerHTML = data.testimonials.map(t => `
@@ -621,8 +666,7 @@
                         `).join('');
                     }
 
-                    if (data.cta) {
-                        const ctaSection = document.getElementById('cta');
+                    if (!isStarter && data.cta) {
                         ctaSection.style.display = 'block';
                         ctaSection.innerHTML = `
                             <div class="container" style="background: var(--primary); padding: 80px 40px; border-radius: var(--radius-lg); text-align: center; color: white; position: relative; overflow: hidden;">
@@ -635,12 +679,27 @@
                             </div>
                         `;
                     }
+                    
+                    const gallery = document.getElementById('galleryGrid');
+                    gallery.innerHTML = '';
+                    if (!isStarter && data.images?.gallery && data.images.gallery.length > 0) {
+                        gallerySection.style.display = 'block';
+                        data.images.gallery.forEach(img => {
+                            const item = document.createElement('div');
+                            item.className = 'gallery-item';
+                            item.innerHTML = `<img src="${img}" alt="Gallery Image" referrerPolicy="no-referrer">`;
+                            gallery.appendChild(item);
+                        });
+                    }
+
+                    window.applyTemplate(data.template || 'CORPORATE_CLEAN');
 
                     if (window.lucide) window.lucide.createIcons();
                 };
 
-                if (siteId) {
-                    const siteRef = doc(db, 'clientSites', siteId);
+                // Setup Listener logic
+                const listenToSite = (id) => {
+                    const siteRef = doc(db, 'clientSites', id);
                     onSnapshot(siteRef, 
                         (docSnap) => {
                             if (docSnap.exists()) renderSite(docSnap.data());
@@ -657,6 +716,46 @@
                             }
                         }
                     );
+                };
+
+                const MAIN_DOMAINS = ["quicksitekenya.co.ke", "quicksite.co.ke", "localhost", "127.0.0.1", "ais-dev-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app", "ais-pre-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app"];
+                
+                if (siteId) {
+                    // Specific ID provided (Standard flow for portal and previews)
+                    listenToSite(siteId);
+                } else if (!MAIN_DOMAINS.includes(hostname)) {
+                    // Custom Domain or Subdomain Routing Flow
+                    let domainQuery;
+                    if (hostname.includes('quicksitekenya.co.ke') || hostname.includes('quicksite.co.ke')) {
+                        const subdomain = hostname.split('.')[0];
+                        domainQuery = query(collection(db, 'clientSites'), where('subdomain', '==', subdomain), limit(1));
+                    } else {
+                        // Strip www. if applicable to ensure correct matching
+                        const cleanHost = hostname.replace(/^www\./, '');
+                        domainQuery = query(collection(db, 'clientSites'), where('customDomain', '==', cleanHost), limit(1));
+                    }
+                    
+                    getDocs(domainQuery).then(snapshot => {
+                        if (!snapshot.empty) {
+                            listenToSite(snapshot.docs[0].id);
+                        } else {
+                            document.getElementById('siteHero').innerHTML = `
+                                <div class="container" style="text-align: center; padding: 100px 20px;">
+                                    <h1 style="color: #ff3b3b; font-size: 2.5rem; margin-bottom: 20px;">Domain Not Connected</h1>
+                                    <p style="font-size: 1.1rem; color: #aaa;">This domain is pointing to QuickSite Kenya but is not connected to any active project yet.<br><br>If you are the owner, please complete your portal activation.</p>
+                                </div>
+                            `;
+                        }
+                    }).catch(error => {
+                        console.error("Domain lookup error", error);
+                    });
+                } else {
+                    document.getElementById('siteHero').innerHTML = `
+                        <div class="container" style="text-align: center; padding: 100px 20px;">
+                            <h1 style="color: #ff3b3b; font-size: 2.5rem; margin-bottom: 20px;">No Site Selected</h1>
+                            <p style="font-size: 1.1rem; color: #aaa;">Please use a valid preview link or connect a domain.</p>
+                        </div>
+                    `;
                 }
             } catch (err) {
                 console.error("Initialization Error:", err);

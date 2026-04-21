@@ -85,6 +85,13 @@ async function startServer() {
         return res.sendFile(path.join(process.cwd(), "site.html"));
       }
     }
+    
+    // Disable caching for the main HTML file to ensure updates flow to users
+    res.setHeader("Surrogate-Control", "no-store");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    
     next();
   });
 
@@ -234,10 +241,13 @@ async function startServer() {
       return res.status(400).json({ error: "Missing promptText" });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: "GEMINI_API_KEY not found on server." });
+    const rawKey = process.env.GEMINI_API_KEY2 || process.env.GEMINI_API_KEY;
+    if (!rawKey) {
+      return res.status(500).json({ error: "GEMINI_API_KEY2 not found on server." });
     }
+    
+    const apiKey = rawKey.trim();
+    console.log(`>>> [API] Attempting auth. Key starts with: ${apiKey.substring(0, 5)}, Length: ${apiKey.length}`);
 
     try {
       // Dynamic import to avoid module issues
@@ -256,10 +266,29 @@ async function startServer() {
       const output = response.text;
       if (!output) throw new Error("AI returned empty response.");
       
-      return res.status(200).json({ output });
+      console.log(">>> [API] AI Raw Output:", output.substring(0, 500));
+      
+      // Extract pure JSON on the backend so even old cached frontends can parse it safely
+      const jsonMatch = output.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error("AI completely failed to generate a JSON structure. It returned conversational text: " + output);
+      }
+      
+      const cleanJsonString = jsonMatch[0];
+      
+      return res.status(200).json({ output: cleanJsonString });
     } catch (error: any) {
       console.error(">>> [API] AI Generation error:", error);
-      return res.status(500).json({ error: error.message || "Failed to generate AI content" });
+      
+      // Specifically intercept the invalid API key error to give the user actionable UI instructions
+      const errMsg = error.message || "";
+      if (errMsg.includes("API key not valid") || errMsg.includes("API_KEY_INVALID")) {
+        return res.status(500).json({ 
+          error: "Your Gemini API key is missing or invalid. Please open the Settings menu (top right) in AI Studio and enter a valid API key to use generative features." 
+        });
+      }
+      
+      return res.status(500).json({ error: errMsg || "Failed to generate AI content" });
     }
   });
 
@@ -270,8 +299,9 @@ async function startServer() {
     
     if (!message) return res.status(400).json({ error: "Missing message" });
     
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY not found on server" });
+    const rawKey = process.env.GEMINI_API_KEY2 || process.env.GEMINI_API_KEY;
+    if (!rawKey) return res.status(500).json({ error: "GEMINI_API_KEY2 not found on server" });
+    const apiKey = rawKey.trim();
     
     try {
       const { GoogleGenAI } = await import("@google/genai");
@@ -297,7 +327,15 @@ CRITICAL: If a user expresses interest, encourage them to provide their Name and
       return res.status(200).json({ text: result.text });
     } catch (error: any) {
       console.error(">>> [API] AI Chatbot error:", error);
-      return res.status(500).json({ error: error.message || "Chat failed" });
+      
+      const errMsg = error.message || "";
+      if (errMsg.includes("API key not valid") || errMsg.includes("API_KEY_INVALID")) {
+        return res.status(500).json({ 
+          error: "Your Gemini API key is missing or invalid. Please open the Settings menu (top right) in AI Studio and enter a valid API key." 
+        });
+      }
+      
+      return res.status(500).json({ error: errMsg || "Chat failed" });
     }
   });
 
@@ -310,8 +348,15 @@ CRITICAL: If a user expresses interest, encourage them to provide their Name and
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, {
+      setHeaders: (res, path) => {
+        if (path.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+        }
+      }
+    }));
     app.get("*", (req, res) => {
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       res.sendFile(path.join(distPath, "index.html"));
     });
   }

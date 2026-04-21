@@ -265,7 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const noPackageView = document.getElementById('noPackageView');
             const unpaidWarning = document.getElementById('unpaidWarning');
             const amountDueDisplay = document.getElementById('amountDueDisplay');
-            const previewLinkBox = document.querySelector('.preview-link-box');
+            const previewLinkBoxWrapper = document.getElementById('previewLinkBoxWrapper');
+            const activationPendingBlock = document.getElementById('activationPendingBlock');
 
             if (snapshot.empty) {
                 if (hasPackageView) hasPackageView.style.display = 'none';
@@ -277,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docSnap = snapshot.docs[0];
                 const data = docSnap.data();
                 
-                const plan = data.plan || 'Starter Presence';
+                const plan = data.plan || data.subscriptionPlan || 'Starter Presence';
                 planName.innerText = plan;
                 const isPaid = data.paymentStatus === 'Paid';
                 planStatus.innerText = isPaid ? 'Active' : 'Unpaid';
@@ -290,36 +291,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 const cost = costMap[plan] || 'KES 11,999';
 
+                let link = 'Pending Generation';
+                if (data.status === 'Preview' || data.previewToken) {
+                    link = `${window.location.origin}/site.html?id=${docSnap.id}&preview=true`;
+                } else if (data.customDomain || data.subdomain) {
+                    link = data.customDomain || `${data.subdomain}.quicksitekenya.co.ke`;
+                }
+                
+                siteUrl.innerText = link;
+                
+                // Set Up the Link Buttons
+                if (link === 'Pending Generation') {
+                    visitLinkBtn.href = "#";
+                    visitLinkBtn.style.pointerEvents = 'none';
+                    visitLinkBtn.classList.add('disabled');
+                    if (previewLinkBoxWrapper) previewLinkBoxWrapper.style.opacity = '0.5';
+                } else {
+                    visitLinkBtn.href = link.startsWith('http') ? link : `https://${link}`;
+                    visitLinkBtn.style.pointerEvents = 'auto';
+                    visitLinkBtn.classList.remove('disabled');
+                    if (previewLinkBoxWrapper) previewLinkBoxWrapper.style.opacity = '1';
+                }
+
                 if (!isPaid) {
                     if (unpaidWarning) unpaidWarning.style.display = 'block';
-                    if (previewLinkBox) previewLinkBox.style.opacity = '0.3';
+                    if (activationPendingBlock) activationPendingBlock.style.display = 'block';
+                    
                     if (amountDueDisplay) {
                         amountDueDisplay.innerText = cost;
                     }
-                    visitLinkBtn.classList.add('disabled');
-                    visitLinkBtn.href = "#";
-                    siteUrl.innerText = 'Activation Pending Payment...';
                 } else {
                     if (unpaidWarning) unpaidWarning.style.display = 'none';
-                    if (previewLinkBox) previewLinkBox.style.opacity = '1';
-                    
-                    let link;
-                    if (data.status === 'Preview') {
-                        link = `${window.location.origin}/site.html?id=${docSnap.id}&preview=true`;
-                    } else {
-                        link = data.customDomain || (data.subdomain ? `${data.subdomain}.quicksitekenya.co.ke` : 'Pending Generation');
-                    }
-                    
-                    siteUrl.innerText = link;
-                    visitLinkBtn.href = link.startsWith('http') ? link : `https://${link}`;
-                    visitLinkBtn.classList.remove('disabled');
+                    if (activationPendingBlock) activationPendingBlock.style.display = 'none';
                 }
 
                 const features = packages[plan] || packages['Starter Presence'];
                 featureList.innerHTML = features.map(f => `<li><i data-lucide="check-circle"></i> ${f}</li>`).join('');
 
-                siteStatus.innerText = data.status || 'Development';
-                siteStatus.className = `status-badge ${data.status === 'Live' ? 'status-published' : 'status-preview'}`;
+                const currentStatus = data.status || 'Draft';
+                siteStatus.innerText = currentStatus;
+                siteStatus.className = `status-badge ${currentStatus === 'Live' ? 'status-published' : (currentStatus === 'Preview' ? 'status-preview' : 'status-development')}`;
 
                 const billingAmount = document.getElementById('dashBillingAmount');
                 const billingStatus = document.getElementById('dashBillingStatus');
@@ -376,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const id = docSnap.id;
                 const link = data.customDomain || (data.subdomain ? `https://${data.subdomain}.quicksitekenya.co.ke` : '#');
                 const status = data.status || 'Draft';
-                const plan = data.plan || 'Starter Presence';
+                const plan = data.plan || data.subscriptionPlan || 'Starter Presence';
                 
                 const card = document.createElement('div');
                 card.className = "client-card"; // Added class for potential styling
@@ -435,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const data = docSnap.data();
                         document.getElementById('editClientId').value = docId;
                         document.getElementById('editPaymentStatus').value = data.paymentStatus || 'Unpaid';
-                        document.getElementById('editPlan').value = data.plan || 'Starter Presence';
+                        document.getElementById('editPlan').value = data.plan || data.subscriptionPlan || 'Starter Presence';
                         document.getElementById('editEnvStatus').value = data.status || 'Draft';
                         document.getElementById('editSubdomain').value = data.subdomain || '';
                         document.getElementById('editTemplate').value = data.template || '';
@@ -559,7 +570,8 @@ document.addEventListener('DOMContentLoaded', () => {
             genLinkBtn.disabled = true;
 
             try {
-                await updateDoc(doc(db, 'clientSites', docId), { previewToken: token, status: 'Preview' });
+                // We keep it as Draft or whatever it is, just generate the preview token so the client can still see the link
+                await updateDoc(doc(db, 'clientSites', docId), { previewToken: token });
 
                 const finalLink = `${window.location.origin}/site.html?id=${docId}&preview=true`;
                 

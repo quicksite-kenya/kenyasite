@@ -84,7 +84,13 @@ const initAIConsultation = () => {
                 body: JSON.stringify(payload)
             });
             
-            const responseData = await response.json();
+            const rawText = await response.text();
+            let responseData;
+            try {
+                responseData = JSON.parse(rawText);
+            } catch (err) {
+                 throw new Error(`Server returned non-JSON response (${response.status}): ` + rawText.substring(0, 100));
+            }
             
             if (!response.ok) {
                 throw new Error(responseData.error || "Server error");
@@ -750,7 +756,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('ctaSettingsInput').value = data && data.cta ? `${data.cta.title || ''} | ${data.cta.btn || ''}` : '';
         
         // Billing & Subscriptions
-        document.getElementById('subscriptionPlanInput').value = data ? data.subscriptionPlan || 'Starter Presence' : 'Starter Presence';
+        document.getElementById('subscriptionPlanInput').value = data ? data.plan || data.subscriptionPlan || 'Starter Presence' : 'Starter Presence';
         document.getElementById('paymentStatusInput').value = data ? data.paymentStatus || 'Unpaid' : 'Unpaid';
         document.getElementById('setupFeeInput').value = data ? data.setupFee || 0 : 0;
         document.getElementById('monthlyFeeInput').value = data ? data.monthlyFee || 0 : 0;
@@ -761,6 +767,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     if (siteEditorForm) {
+        // Admin Site Editor save logic
+        document.getElementById('planInput').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const subPlan = document.getElementById('subscriptionPlanInput');
+            if (subPlan) subPlan.value = val;
+        });
+
+        document.getElementById('subscriptionPlanInput').addEventListener('change', (e) => {
+            const val = e.target.value;
+            const planInput = document.getElementById('planInput');
+            if (planInput) planInput.value = val;
+        });
+
         siteEditorForm.onsubmit = async (e) => {
             e.preventDefault();
             const id = document.getElementById('editSiteId').value;
@@ -774,10 +793,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return { name: parts[0].trim(), price: parts[1].trim(), description: (parts[2] || '').trim() };
             });
 
+            // Ensure plan values match before submission
+            const assignedPlan = document.getElementById('planInput').value;
+            const subscriptionPlan = document.getElementById('subscriptionPlanInput').value;
+            const finalPlan = assignedPlan || subscriptionPlan || 'Starter Presence';
+
             const siteData = {
                 clientName: document.getElementById('clientNameInput').value,
                 businessName: document.getElementById('businessNameInput').value,
-                plan: document.getElementById('planInput').value,
+                plan: finalPlan,
+                subscriptionPlan: finalPlan, // For backward compatibility
                 template: document.getElementById('templateInput').value,
                 tagline: document.getElementById('taglineInput').value,
                 aboutText: document.getElementById('aboutTextInput').value,
@@ -790,9 +815,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 customDomain: document.getElementById('customDomainInput').value,
                 custom_domains: document.getElementById('customDomainsListInput').value.split(',').map(d => d.trim()).filter(d => d),
                 subdomain: document.getElementById('subdomainInput').value,
-                template_type: document.getElementById('templateInput').value,
+                template: document.getElementById('templateInput').value,
                 // SaaS Billing Fields
-                subscriptionPlan: document.getElementById('subscriptionPlanInput').value,
                 paymentStatus: document.getElementById('paymentStatusInput').value,
                 setupFee: parseFloat(document.getElementById('setupFeeInput').value) || 0,
                 monthlyFee: parseFloat(document.getElementById('monthlyFeeInput').value) || 0,
@@ -898,16 +922,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             tabBriefGenerateBtn.innerText = 'Engineering Site...';
         }
 
+        const plan = document.getElementById('subscriptionPlanInput').value || 'Business Growth';
+
         try {
             const promptText = `Generate a website content object in JSON format based on the following context:
 
 BUSINESS NAME: ${businessName}
+SUBSCRIPTION PLAN: ${plan}
 PROJECT BRIEF: ${brief}
 CONTACT INFO: ${phone ? 'Phone: ' + phone : ''} ${whatsapp ? 'WhatsApp: ' + whatsapp : ''} ${address ? 'Address: ' + address : ''}
 EXISTING TAGLINE: ${existingTagline}
 EXISTING ABOUT: ${existingAbout}
 
 You are an AI assistant responsible for selecting the most appropriate premium website template for a business AND generating all copy.
+
+CRITICAL INSTRUCTION: You MUST respect the limits of the ${plan} subscription plan.
+- If the plan is "Starter Presence" (1-Page Site): Only generate core essentials (Hero, About, Services, Contact, Tagline). Do NOT generate Testimonials, Features, or Pricing arrays.
+- If the plan is "Business Growth" (5-7 Pages): Generate comprehensive content including Hero, About, Services, Features, Testimonials, Gallery Keywords, Pricing, and CTA.
+- If the plan is "Pro Conversion System" (Advanced SaaS/Sales): Generate everything in "Business Growth" PLUS highly aggressive sales copy, advanced marketing CTAs, and complex pricing tiers.
 
 Your template decision must be based on:
 - Business name
@@ -943,14 +975,14 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
   "template": "LUXURY_DARK | CORPORATE_CLEAN | STARTUP_MODERN | BOLD_FITNESS",
   "templateReason": "short explanation of why this template fits the business",
   "hero": { "title": "Main Headline", "subtitle": "Supporting text" },
-  "heroImage": "Single keyword for hero image (e.g. workspace)",
-  "aboutImage": "Single keyword for about image (e.g. team)",
+  "heroImage": "Single keyword for hero image (e.g. business meeting)",
+  "aboutImage": "Single keyword for about image (e.g. diverse team)",
   "servicesImage": "Single keyword for services image",
   "aboutText": "A professional, persuasive story about the business",
   "services": [ { "name": "Service Name", "description": "Short description", "price": "KES 5000" } ],
-  "features": [ { "icon": "check", "title": "Quality", "desc": "We perfectly deliver" } ],
-  "pricing": [ { "plan": "Basic", "price": "KES 1000", "features": ["Feature 1", "Feature 2"] } ],
-  "testimonials": [ { "name": "John Doe", "quote": "Amazing service!" } ],
+  "features": [ { "icon": "check", "title": "Quality", "desc": "We perfectly deliver" } ], // Omit if Starter Presence
+  "pricing": [ { "plan": "Basic", "price": "KES 1000", "features": ["Feature 1", "Feature 2"] } ], // Omit if Starter Presence
+  "testimonials": [ { "name": "John Doe", "quote": "Amazing service!" } ], // Omit if Starter Presence
   "tagline": "A punchy 1-sentence brand promise",
   "cta": { "title": "Ready to Start?", "btn": "Contact Us Now" }
 }`;
@@ -967,7 +999,16 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 body: JSON.stringify(payload)
             });
 
-            const responseData = await response.json();
+            // Read as text first to handle non-JSON responses from proxies
+            const rawText = await response.text();
+            
+            let responseData;
+            try {
+                responseData = JSON.parse(rawText);
+            } catch (parseErr) {
+                // If it fails to parse, it means we got plain text or HTML (like 504 Gateway Timeout)
+                throw new Error(`Server returned non-JSON response (${response.status}): ` + rawText.substring(0, 100));
+            }
             
             if (!response.ok) {
                 throw new Error(responseData.error || "Server processing error");
@@ -982,7 +1023,13 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                throw new Error("Invalid output format returned by AI.");
             }
             
-            const content = JSON.parse(jsonMatch[0]);
+            let content;
+            try {
+                content = JSON.parse(jsonMatch[0]);
+            } catch (err) {
+                console.error("AI JSON Matching Extracted:", jsonMatch[0]);
+                throw new Error("Failed to parse extracted JSON block. The AI may have malformed the object.");
+            }
 
             // Map Image keywords to real high-res placeholders
             if (content.heroImage) content.heroImageUrl = `https://picsum.photos/seed/${String(content.heroImage).replace(/\s+/g, '')}/1920/1080`;

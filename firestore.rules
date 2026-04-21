@@ -15,9 +15,7 @@ service cloud.firestore {
     function isVerifiedAdmin() {
       return isSignedIn() && 
              request.auth.token.email != null &&
-             (request.auth.token.email.lower() == "michaelmulili41@gmail.com" || 
-              request.auth.token.email.lower() == "quicksitekenya@gmail.com" ||
-              request.auth.token.email.lower().endsWith("@quicksite.com"));
+             request.auth.token.email.lower() == "michaelmulili41@gmail.com";
     }
 
     function isValidId(id) {
@@ -66,11 +64,8 @@ service cloud.firestore {
       // Public read by ID for site visitors
       allow get: if true;
       
-      // List rules: Admins see all. Public sees only Live (if they query with status == Live). 
-      // Clients see their own if they query with clientEmail == their email.
-      allow list: if isVerifiedAdmin() || 
-                    (resource.data.status == 'Live') || 
-                    (isSignedIn() && resource.data.get('clientEmail', '') == request.auth.token.email);
+      // Allow list to support custom domain and subdomain lookups for hosted sites
+      allow list: if true;
       
       allow create: if isVerifiedAdmin() || 
                     (isSignedIn() && request.resource.data.get('clientEmail', '').lower() == request.auth.token.email.lower() && isValidClientSite(request.resource.data));
