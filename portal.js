@@ -471,6 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('editHeroTitle').value = data.hero?.title || '';
                         document.getElementById('editHeroSubtitle').value = data.hero?.subtitle || '';
                         document.getElementById('editCustomDomain').value = data.customDomain || '';
+                        document.getElementById('editPageCount').value = data.pageCount || 1;
+                        document.getElementById('editTheme').value = data.theme || 'default';
                         const editVision = document.getElementById('editProjectVision');
                         if (editVision) editVision.value = data.projectVision || '';
                         modal.style.display = 'flex';
@@ -502,6 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 template: document.getElementById('editTemplate').value,
                 businessName: document.getElementById('editBusinessName').value,
                 customDomain: document.getElementById('editCustomDomain').value,
+                pageCount: parseInt(document.getElementById('editPageCount').value) || 1,
+                theme: document.getElementById('editTheme').value,
                 hero: {
                     title: document.getElementById('editHeroTitle').value,
                     subtitle: document.getElementById('editHeroSubtitle').value
@@ -537,6 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     businessName: document.getElementById('newClientBusiness').value,
                     template: 'Default',
                     plan: document.getElementById('newClientPlan').value,
+                    pageCount: parseInt(document.getElementById('newClientPageCount').value) || 1,
+                    theme: document.getElementById('newClientTheme').value,
                     status: 'Draft',
                     paymentStatus: 'Unpaid',
                     createdAt: serverTimestamp()
@@ -566,6 +572,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     ],
                     cta: { title: 'Ready to Transform Your Business?', btn: 'Secure Your Slot' },
                     template: 'Universal Professional', // Inject elite template too
+                    pageCount: 5, // Default for elite
+                    theme: 'sunset', // Default for elite
                     updatedAt: serverTimestamp()
                 });
                 alert("Elite data injected successfully.");

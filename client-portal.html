@@ -302,31 +302,22 @@
                                 <p style="font-size: 0.75rem; color: #888; text-align: center;">Click to send confirmation to WhatsApp.</p>
                             </div>
 
-                            <!-- Upgrade Package -->
-                            <div class="portal-card" style="margin-top: 20px;">
-                                <h3><i data-lucide="arrow-up-circle"></i> Upgrade Your Plan</h3>
-                                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Unlock more features by upgrading your subscription.</p>
-                                <select id="upgradePlanSelect" class="form-input" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 15px;">
-                                    <option value="Starter Presence">Starter Presence</option>
-                                    <option value="Business Growth">Business Growth</option>
-                                    <option value="Pro Conversion System">Pro Conversion System</option>
+                            <!-- Upgrade Section -->
+                            <div class="portal-card" style="margin-top: 20px; border: 2px solid var(--primary-color); background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(0,0,0,0.2) 100%);">
+                                <h3 style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
+                                    <i data-lucide="zap" style="width: 20px; height: 20px;"></i>
+                                    Unlock Your Growth!
+                                </h3>
+                                <p style="font-size: 0.95rem; color: #fff; margin-bottom: 20px;">Ready to scale? Upgrade today to access advanced features, better performance, and priority support.</p>
+                                
+                                <select id="upgradePlanSelect" class="form-input" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 20px; font-weight: 600; cursor: pointer;">
+                                    <option value="Business Growth">🚀 Business Growth</option>
+                                    <option value="Pro Conversion System">💎 Pro Conversion System</option>
+                                    <option value="Enterprise SaaS System">🏢 Enterprise SaaS System</option>
                                 </select>
-                                <button id="upgradePlanBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;">
-                                    Request Upgrade
-                                </button>
-                            </div>
-
-                            <!-- Upgrade Package -->
-                            <div class="portal-card" style="margin-top: 20px;">
-                                <h3><i data-lucide="arrow-up-circle"></i> Upgrade Your Plan</h3>
-                                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Unlock more features by upgrading your subscription.</p>
-                                <select id="upgradePlanSelect" class="form-input" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 15px;">
-                                    <option value="Starter Presence">Starter Presence</option>
-                                    <option value="Business Growth">Business Growth</option>
-                                    <option value="Pro Conversion System">Pro Conversion System</option>
-                                </select>
-                                <button id="upgradePlanBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;">
-                                    Request Upgrade
+                                
+                                <button id="upgradePlanBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(212,175,55,0.3);">
+                                    Upgrade Now
                                 </button>
                             </div>
 
@@ -505,6 +496,23 @@
                                     <option value="Pro Conversion System">Pro Conversion System</option>
                                 </select>
                             </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                                <div class="form-group">
+                                    <label>Initial Pages (1-7)</label>
+                                    <input type="range" id="newClientPageCount" min="1" max="7" value="1" style="width: 100%; cursor: pointer;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Color Theme</label>
+                                    <select id="newClientTheme" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                        <option value="default">Default</option>
+                                        <option value="ocean">Ocean Blue</option>
+                                        <option value="sunset">Sunset Orange</option>
+                                        <option value="forest">Forest Green</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
                             <div style="margin-top: 30px;">
                                 <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 15px; font-weight: 700; border-radius: 12px;">Create Environment</button>
                             </div>
@@ -561,6 +569,22 @@
                                         <option value="Restaurant & Cafe">Restaurant & Cafe</option>
                                         <option value="Medical & Health">Medical & Health</option>
                                         <option value="Legal & Consulting">Legal & Consulting</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                                <div class="form-group">
+                                    <label>Website Pages (1-7)</label>
+                                    <input type="range" id="editPageCount" min="1" max="7" value="1" style="width: 100%; cursor: pointer;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Color Theme</label>
+                                    <select id="editTheme" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                        <option value="default">Default</option>
+                                        <option value="ocean">Ocean Blue</option>
+                                        <option value="sunset">Sunset Orange</option>
+                                        <option value="forest">Forest Green</option>
                                     </select>
                                 </div>
                             </div>
