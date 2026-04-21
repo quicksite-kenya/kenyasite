@@ -254,16 +254,36 @@ async function startServer() {
       const { GoogleGenAI } = await import("@google/genai");
       const ai = new GoogleGenAI({ apiKey });
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: promptText,
-        config: {
-          systemInstruction: systemInstruction || "You are an elite web designer.",
-          responseMimeType: "application/json"
+      let response;
+      let retries = 0;
+      const MAX_RETRIES = 3;
+
+      while (retries < MAX_RETRIES) {
+        try {
+          response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: promptText,
+            config: {
+              systemInstruction: systemInstruction || "You are an elite web designer.",
+              responseMimeType: "application/json"
+            }
+          });
+          break; // Success
+        } catch (error: any) {
+          const errMsg = typeof error === 'string' ? error : JSON.stringify(error);
+          if (errMsg.includes("503") || errMsg.includes("UNAVAILABLE")) {
+            retries++;
+            if (retries >= MAX_RETRIES) throw error;
+            const delay = Math.pow(2, retries) * 1000;
+            console.log(`>>> [API] AI busy (503), retrying in ${delay}ms... (Attempt ${retries}/${MAX_RETRIES})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } else {
+            throw error;
+          }
         }
-      });
+      }
       
-      const output = response.text;
+      const output = response?.text;
       if (!output) throw new Error("AI returned empty response.");
       
       console.log(">>> [API] AI Raw Output:", output.substring(0, 500));
@@ -323,8 +343,29 @@ CRITICAL: If a user expresses interest, encourage them to provide their Name and
         history: chatHistory || []
       });
       
-      const result = await chat.sendMessage({ message });
-      return res.status(200).json({ text: result.text });
+      let result;
+      let retries = 0;
+      const MAX_RETRIES = 3;
+
+      while (retries < MAX_RETRIES) {
+        try {
+          result = await chat.sendMessage({ message });
+          break; // Success
+        } catch (error: any) {
+          const errMsg = typeof error === 'string' ? error : JSON.stringify(error);
+          if (errMsg.includes("503") || errMsg.includes("UNAVAILABLE")) {
+            retries++;
+            if (retries >= MAX_RETRIES) throw error;
+            const delay = Math.pow(2, retries) * 1000;
+            console.log(`>>> [API] AI Chat busy (503), retrying in ${delay}ms... (Attempt ${retries}/${MAX_RETRIES})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          } else {
+            throw error;
+          }
+        }
+      }
+      
+      return res.status(200).json({ text: result?.text });
     } catch (error: any) {
       console.error(">>> [API] AI Chatbot error:", error);
       

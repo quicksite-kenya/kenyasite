@@ -964,15 +964,23 @@ Style: Gradient backgrounds, Bright colors (purple/blue), Glassmorphism UI, Mode
 Best for: Gyms, Personal trainers, Sports brands, Fitness businesses
 Style: Dark theme, Neon accents, Strong typography, High-energy visuals
 
+5. UNIVERSAL_PROFESSIONAL
+Best for: General professional services, Portfolios, Small businesses
+Style: Modern, Clean, Versatile layout, High legibility
+
+6. LEGAL_CONSULTING
+Best for: Law firms, High-level consulting, Financial advisors
+Style: Sophisticated, Serif typography, Trustworthy, Formal layout
+
 INSTRUCTIONS:
-- Analyze the business type carefully
-- Match the business to the most suitable template out of the options above based on Project Brief, Content, Media and Advanced needs.
-- If multiple templates could fit, choose the one that feels most premium and visually appropriate
+- Match the business to the most suitable template from the list of AVAILABLE TEMPLATES based on Project Brief, Content, Media and Advanced needs. DO NOT default to any specific template; select the one that best fits the business industry and needs.
+- If multiple templates could fit, choose the one that feels most premium and visually appropriate.
+- ALWAYS make a fresh, business-specific template selection.
 - Ensure the copy is high-converting and specifically tailored to the Kenyan market. Use local nuances if appropriate.
 
 Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap in markdown blocks. DO NOT include any conversational prefixes.
 {
-  "template": "LUXURY_DARK | CORPORATE_CLEAN | STARTUP_MODERN | BOLD_FITNESS",
+  "template": "LUXURY_DARK | CORPORATE_CLEAN | STARTUP_MODERN | BOLD_FITNESS | UNIVERSAL_PROFESSIONAL | LEGAL_CONSULTING",
   "templateReason": "short explanation of why this template fits the business",
   "hero": { "title": "Main Headline", "subtitle": "Supporting text" },
   "heroImage": "Single keyword for hero image (e.g. business meeting)",
@@ -989,7 +997,13 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
 
             const payload = {
                 promptText: promptText,
-                systemInstruction: "You are an elite web designer and copywriter for QuickSite Kenya."
+                systemInstruction: `You are an elite web designer and copywriter for QuickSite Kenya. 
+                CRITICAL INSTRUCTION: You MUST strictly enforce the features of the assigned subscription plan:
+                - If the PLAN is "Starter Presence": This is a 1-page site. Generate ONLY: Hero, About, Services, Contact. PROHIBIT: Testimonials, Features, Pricing, Gallery sections.
+                - If the PLAN is "Business Growth": This is a 5-7 page site. Generate comprehensive content: Hero, About, Services, Features, Testimonials, Gallery, Pricing, CTA.
+                - If the PLAN is "Pro Conversion System": Generate everything in "Business Growth" PLUS aggressive high-converting sales copy and complex pricing.
+                
+                Respond ONLY with JSON that adheres to these constraints.`
             };
 
             const reqUrl = window.location.origin.includes('localhost') ? 'http://localhost:3000/api/generate-design' : '/api/generate-design';
@@ -1043,7 +1057,9 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             const features = Array.isArray(content.features) ? content.features : [];
             const pricing = Array.isArray(content.pricing) ? content.pricing : [];
             const testimonials = Array.isArray(content.testimonials) ? content.testimonials : [];
-            const aiTemplate = content.template || template;
+            // Prefer user's choice if not 'Default', otherwise let AI select
+            const userTemplate = document.getElementById('templateInput').value;
+            const aiTemplate = (userTemplate && userTemplate !== 'Default') ? userTemplate : (content.template || userTemplate);
 
             // Ensure the dropdown reflects the AI's choice if it exists
             const templateInputEl = document.getElementById('templateInput');

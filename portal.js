@@ -353,12 +353,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         newBtn.innerText = 'Payment Complete';
                         newBtn.disabled = true;
                     } else {
-                        newBtn.innerHTML = '<i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Verify Payment';
+                        newBtn.innerHTML = '<i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Send Payment Confirmation';
                         newBtn.addEventListener('click', () => {
-                            const message = encodeURIComponent(`Hello, I paid ${cost} for my ${plan}. Email: ${user.email}`);
+                            const message = encodeURIComponent(`Hello QuickSite team, I have just paid ${cost} for my ${plan} package using M-PESA. My registered email is ${user.email}. Please verify my payment. I am looking forward to getting started!`);
                             window.open(`https://wa.me/254708691648?text=${message}`, '_blank');
                         });
                     }
+                }
+
+                // Handle Upgrade Request
+                const upgradePlanBtn = document.getElementById('upgradePlanBtn');
+                if (upgradePlanBtn) {
+                    // Remove old listener if any by cloning
+                    const newUpgradeBtn = upgradePlanBtn.cloneNode(true);
+                    upgradePlanBtn.parentNode.replaceChild(newUpgradeBtn, upgradePlanBtn);
+                    
+                    newUpgradeBtn.addEventListener('click', async () => {
+                        const newPlan = document.getElementById('upgradePlanSelect').value;
+                        const user = auth.currentUser;
+                        if (!user) return;
+                        
+                        const message = encodeURIComponent(`Hello QuickSite team, I would like to upgrade my ${plan} package to the ${newPlan} package. My registered email is ${user.email}. Please guide me on the next steps.`);
+                        window.open(`https://wa.me/254708691648?text=${message}`, '_blank');
+                    });
                 }
             }
             if (window.lucide) window.lucide.createIcons();
