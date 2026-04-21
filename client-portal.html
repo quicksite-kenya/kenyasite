@@ -111,9 +111,9 @@
             }
         }
     </style>
-  <script type="module" crossorigin src="./assets/clientPortal-CtSXucFk.js"></script>
+  <script type="module" crossorigin src="./assets/clientPortal-CJ3NGPdI.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/firebase-applet-config-Ck6_0kXN.js">
-  <link rel="modulepreload" crossorigin href="./assets/firebase-BIUChNWT.js">
+  <link rel="modulepreload" crossorigin href="./assets/firebase-DvvX7lKd.js">
   <link rel="stylesheet" crossorigin href="./assets/firebase-C_h2CrCg.css">
 </head>
 <body>
@@ -251,12 +251,12 @@
                                 
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                                     <span style="color: #aaa;">Status</span>
-                                    <span class="status-badge" id="dashSiteStatus">...</span>
+                                    <span class="status-badge" id="dashSiteStatus">Draft</span>
                                 </div>
 
-                                <p style="font-size: 0.9rem; color: #ccc;">Your live preview environment:</p>
+                                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 5px;">Your live preview environment:</p>
                                 
-                                <div class="preview-link-box">
+                                <div class="preview-link-box" id="previewLinkBoxWrapper">
                                     <code id="dashSiteUrl">Connecting...</code>
                                     <div style="display: flex; gap: 10px;">
                                         <button class="btn btn-secondary" style="padding: 8px;" id="copyLinkBtn">
@@ -268,7 +268,11 @@
                                     </div>
                                 </div>
                                 
-                                <div style="margin-top: 20px; font-size: 0.8rem; color: #aaa; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px;">
+                                <div style="margin-top: 20px; font-size: 0.8rem; color: #aaa; background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); padding: 12px; border-radius: 8px;" id="activationPendingBlock">
+                                    <strong style="color: #ffa500; display: block; margin-bottom: 5px;">Activation Pending Payment...</strong>
+                                </div>
+
+                                <div style="margin-top: 15px; font-size: 0.8rem; color: #aaa; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px;">
                                     <strong>Need changes?</strong> For major content updates, please reach out via WhatsApp with your dedicated support line.
                                 </div>
                             </div>

@@ -194,7 +194,7 @@
             .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
-  <script type="module" crossorigin src="./assets/site-Bv6H8Pby.js"></script>
+  <script type="module" crossorigin src="./assets/site-D6iyb9Fu.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/firebase-applet-config-Ck6_0kXN.js">
 </head>
 <body>
@@ -314,20 +314,65 @@
                 <span>Inquiry</span>
                 <h2>Connect <span>With Us</span></h2>
             </div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr; align-items: start;">
-                <div class="card">
-                    <h3>Contact Information</h3>
-                    <p id="contactAddress">📍 Neighborhood, Nairobi</p>
-                    <p id="contactPhone">📞 +254 700 000000</p>
-                    <p id="contactEmail">📧 contact@business.com</p>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); align-items: stretch; gap: 32px;">
+                <div class="card" style="display: flex; flex-direction: column;">
+                    <h3 style="font-size: 2rem; margin-bottom: 16px; font-weight: 800;">Get in Touch</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 1.05rem;">We're here to help and answer any question you might have. We look forward to hearing from you.</p>
                     
-                    <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 12px;">
-                        <a href="#" id="callBtn" class="btn btn-primary" style="width: 100%;">Call Now</a>
-                        <a href="#" id="waBtn" class="btn" style="width: 100%; background: #25d366; color: white;">Message on WhatsApp</a>
+                    <div style="display: flex; flex-direction: column; gap: 20px; flex-grow: 1; margin-bottom: 40px;">
+                        <div style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px;">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="map-pin" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Location</span>
+                                <span id="contactAddressText" style="font-weight: 600; font-size: 1.1rem;">Nairobi, Kenya</span>
+                            </div>
+                        </div>
+                        
+                        <a href="#" id="callBtnLink" style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px; text-decoration: none; color: var(--text); transition: var(--transition);">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="phone" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Direct Line</span>
+                                <span id="contactPhoneText" style="font-weight: 600; font-size: 1.1rem;">+254 700 000000</span>
+                            </div>
+                        </a>
+                        
+                        <div style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px;">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="mail" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Email Support</span>
+                                <span id="contactEmailText" style="font-weight: 600; font-size: 1.1rem;">contact@business.com</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" id="callBtn" class="btn btn-primary" style="flex: 1;"><i data-lucide="phone"></i> Call</a>
+                        <a href="#" id="waBtn" class="btn" style="flex: 2; background: #25D366; color: white;"><i data-lucide="message-circle" style="fill: white;"></i> Chat on WhatsApp</a>
                     </div>
                 </div>
-                <div class="card" id="mapContainer" style="padding: 0; overflow: hidden; min-height: 400px; border-radius: 24px;">
-                    <!-- Map iframe here -->
+                
+                <div class="card" style="padding: 0; min-height: 500px; border-radius: var(--radius-lg); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="padding: 30px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 16px; z-index: 2;">
+                        <div style="width: 48px; height: 48px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="compass"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.2rem;">Our Headquarters</h4>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Navigate to our office</p>
+                        </div>
+                    </div>
+                    <div id="mapContainer" style="flex-grow: 1; width: 100%; position: relative; background: #1a1a1a;">
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem;">
+                            Map Data Unavailable
+                        </div>
+                        <!-- Map iframe injected here -->
+                    </div>
                 </div>
             </div>
         </div>
