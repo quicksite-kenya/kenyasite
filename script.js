@@ -1191,6 +1191,10 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             
             if(editData.category) {
                 selectCategory(editData.category);
+                document.getElementById('siteCategory').value = editData.category;
+            } else {
+                document.getElementById('siteCategory').value = 'Other Digital Assets';
+                selectCategory('Other Digital Assets');
             }
         } else {
             if (title) title.innerHTML = `List Your <span>Website</span>`;
@@ -2362,6 +2366,11 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             
             const img = document.getElementById('siteImage').value;
             const editId = document.getElementById('editWebsiteId').value;
+
+            if (!category) {
+                showToast('Please select a category.', 'error');
+                return;
+            }
 
             const submitBtn = addWebsiteForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
