@@ -85,9 +85,9 @@
       rel="stylesheet"
     />
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
-    <script type="module" crossorigin src="./assets/main-oius16V1.js"></script>
+    <script type="module" crossorigin src="./assets/main-D-XWC2NR.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/firebase-applet-config-Ck6_0kXN.js">
-    <link rel="modulepreload" crossorigin href="./assets/firebase-DvvX7lKd.js">
+    <link rel="modulepreload" crossorigin href="./assets/firebase-BmRSB5n7.js">
     <link rel="modulepreload" crossorigin href="./assets/index-DzSSpGO4.js">
     <link rel="stylesheet" crossorigin href="./assets/firebase-C_h2CrCg.css">
   </head>
@@ -996,12 +996,13 @@
       <div id="addWebsiteModal" class="modal">
         <div class="modal-content">
           <span class="close-modal" id="closeAddModal">&times;</span>
-          <h2>List Your <span>Website</span></h2>
-          <p>
+          <h2 id="addWebsiteModalTitle">List Your <span>Website</span></h2>
+          <p id="addWebsiteModalDesc">
             Fill in the details to showcase your digital asset in our elite
             marketplace.
           </p>
           <form id="addWebsiteForm">
+            <input type="hidden" id="editWebsiteId" />
             <div class="form-group">
               <label>Website Name</label>
               <input
@@ -1971,6 +1972,9 @@
                   color: white;
                 "
               />
+            </div>
+            <div style="text-align: right; margin-bottom: 20px;">
+              <a href="#" id="forgotPasswordBtn" style="color: var(--primary-color); font-size: 0.8rem; text-decoration: none;">Forgot Password?</a>
             </div>
             <button
               type="submit"
