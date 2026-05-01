@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, setPersistence, browserSessionPersistence, inMemoryPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getAuth, setPersistence, browserSessionPersistence, inMemoryPersistence, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'firebase/auth';
 import { initializeFirestore, doc, getDocFromServer, serverTimestamp } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import firebaseConfig from './firebase-applet-config.json';
@@ -53,7 +53,6 @@ export const signInWithEmail = async (email, password) => {
   try {
     console.log("Attempting Email sign in...");
     if (!auth) {
-        console.error("Auth is not defined!");
         throw new Error("Auth is not defined!");
     }
     const result = await signInWithEmailAndPassword(auth, email, password);
@@ -62,7 +61,6 @@ export const signInWithEmail = async (email, password) => {
     if (error.code === 'auth/network-request-failed') {
       console.error("AD-BLOCKER DETECTED: Firebase Auth requests are being blocked by an extension or browser shield.");
     }
-    console.error("Error signing in with Email. Code:", error.code, "Message:", error.message);
     throw error;
   }
 };
@@ -71,7 +69,6 @@ export const signUpWithEmail = async (email, password) => {
   try {
     console.log("Attempting Email sign up...");
     if (!auth) {
-        console.error("Auth is not defined!");
         throw new Error("Auth is not defined!");
     }
     const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -80,7 +77,6 @@ export const signUpWithEmail = async (email, password) => {
     if (error.code === 'auth/network-request-failed') {
       console.error("AD-BLOCKER DETECTED: Firebase Auth requests are being blocked by an extension or browser shield.");
     }
-    console.error("Error signing up with Email. Code:", error.code, "Message:", error.message);
     throw error;
   }
 };
@@ -90,6 +86,15 @@ export const logOut = async () => {
     await signOut(auth);
   } catch (error) {
     console.error("Error signing out", error);
+    throw error;
+  }
+};
+
+export const resetPassword = async (email) => {
+  try {
+    if (!auth) throw new Error("Auth is not defined!");
+    await sendPasswordResetEmail(auth, email);
+  } catch (error) {
     throw error;
   }
 };

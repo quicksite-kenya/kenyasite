@@ -992,12 +992,13 @@
       <div id="addWebsiteModal" class="modal">
         <div class="modal-content">
           <span class="close-modal" id="closeAddModal">&times;</span>
-          <h2>List Your <span>Website</span></h2>
-          <p>
+          <h2 id="addWebsiteModalTitle">List Your <span>Website</span></h2>
+          <p id="addWebsiteModalDesc">
             Fill in the details to showcase your digital asset in our elite
             marketplace.
           </p>
           <form id="addWebsiteForm">
+            <input type="hidden" id="editWebsiteId" />
             <div class="form-group">
               <label>Website Name</label>
               <input
@@ -1967,6 +1968,9 @@
                   color: white;
                 "
               />
+            </div>
+            <div style="text-align: right; margin-bottom: 20px;">
+              <a href="#" id="forgotPasswordBtn" style="color: var(--primary-color); font-size: 0.8rem; text-decoration: none;">Forgot Password?</a>
             </div>
             <button
               type="submit"

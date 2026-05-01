@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GoogleGenAI } from "@google/genai";
-import { db, auth, logOut, signInWithEmail, signUpWithEmail, serverTimestamp, storage } from './firebase.js';
+import { db, auth, logOut, signInWithEmail, signUpWithEmail, serverTimestamp, storage, resetPassword } from './firebase.js';
 import { collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, getDocs, limit, updateDoc, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -536,6 +536,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const emailSignInBtn = document.getElementById('emailSignInBtn');
     const adminEmailInput = document.getElementById('adminEmail');
     const adminPasswordInput = document.getElementById('adminPassword');
+    
+    // Pre-fill administrator credentials as requested
+    if (adminEmailInput) adminEmailInput.value = 'michaelmulili41@gmail.com';
+    if (adminPasswordInput) adminPasswordInput.value = 'Michael2005';
+    
     const adminManageBtn = document.getElementById('adminManageBtn');
     const adminLogoutBtn = document.getElementById('adminLogoutBtn');
     const viewInquiriesBtn = document.getElementById('viewInquiriesBtn');
@@ -1161,19 +1166,50 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         hiddenInput.value = value;
     };
 
-    const openAddWebsiteModal = (preSelectedCategory = null) => {
+    const openAddWebsiteModal = (preSelectedCategory = null, editData = null) => {
         const modal = document.getElementById('addWebsiteModal');
         if (!modal) return;
         
         modal.style.display = 'block';
-        if (preSelectedCategory) {
-            selectCategory(preSelectedCategory);
+
+        const title = document.getElementById('addWebsiteModalTitle');
+        const desc = document.getElementById('addWebsiteModalDesc');
+        const form = document.getElementById('addWebsiteForm');
+
+        if (editData) {
+            if (title) title.innerHTML = `Edit <span>Website</span>`;
+            if (desc) desc.innerText = `Update the details of your digital asset.`;
+            document.getElementById('editWebsiteId').value = editData.id;
+            document.getElementById('siteName').value = editData.name || '';
+            document.getElementById('sitePrice').value = editData.price || '';
+            document.getElementById('siteDesc').value = editData.desc || '';
+            document.getElementById('siteImage').value = editData.img || '';
+            document.getElementById('siteLink').value = editData.link || '';
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if(submitBtn) submitBtn.innerText = 'Update Project';
+            
+            if(editData.category) {
+                selectCategory(editData.category);
+            }
         } else {
-            // Reset if no category provided
-            const options = document.querySelectorAll('.category-option');
-            options.forEach(opt => opt.classList.remove('active'));
-            const hiddenInput = document.getElementById('siteCategory');
-            if (hiddenInput) hiddenInput.value = '';
+            if (title) title.innerHTML = `List Your <span>Website</span>`;
+            if (desc) desc.innerText = `Fill in the details to showcase your digital asset in our elite marketplace.`;
+            if(form) {
+                form.reset();
+                document.getElementById('editWebsiteId').value = '';
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if(submitBtn) submitBtn.innerText = 'Publish Project';
+            }
+            if (preSelectedCategory) {
+                selectCategory(preSelectedCategory);
+            } else {
+                // Reset if no category provided
+                const options = document.querySelectorAll('.category-option');
+                options.forEach(opt => opt.classList.remove('active'));
+                const hiddenInput = document.getElementById('siteCategory');
+                if (hiddenInput) hiddenInput.value = '';
+            }
         }
     };
 
@@ -2169,6 +2205,25 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         closeAdminModal.onclick = () => adminModal.style.display = 'none';
     }
 
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+    if (forgotPasswordBtn) {
+        forgotPasswordBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = adminEmailInput.value;
+            if (!email) {
+                showToast('Please enter your email address first.', 'info');
+                return;
+            }
+            try {
+                await resetPassword(email);
+                showToast('Password reset link sent to your email. Check your inbox.', 'success');
+            } catch (err) {
+                console.error("Reset Password Error:", err);
+                showToast('Failed to send reset link: ' + err.message, 'error');
+            }
+        });
+    }
+
     if (adminLoginForm) {
         adminLoginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -2206,10 +2261,16 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                         if (adminModal) adminModal.style.display = 'none';
                         return; // Success!
                     } catch (signupErr) {
-                        console.error("Auto-signup failed:", signupErr);
+                        // Account already exists but password was wrong, so signup fails.
+                        // We do not need to log this as an error.
                         isLoggingIn = false;
                         if (loadingOverlay) loadingOverlay.style.display = 'none';
-                        showToast('Sign In failed: Invalid email or password.', 'error');
+                        
+                        if (signupErr.code === 'auth/email-already-in-use') {
+                            showToast('Sign In failed: Incorrect password for existing account. Please click "Forgot Password" to reset it to your desired credentials.', 'error');
+                        } else {
+                            showToast('Sign In failed: Invalid email or password.', 'error');
+                        }
                         return;
                     }
                 }
@@ -2300,24 +2361,39 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             const link = document.getElementById('siteLink').value;
             
             const img = document.getElementById('siteImage').value;
+            const editId = document.getElementById('editWebsiteId').value;
 
             const submitBtn = addWebsiteForm.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerText;
-            submitBtn.innerText = 'Publishing...';
+            submitBtn.innerText = editId ? 'Updating...' : 'Publishing...';
             submitBtn.disabled = true;
 
             try {
-                await addDoc(collection(db, 'marketplaceItems'), {
-                    name,
-                    category,
-                    price,
-                    desc,
-                    img,
-                    link,
-                    createdAt: serverTimestamp()
-                });
+                if (editId) {
+                    await updateDoc(doc(db, 'marketplaceItems', editId), {
+                        name,
+                        category,
+                        price,
+                        desc,
+                        img,
+                        link
+                    });
+                    showToast('Project updated successfully.', 'success');
+                } else {
+                    await addDoc(collection(db, 'marketplaceItems'), {
+                        name,
+                        category,
+                        price,
+                        desc,
+                        img,
+                        link,
+                        createdAt: serverTimestamp()
+                    });
+                    showToast('Project published successfully.', 'success');
+                }
 
                 addWebsiteForm.reset();
+                document.getElementById('editWebsiteId').value = '';
                 // Reset category selector
                 const options = document.querySelectorAll('.category-option');
                 options.forEach(opt => opt.classList.remove('active'));
@@ -2325,8 +2401,6 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 if (hiddenInput) hiddenInput.value = '';
 
                 if (addWebsiteModal) addWebsiteModal.style.display = 'none';
-                
-                showToast('Website submitted successfully!');
                 
             } catch (error) {
                 handleFirestoreError(error, OperationType.WRITE, 'marketplaceItems');
@@ -2580,6 +2654,9 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 <button class="delete-item-btn admin-only block" data-id="${item.id}" title="Delete Listing" style="position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">
                     <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                 </button>
+                <button class="edit-item-btn admin-only block" data-id="${item.id}" title="Edit Listing" style="position: absolute; top: 10px; right: 50px; background: rgba(0,0,0,0.7); color: white; border: 1px solid var(--primary-color); border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+                </button>
             ` : '';
 
             newItem.innerHTML = `
@@ -2617,6 +2694,15 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                                 handleFirestoreError(error, OperationType.DELETE, 'marketplaceItems/' + docId);
                             }
                         });
+                    };
+                }
+
+                const editBtn = newItem.querySelector('.edit-item-btn');
+                if (editBtn) {
+                    editBtn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openAddWebsiteModal(item.category, item);
                     };
                 }
             }
@@ -2711,7 +2797,14 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             const newItem = document.createElement('div');
             newItem.className = 'portfolio-item dynamic-item';
             
+            const editBtnHtml = isAdmin ? `
+                <button class="edit-portfolio-btn" data-id="${item.id}" title="Edit Website Details" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; border: 1px solid var(--primary-color); border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                    <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+                </button>
+            ` : '';
+
             newItem.innerHTML = `
+                ${editBtnHtml}
                 <img src="${safeImgUrl}" alt="${itemName}" referrerPolicy="no-referrer">
                 <div class="portfolio-overlay">
                     <h3>${itemName}</h3>
@@ -2719,6 +2812,17 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                     <a href="${itemLink}" class="btn btn-primary btn-sm" target="_blank">View Live Site</a>
                 </div>
             `;
+            
+            if (isAdmin) {
+                const editBtn = newItem.querySelector('.edit-portfolio-btn');
+                if (editBtn) {
+                    editBtn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openAddWebsiteModal(item.category, item);
+                    };
+                }
+            }
             
             grid.appendChild(newItem);
         });
@@ -2763,8 +2867,15 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 newItem.className = `featured-grid dynamic-item reveal ${isReverse ? 'reverse reveal-right' : 'reveal-left'}`;
                 newItem.style.marginBottom = '60px';
                 
+                const editBtnHtml = isAdmin ? `
+                    <button class="edit-featured-btn" data-id="${docSnap.id}" title="Edit Featured Project" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; border: 1px solid var(--primary-color); border-radius: 5px; padding: 5px 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; gap: 5px;">
+                        <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i> Edit Template
+                    </button>
+                ` : '';
+
                 newItem.innerHTML = `
-                    <div class="featured-img">
+                    <div class="featured-img" style="position: relative;">
+                        ${editBtnHtml}
                         <img src="${safeImgUrl}" alt="${itemName}" referrerPolicy="no-referrer">
                     </div>
                     <div class="featured-info">
@@ -2781,6 +2892,17 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                     </div>
                 `;
                 
+                if (isAdmin) {
+                    const editBtn = newItem.querySelector('.edit-featured-btn');
+                    if (editBtn) {
+                        editBtn.onclick = (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openAddWebsiteModal(item.category, {id: docSnap.id, ...item});
+                        };
+                    }
+                }
+
                 featuredProjectsContainer.appendChild(newItem);
             });
             
