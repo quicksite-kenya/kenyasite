@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Site | QuickSite Kenya</title>
+    <!-- Dynamic Favicon -->
+    <link rel="icon" type="image/png" id="favIcon" href="https://img.icons8.com/fluency/48/000000/diamond--v1.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link id="dynamicFont" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
+    
+    <style id="templateStyles">
+        :root {
+            --primary: #d4af37;
+            --primary-rgb: 212, 175, 55;
+            --bg: #030303;
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.6);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --container-width: 1100px;
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        .container { max-width: var(--container-width); margin: 0 auto; padding: 0 24px; }
+        
+        /* Navigation */
+        nav { 
+            padding: 20px 0; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            background: rgba(3, 3, 3, 0.7); 
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.25rem; font-weight: 800; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-links a { text-decoration: none; font-size: 0.9rem; font-weight: 500; color: var(--text); transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        
+        /* Hero Section */
+        .hero { 
+            padding: 160px 0 120px; 
+            text-align: center; 
+            background-size: cover; 
+            background-position: center; 
+            position: relative; 
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            min-height: 80vh;
+        }
+        .hero::before { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            background: radial-gradient(circle at 50% 50%, rgba(3,3,3,0.4) 0%, rgba(3,3,3,0.9) 100%); 
+            z-index: 1; 
+        }
+        .hero-content { position: relative; z-index: 2; width: 100%; max-width: 800px; margin: 0 auto; }
+        .hero h1 { 
+            font-size: clamp(2.5rem, 8vw, 4.5rem); 
+            line-height: 1.1; 
+            font-weight: 800; 
+            margin-bottom: 24px; 
+            letter-spacing: -0.03em;
+        }
+        .hero p { 
+            font-size: clamp(1rem, 4vw, 1.25rem); 
+            color: var(--text-muted); 
+            max-width: 600px; 
+            margin: 0 auto 40px; 
+            line-height: 1.6;
+        }
+        
+        /* Buttons */
+        .btn { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 14px 32px; 
+            border-radius: var(--radius-md); 
+            text-decoration: none; 
+            font-weight: 600; 
+            transition: var(--transition); 
+            cursor: pointer; 
+            border: none;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .btn-primary { 
+            background: var(--primary); 
+            color: #000; 
+            box-shadow: 0 10px 20px -5px rgba(var(--primary-rgb), 0.3);
+        }
+        .btn-primary:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 20px 30px -10px rgba(var(--primary-rgb), 0.5);
+            background: #f1c40f; 
+        }
+        
+        /* Sections */
+        section { padding: 100px 0; position: relative; }
+        section:nth-child(even) { background: rgba(255,255,255,0.015); }
+        .section-title { text-align: center; margin-bottom: 64px; }
+        .section-title span { 
+            color: var(--primary); 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            font-size: 0.8rem; 
+            letter-spacing: 2px; 
+            display: block; 
+            margin-bottom: 12px; 
+        }
+        .section-title h2 { 
+            font-size: clamp(2rem, 5vw, 2.75rem); 
+            font-weight: 700; 
+            letter-spacing: -0.02em; 
+        }
+        
+        /* Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .card { 
+            background: var(--card-bg); 
+            padding: 40px; 
+            border-radius: var(--radius-lg); 
+            border: 1px solid var(--glass-border); 
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(var(--primary-rgb), 0.3);
+            background: rgba(255,255,255,0.05);
+        }
+        .card h3 { font-size: 1.5rem; margin-bottom: 16px; font-weight: 600; color: var(--text); }
+        .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; flex-grow: 1; }
+        .price { font-size: 1.5rem; font-weight: 800; color: var(--primary); display: block; margin-top: auto; }
+        
+        /* About */
+        .about-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center; }
+        .about-text h2 { margin-bottom: 24px; font-size: 2.5rem; }
+        .about-img img { 
+            width: 100%; 
+            border-radius: var(--radius-lg); 
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.5);
+            display: block;
+        }
+        
+        /* Gallery */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .gallery-item { border-radius: var(--radius-md); overflow: hidden; aspect-ratio: 1; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .gallery-item:hover img { transform: scale(1.1); }
+        
+        /* Footer */
+        footer { padding: 80px 0 40px; background: #010101; border-top: 1px solid var(--glass-border); }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; }
+        .footer-col h4 { margin-bottom: 20px; font-weight: 700; color: var(--text); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .footer-col p { margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem; }
+        .footer-col a { color: var(--text-muted); text-decoration: none; transition: 0.3s; }
+        .footer-col a:hover { color: var(--primary); }
+        
+        .whatsapp-float { 
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
+            background: #25d366; color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 24px; 
+            box-shadow: 0 10px 30px rgba(37,211,102,0.3); z-index: 1000; text-decoration: none; transition: 0.3s;
+        }
+        .whatsapp-float:hover { transform: scale(1.1) translateY(-5px); }
+        
+        #previewBanner { position: fixed; top: 0; left: 0; width: 100%; background: var(--primary); color: black; text-align: center; padding: 10px; font-weight: 700; z-index: 9999; display: none; }
+        
+        @media (max-width: 991px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .about-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .hero { padding: 120px 0 80px; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="previewBanner">LIVE PREVIEW MODE — Updates publish instantly from dashboard</div>
+    
+    <nav>
+        <div class="container nav-content">
+            <a href="#" class="logo" id="siteLogoText">BusinessName</a>
+            <div class="nav-links">
+                <a href="#services">Services</a>
+                <a href="#about">About</a>
+                <a href="#contact" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.8rem;">Contact Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero" id="siteHero">
+        <div class="container hero-content">
+            <h1 id="siteTitle">Main Headline</h1>
+            <p id="siteTagline">Engaging tagline for your service business in Nairobi.</p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <a href="#contact" class="btn btn-primary">Book Consultation</a>
+                <a href="#services" class="btn btn-outline" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;">Our Services</a>
+            </div>
+        </div>
+    </header>
+
+    <section id="services">
+        <div class="container">
+            <div class="section-title">
+                <span>Our Expertise</span>
+                <h2 id="servicesTitle">Professional Solutions</h2>
+            </div>
+            <div class="grid" id="servicesGrid">
+                <!-- Services injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="features" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <span>Advantages</span>
+                <h2>Why Choose <span>Us</span></h2>
+            </div>
+            <div class="grid" id="featuresGrid">
+                 <!-- Features injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <div class="section-title" style="text-align: left; margin-bottom: 24px;">
+                        <span>Our Story</span>
+                        <h2 style="font-size: 2.5rem;">Why Choose <span id="aboutName" style="color: var(--primary);">Us</span>?</h2>
+                    </div>
+                    <p id="aboutContent" style="color: var(--text-muted); font-size: 1.1rem; line-height: 1.8;">Detailed about text goes here.</p>
+                </div>
+                <div class="about-img" id="aboutImgContainer">
+                    <img src="https://images.unsplash.com/photo-1600880210839-4f444c136329?auto=format&fit=crop&w=800&q=80" alt="About Us">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gallery" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <span>Portfolio</span>
+                <h2>Our Recent <span>Work</span></h2>
+            </div>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Gallery injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <span>Packages</span>
+                <h2>Transparent <span>Pricing</span></h2>
+            </div>
+            <div class="grid" id="pricingGrid">
+                 <!-- Pricing injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" style="display: none;">
+        <div class="container">
+            <div class="section-title">
+                <span>Reviews</span>
+                <h2>Client <span>Love</span></h2>
+            </div>
+            <div class="grid" id="testimonialsGrid">
+                 <!-- Testimonials injected here -->
+            </div>
+        </div>
+    </section>
+
+    <section id="cta" style="display: none;">
+        <div class="container">
+            <div style="background: var(--primary); padding: 80px 40px; border-radius: 40px; color: #000; text-align: center;">
+                <h2 id="ctaTitle" style="font-size: 2.5rem; margin-bottom: 24px; font-weight: 800;">Ready to Elevate Your Business?</h2>
+                <a href="#contact" id="ctaBtn" class="btn" style="background: #000; color: #fff; font-weight: 700; padding: 18px 40px; border-radius: 16px;">Get Started Now</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <div class="section-title">
+                <span>Inquiry</span>
+                <h2>Connect <span>With Us</span></h2>
+            </div>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); align-items: stretch; gap: 32px;">
+                <div class="card" style="display: flex; flex-direction: column;">
+                    <h3 style="font-size: 2rem; margin-bottom: 16px; font-weight: 800;">Get in Touch</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 32px; font-size: 1.05rem;">We're here to help and answer any question you might have. We look forward to hearing from you.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 20px; flex-grow: 1; margin-bottom: 40px;">
+                        <div style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px;">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="map-pin" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Location</span>
+                                <span id="contactAddressText" style="font-weight: 600; font-size: 1.1rem;">Nairobi, Kenya</span>
+                            </div>
+                        </div>
+                        
+                        <a href="#" id="callBtnLink" style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px; text-decoration: none; color: var(--text); transition: var(--transition);">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="phone" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Direct Line</span>
+                                <span id="contactPhoneText" style="font-weight: 600; font-size: 1.1rem;">+254 700 000000</span>
+                            </div>
+                        </a>
+                        
+                        <div style="display: flex; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px;">
+                            <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 14px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="mail" style="width: 24px; height: 24px;"></i>
+                            </div>
+                            <div>
+                                <span style="display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px;">Email Support</span>
+                                <span id="contactEmailText" style="font-weight: 600; font-size: 1.1rem;">contact@business.com</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 16px;">
+                        <a href="#" id="callBtn" class="btn btn-primary" style="flex: 1;"><i data-lucide="phone"></i> Call</a>
+                        <a href="#" id="waBtn" class="btn" style="flex: 2; background: #25D366; color: white;"><i data-lucide="message-circle" style="fill: white;"></i> Chat on WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="card" style="padding: 0; min-height: 500px; border-radius: var(--radius-lg); position: relative; overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="padding: 30px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 16px; z-index: 2;">
+                        <div style="width: 48px; height: 48px; background: rgba(var(--primary-rgb), 0.1); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="compass"></i>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.2rem;">Our Headquarters</h4>
+                            <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">Navigate to our office</p>
+                        </div>
+                    </div>
+                    <div id="mapContainer" style="flex-grow: 1; width: 100%; position: relative; background: #1a1a1a;">
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 0.9rem;">
+                            Map Data Unavailable
+                        </div>
+                        <!-- Map iframe injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4 id="footerName" style="color: var(--primary); font-size: 1.25rem;">BusinessName</h4>
+                    <p id="footerTagline">Professional web solutions for elite businesses.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Internal Links</h4>
+                    <p><a href="#services">Services</a></p>
+                    <p><a href="#about">About</a></p>
+                    <p><a href="#contact">Contact</a></p>
+                </div>
+                <div class="footer-col">
+                    <h4>Business Hours</h4>
+                    <p>Mon - Fri: 8:00 AM - 6:00 PM</p>
+                    <p>Sat: 9:00 AM - 3:00 PM</p>
+                    <p>Sun: Closed</p>
+                </div>
+            </div>
+            <div style="margin-top: 60px; text-align: center; opacity: 0.5; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 40px;">
+                <p>&copy; 2026 <span id="copyName">BusinessName</span>.</p>
+                <div id="poweredByTag" style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <span>Designed & Developed by</span>
+                    <a href="https://quicksitekenya.co.ke" target="_blank" style="color: var(--primary); text-decoration: none; font-weight: 700;">QuickSite Kenya</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="whatsapp-float" id="floatWaBtn">
+        <i data-lucide="phone"></i>
+    </a>
+
+    <!-- Firebase SDKs (Modular) -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+        import { initializeFirestore, doc, onSnapshot, collection, query, where, getDocs, limit } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+        import firebaseConfig from './firebase-applet-config.json';
+
+        async function init() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                const db = initializeFirestore(app, {
+                    experimentalForceLongPolling: true
+                }, firebaseConfig.firestoreDatabaseId);
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const siteId = urlParams.get('id');
+                const isPreview = urlParams.get('preview') === 'true';
+                const hostname = window.location.hostname;
+
+                if (isPreview) document.getElementById('previewBanner').style.display = 'block';
+
+                window.applyTemplate = (template) => {
+                    const styles = document.getElementById('templateStyles');
+                    const font = document.getElementById('dynamicFont');
+                    if (!styles || !font) return;
+                    
+                    if (template === 'LUXURY_DARK') {
+                        font.href = "https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Montserrat:wght@300;400;600&display=swap";
+                        styles.innerHTML += `
+                            :root { 
+                                --primary: #e63946; 
+                                --primary-rgb: 230, 57, 70; 
+                                --bg: #0a0a0a; --text: #f1faee; 
+                                --text-muted: #a8dadc; --card-bg: #1d3557; 
+                                --glass-border: rgba(230, 57, 70, 0.2);
+                                --radius-lg: 12px;
+                            }
+                            body { font-family: 'Montserrat', sans-serif; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%); color: var(--text); }
+                            h1, h2, h3, .logo { font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 2px;}
+                            .hero::before { background: radial-gradient(circle at 50% 50%, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.95) 100%); }
+                            .card { box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); }
+                            .btn-primary { background: var(--primary); color: white; border-radius: 4px; border: 1px solid #e63946; }
+                            .btn-primary:hover { background: #c1121f; }
+                        `;
+                     } else if (template === 'CORPORATE_CLEAN') {
+                        font.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
+                        styles.innerHTML += `
+                            :root { 
+                                --primary: #00509e; --bg: #ffffff; --text: #333333; 
+                                --text-muted: #666666; --card-bg: #f8f9fa; 
+                                --glass-border: #e9ecef; --radius-lg: 8px; --radius-md: 4px;
+                            }
+                            body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+                            h1, h2, h3, .logo { font-weight: 700; color: #001d3d; }
+                            .hero { background: #fdfdfd; padding: 140px 0 100px; text-align: center;}
+                            .hero h1 { color: #001d3d; }
+                            .hero::before { background: none; }
+                            .card { border: 1px solid var(--glass-border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+                            .btn-primary { border-radius: 4px; background: var(--primary); color: white; }
+                        `;
+                    } else if (template === 'STARTUP_MODERN') {
+                        font.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap';
+                        styles.innerHTML += `
+                            :root {
+                                --primary: #7209b7; --primary-rgb: 114, 9, 183;
+                                --bg: #f8f9fa; --text: #212529; --text-muted: #495057;
+                                --card-bg: rgba(255, 255, 255, 0.7); --glass-border: rgba(114, 9, 183, 0.1);
+                            }
+                            body { background: var(--bg); color: var(--text); font-family: 'Poppins', sans-serif; }
+                            nav { background: rgba(255, 255, 255, 0.8); }
+                            .hero { background: linear-gradient(135deg, #4cc9f0 0%, #7209b7 100%); color: white; border-radius: 0 0 50px 50px; }
+                            .hero::before { background: none; }
+                            .hero h1, .hero p, .hero .section-title h2 { color: white; }
+                            .card { border-radius: 24px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+                            .card:hover { transform: translateY(-10px); box-shadow: 0 15px 35px rgba(114, 9, 183, 0.15); }
+                            .btn-primary { background: #f72585; border-radius: 50px; color: white; }
+                        `;
+                    } else if (template === 'BOLD_FITNESS') {
+                         font.href = "https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Roboto:wght@400;500&display=swap";
+                         styles.innerHTML += `
+                            :root { 
+                                --primary: #ccff00; --bg: #111111; --text: #ffffff; 
+                                --text-muted: #aaaaaa; --card-bg: #1a1a1a; 
+                                --glass-border: #333333; --radius-lg: 0px; --radius-md: 0px;
+                            }
+                            body { font-family: 'Roboto', sans-serif; text-transform: none; }
+                            h1, h2, h3, .logo { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; color: white; }
+                            .hero { background: #000; }
+                            .hero::before { background: radial-gradient(circle at center, rgba(204,255,0,0.1) 0%, #000 80%); }
+                            .card { border: 2px solid #222; }
+                            .card:hover { border-color: var(--primary); }
+                            .btn-primary { background: var(--primary); color: black; border-radius: 0; font-weight: 700; text-transform: uppercase; transform: skewX(-10deg); }
+                            .btn-primary:hover { transform: skewX(-10deg) scale(1.05); }
+                         `;
+                    } else if (template === 'Universal Professional') {
+                        font.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap';
+                        styles.innerHTML += `
+                            :root {
+                                --primary: #4f46e5; --primary-rgb: 79, 70, 229;
+                                --bg: #ffffff; --text: #0f172a; --text-muted: #64748b;
+                                --card-bg: #f8fafc; --glass-border: #e2e8f0;
+                            }
+                            body { background: var(--bg); color: var(--text); }
+                            .hero { background: white; text-align: left; padding: 180px 0 140px; }
+                            .hero::before { background: radial-gradient(circle at 100% 0%, #eef2ff 0%, transparent 60%); }
+                            .hero h1 { color: #0f172a; letter-spacing: -0.04em; }
+                            .card { border-radius: 24px; background: white; border: 1px solid #e2e8f0; }
+                            .card:hover { border-color: var(--primary); }
+                        `;
+                    } else if (template === 'Legal & Consulting') {
+                         font.href = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@400;600&display=swap";
+                         styles.innerHTML += `
+                            :root { 
+                                --primary: #1a237e; --bg: #fdfdfd; --text: #1a1a1a; 
+                                --card-bg: #fff; --radius-lg: 0px;
+                            }
+                            body { font-family: 'Montserrat', sans-serif; }
+                            h1, h2, h3, .logo { font-family: 'Cormorant Garamond', serif; }
+                            .hero { background: #1a237e; color: white; }
+                            .btn-primary { background: #c5a059; border-radius: 0; }
+                         `;
+                    }
+                };
+
+                window.renderSite = (data) => {
+                    if (!data) return;
+                    document.title = `${data.businessName || 'Business'} | Official Site`;
+                    document.getElementById('siteLogoText').innerText = data.businessName || 'Business';
+                    document.getElementById('siteTitle').innerText = data.hero?.title || data.businessName || 'Headline';
+                    document.getElementById('siteTagline').innerText = data.hero?.subtitle || data.tagline || 'Leading Service Business in Nairobi';
+                    document.getElementById('aboutName').innerText = data.businessName || 'Us';
+                    document.getElementById('aboutContent').innerText = data.aboutText || 'We provide top-tier services to our clients with high attention to detail and professional excellence.';
+                    
+                    document.getElementById('footerName').innerText = data.businessName || 'Business';
+                    document.getElementById('footerTagline').innerText = data.tagline || '';
+                    document.getElementById('copyName').innerText = data.businessName || 'Business';
+
+                    const heroEl = document.getElementById('siteHero');
+                    if (data.images?.hero) {
+                        heroEl.style.backgroundImage = `url('${data.images.hero}')`;
+                    } else {
+                        heroEl.style.background = 'linear-gradient(45deg, #111, #222)';
+                    }
+
+                    // Update About Image
+                    if (data.images?.about) {
+                        const aboutImg = document.querySelector('#aboutImgContainer img');
+                        if (aboutImg) aboutImg.src = data.images.about;
+                    }
+
+                    const grid = document.getElementById('servicesGrid');
+                    grid.innerHTML = '';
+                    
+                    // Clear existing dynamic header image if any
+                    const oldHeader = document.getElementById('servicesDynamicHeader');
+                    if (oldHeader) oldHeader.remove();
+
+                    // Add Services Header Image if exists
+                    if (data.images?.services) {
+                        const servicesHeaderImg = document.createElement('div');
+                        servicesHeaderImg.id = 'servicesDynamicHeader';
+                        servicesHeaderImg.style.width = '100%';
+                        servicesHeaderImg.style.height = '350px';
+                        servicesHeaderImg.style.borderRadius = 'var(--radius-lg)';
+                        servicesHeaderImg.style.marginBottom = '40px';
+                        servicesHeaderImg.style.backgroundImage = `url('${data.images.services}')`;
+                        servicesHeaderImg.style.backgroundSize = 'cover';
+                        servicesHeaderImg.style.backgroundPosition = 'center';
+                        servicesHeaderImg.style.border = '1px solid var(--glass-border)';
+                        grid.before(servicesHeaderImg);
+                    }
+
+                    if (data.services && data.services.length > 0) {
+                        data.services.forEach(s => {
+                            const card = document.createElement('div');
+                            card.className = 'card';
+                            card.innerHTML = `<h3>${s.name || 'Service'}</h3><p>${s.description || ''}</p><span class="price">${s.price || ''}</span>`;
+                            grid.appendChild(card);
+                        });
+                    }
+
+                    if (data.contact) {
+                        document.getElementById('contactAddressText').innerText = data.contact.address || 'Nairobi, Kenya';
+                        document.getElementById('contactPhoneText').innerText = data.contact.phone || '+254 700 000000';
+                        document.getElementById('contactEmailText').innerText = data.contact.email || 'contact@business.com';
+                        document.getElementById('callBtn').href = `tel:${data.contact.phone}`;
+                        document.getElementById('callBtnLink').href = `tel:${data.contact.phone}`;
+                        const waNumber = (data.contact.whatsapp || data.contact.phone || '').toString().replace(/\+/g, '').replace(/\s/g, '');
+                        window.currentWaUrl = `https://wa.me/${waNumber}`;
+                        document.getElementById('waBtn').href = window.currentWaUrl;
+                        document.getElementById('floatWaBtn').href = window.currentWaUrl;
+                        if (data.contact.mapUrl) {
+                            document.getElementById('mapContainer').innerHTML = `<iframe src="${data.contact.mapUrl}" width="100%" height="100%" style="border:0; position: absolute; inset:0;" allowfullscreen="" loading="lazy" referrerPolicy="no-referrer"></iframe>`;
+                        }
+                    }
+
+                    const features = data.featuresEnabled || [];
+                    const plan = data.plan || data.subscriptionPlan || 'Business Growth';
+                    const isStarter = plan === 'Starter Presence';
+
+                    // Enforce plan section visibility
+                    const featuresSection = document.getElementById('features');
+                    const pricingSection = document.getElementById('pricing');
+                    const testimonialSection = document.getElementById('testimonials');
+                    const ctaSection = document.getElementById('cta');
+                    const gallerySection = document.getElementById('gallery');
+                    
+                    // Reset all to none first to ensure clean slate
+                    if(featuresSection) featuresSection.style.display = 'none';
+                    if(pricingSection) pricingSection.style.display = 'none';
+                    if(testimonialSection) testimonialSection.style.display = 'none';
+                    if(ctaSection) ctaSection.style.display = 'none';
+                    if(gallerySection) gallerySection.style.display = 'none';
+
+                    if (data.template === 'Universal Professional' && !isStarter) {
+                        const featuresGrid = document.getElementById('featuresGrid');
+                        if (data.features && data.features.length > 0) {
+                            featuresSection.style.display = 'block';
+                            featuresGrid.innerHTML = data.features.map(f => `
+                                <div class="card" style="text-align: center;">
+                                    <div style="width: 64px; height: 64px; background: rgba(var(--primary-rgb), 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: var(--primary);">
+                                        <i data-lucide="${f.icon || 'check'}"></i>
+                                    </div>
+                                    <h3 style="font-size: 1.25rem;">${f.title}</h3>
+                                    <p>${f.desc}</p>
+                                </div>
+                            `).join('');
+                        }
+                    }
+
+                    if (!isStarter && data.pricing && data.pricing.length > 0) {
+                        const pricingGrid = document.getElementById('pricingGrid');
+                        pricingSection.style.display = 'block';
+                        pricingGrid.innerHTML = data.pricing.map(p => `
+                            <div class="card" style="display: flex; flex-direction: column;">
+                                <h3 style="font-size: 1.5rem; margin-bottom: 8px;">${p.plan}</h3>
+                                <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 24px;">${p.price}</div>
+                                <ul style="list-style: none; padding: 0; margin-bottom: 32px; flex-grow: 1;">
+                                    ${p.features.map(feat => `<li style="margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; font-size: 0.95rem; color: var(--text-muted);"><i data-lucide="check" style="width: 18px; color: var(--primary); flex-shrink: 0;"></i> ${feat}</li>`).join('')}
+                                </ul>
+                                <a href="#contact" class="btn btn-primary" style="width: 100%; justify-content: center;">Choose Plan</a>
+                            </div>
+                        `).join('');
+                    }
+
+                    if (!isStarter && data.testimonials && data.testimonials.length > 0) {
+                        const testimonialGrid = document.getElementById('testimonialsGrid');
+                        testimonialSection.style.display = 'block';
+                        testimonialGrid.innerHTML = data.testimonials.map(t => `
+                            <div class="card">
+                                <i data-lucide="quote" style="width: 32px; color: var(--primary); opacity: 0.3; margin-bottom: 20px;"></i>
+                                <p style="font-style: italic; color: var(--text-muted); margin-bottom: 24px; font-size: 1.1rem;">"${t.quote}"</p>
+                                <h4 style="font-weight: 700; color: var(--text);">${t.name}</h4>
+                            </div>
+                        `).join('');
+                    }
+
+                    if (!isStarter && data.cta) {
+                        ctaSection.style.display = 'block';
+                        ctaSection.innerHTML = `
+                            <div class="container" style="background: var(--primary); padding: 80px 40px; border-radius: var(--radius-lg); text-align: center; color: white; position: relative; overflow: hidden;">
+                                <div style="position: relative; z-index: 2;">
+                                    <h2 style="font-size: 3rem; margin-bottom: 24px; color: white;">${data.cta.title || 'Ready to Start?'}</h2>
+                                    <p style="font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto 40px;">Let's build your vision into reality. Professionalism and quality guaranteed.</p>
+                                    <a href="#contact" class="btn" style="background: white; color: var(--primary); padding: 18px 48px; font-size: 1.1rem; font-weight: 700;">${data.cta.btn || 'Get Started Now'}</a>
+                                </div>
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(0,0,0,0.2) 0%, transparent 100%); z-index: 1;"></div>
+                            </div>
+                        `;
+                    }
+                    
+                    const gallery = document.getElementById('galleryGrid');
+                    gallery.innerHTML = '';
+                    if (!isStarter && data.images?.gallery && data.images.gallery.length > 0) {
+                        gallerySection.style.display = 'block';
+                        data.images.gallery.forEach(img => {
+                            const item = document.createElement('div');
+                            item.className = 'gallery-item';
+                            item.innerHTML = `<img src="${img}" alt="Gallery Image" referrerPolicy="no-referrer">`;
+                            gallery.appendChild(item);
+                        });
+                    }
+
+                    window.applyTemplate(data.template || 'CORPORATE_CLEAN');
+
+                    if (window.lucide) window.lucide.createIcons();
+                };
+
+                // Setup Listener logic
+                const listenToSite = (id) => {
+                    const siteRef = doc(db, 'clientSites', id);
+                    onSnapshot(siteRef, 
+                        (docSnap) => {
+                            if (docSnap.exists()) renderSite(docSnap.data());
+                        },
+                        (error) => {
+                            console.error("Site listener error:", error);
+                            if (error.code === 'permission-denied') {
+                                document.getElementById('siteHero').innerHTML = `
+                                    <div class="container" style="text-align: center; padding: 100px 20px;">
+                                        <h1>Access Restricted</h1>
+                                        <p>This website requires special permissions or is not currently live.</p>
+                                    </div>
+                                `;
+                            }
+                        }
+                    );
+                };
+
+                const MAIN_DOMAINS = ["quicksitekenya.co.ke", "quicksite.co.ke", "localhost", "127.0.0.1", "ais-dev-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app", "ais-pre-mxuldhpyhe7g4tmvbuamip-731127575238.europe-west2.run.app"];
+                
+                if (siteId) {
+                    // Specific ID provided (Standard flow for portal and previews)
+                    listenToSite(siteId);
+                } else if (!MAIN_DOMAINS.includes(hostname)) {
+                    // Custom Domain or Subdomain Routing Flow
+                    let domainQuery;
+                    if (hostname.includes('quicksitekenya.co.ke') || hostname.includes('quicksite.co.ke')) {
+                        const subdomain = hostname.split('.')[0];
+                        domainQuery = query(collection(db, 'clientSites'), where('subdomain', '==', subdomain), limit(1));
+                    } else {
+                        // Strip www. if applicable to ensure correct matching
+                        const cleanHost = hostname.replace(/^www\./, '');
+                        domainQuery = query(collection(db, 'clientSites'), where('customDomain', '==', cleanHost), limit(1));
+                    }
+                    
+                    getDocs(domainQuery).then(snapshot => {
+                        if (!snapshot.empty) {
+                            listenToSite(snapshot.docs[0].id);
+                        } else {
+                            document.getElementById('siteHero').innerHTML = `
+                                <div class="container" style="text-align: center; padding: 100px 20px;">
+                                    <h1 style="color: #ff3b3b; font-size: 2.5rem; margin-bottom: 20px;">Domain Not Connected</h1>
+                                    <p style="font-size: 1.1rem; color: #aaa;">This domain is pointing to QuickSite Kenya but is not connected to any active project yet.<br><br>If you are the owner, please complete your portal activation.</p>
+                                </div>
+                            `;
+                        }
+                    }).catch(error => {
+                        console.error("Domain lookup error", error);
+                    });
+                } else {
+                    document.getElementById('siteHero').innerHTML = `
+                        <div class="container" style="text-align: center; padding: 100px 20px;">
+                            <h1 style="color: #ff3b3b; font-size: 2.5rem; margin-bottom: 20px;">No Site Selected</h1>
+                            <p style="font-size: 1.1rem; color: #aaa;">Please use a valid preview link or connect a domain.</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error("Initialization Error:", err);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Catch-all Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedAdmin() {
+      return isSignedIn() && 
+             request.auth.token.email != null &&
+             request.auth.token.email.lower() == "michaelmulili41@gmail.com";
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Validation Blueprints ---
+
+    function isValidInquiry(data) {
+      return data.keys().hasAll(['name', 'email', 'service', 'message', 'createdAt', 'status']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 200 &&
+             data.status in ['New', 'Read', 'Replied', 'Closed'];
+    }
+
+    function isValidClientSite(data) {
+      return data.keys().hasAll(['businessName', 'template', 'plan', 'status', 'createdAt']) &&
+             data.businessName is string && data.businessName.size() <= 200 &&
+             data.status in ['Draft', 'Preview', 'Live'];
+    }
+
+    function isValidSecurityLog(data) {
+      return data.keys().hasAll(['type', 'severity', 'details', 'timestamp']) &&
+             data.severity in ['low', 'medium', 'high', 'critical'] &&
+             (data.timestamp == request.time || data.timestamp == null);
+    }
+
+    // --- Resource Routes ---
+
+    match /marketplaceItems/{itemId} {
+      allow read, get, list: if true;
+      allow write: if isVerifiedAdmin();
+    }
+    
+    match /inquiries/{inquiryId} {
+      allow read, get, list, delete: if isVerifiedAdmin();
+      allow create: if isValidInquiry(request.resource.data) && (request.resource.data.createdAt == request.time || request.resource.data.createdAt == null);
+      allow update: if isVerifiedAdmin();
+    }
+    
+    match /blogPosts/{postId} {
+      allow read, get, list: if true;
+      allow write: if isVerifiedAdmin();
+    }
+
+    match /clientSites/{siteId} {
+      // Public read by ID for site visitors
+      allow get: if true;
+      
+      // Allow list to support custom domain and subdomain lookups for hosted sites
+      allow list: if true;
+      
+      allow create: if isVerifiedAdmin() || 
+                    (isSignedIn() && request.resource.data.get('clientEmail', '').lower() == request.auth.token.email.lower() && isValidClientSite(request.resource.data));
+      
+      allow update: if isVerifiedAdmin() || 
+                    (isSignedIn() && resource.data.get('clientEmail', '').lower() == request.auth.token.email.lower());
+                    
+      allow delete: if isVerifiedAdmin();
+    }
+
+    match /security_logs/{logId} {
+      allow create: if isValidSecurityLog(request.resource.data);
+      allow read, write: if isVerifiedAdmin();
+    }
+  }
+}

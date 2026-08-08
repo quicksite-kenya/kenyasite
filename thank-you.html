@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thank You - QuickSite Kenya</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1638685270674909');
+    fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+  </head>
+  <body class="thank-you-page">
+    <!-- Meta Pixel Code noscript -->
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1638685270674909&ev=PageView&noscript=1"
+    /></noscript>
+    <div id="three-canvas-container"></div>
+    <div id="app-wrapper">
+        <nav id="navbar" class="active">
+            <div class="container">
+                <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="portfolio.html">Portfolio</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="thank-you-container">
+      <div class="container">
+        <div class="thank-you-card reveal">
+          <div class="success-icon">
+            <i data-lucide="check-circle"></i>
+          </div>
+          <h1>Thank <span>You!</span></h1>
+          <p>
+            Your message has been received successfully. Our team is already
+            reviewing your inquiry and will get back to you within 24 hours.
+          </p>
+          
+          <div class="social-prompt">
+            <p>While you wait, feel free to explore our latest projects:</p>
+            <div class="thank-you-actions">
+              <a href="portfolio.html" class="btn btn-secondary">View Portfolio</a>
+              <a href="index.html" class="btn btn-outline" style="border: 1px solid var(--primary-color); color: var(--primary-color);">Back to Home</a>
+            </div>
+          </div>
+
+          <div class="contact-alternative">
+            <p>Urgent inquiry? Chat with us directly:</p>
+            <a href="https://wa.me/254708691648" class="whatsapp-btn">
+              <i data-lucide="message-circle"></i> Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+    </div>
+
+    <style>
+      .thank-you-page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: var(--bg-color);
+      }
+      .thank-you-container {
+        padding: 120px 0 80px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+      .thank-you-card {
+        max-width: 600px;
+        margin: 0 auto;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        padding: 60px 40px;
+        border-radius: 30px;
+        text-align: center;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+      }
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(212, 175, 55, 0.1);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 30px;
+      }
+      .success-icon i {
+        width: 48px;
+        height: 48px;
+      }
+      .thank-you-card h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+      }
+      .thank-you-card h1 span {
+        color: var(--primary-color);
+      }
+      .thank-you-card p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        line-height: 1.7;
+        margin-bottom: 30px;
+      }
+      .social-prompt {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 1px solid var(--glass-border);
+      }
+      .thank-you-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .contact-alternative {
+        margin-top: 50px;
+      }
+      .whatsapp-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: #25d366;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 15px;
+        transition: 0.3s;
+      }
+      .whatsapp-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+      }
+      @media (max-width: 768px) {
+        .thank-you-card {
+            padding: 40px 20px;
+        }
+        .thank-you-actions {
+            flex-direction: column;
+        }
+        .thank-you-card h1 {
+            font-size: 2.5rem;
+        }
+      }
+    </style>
+
+    <script type="module" src="script.js"></script>
+    <script>
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>
