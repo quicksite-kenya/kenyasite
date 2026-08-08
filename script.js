@@ -1016,53 +1016,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const openSiteEditor = (id = null, data = null) => {
-        document.getElementById('editSiteId').value = id || '';
-        document.getElementById('siteEditorTitle').innerHTML = id ? `Edit <span>${data.businessName}</span>` : 'Add New <span>Client Site</span>';
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.value = (val !== undefined && val !== null) ? val : '';
+        };
+
+        setVal('editSiteId', id || '');
+        const titleEl = document.getElementById('siteEditorTitle');
+        if (titleEl) titleEl.innerHTML = id ? `Edit <span>${data.businessName}</span>` : 'Add New <span>Client Site</span>';
         
         // Populate inputs
-        document.getElementById('clientNameInput').value = data ? data.clientName || '' : '';
-        document.getElementById('businessNameInput').value = data ? data.businessName || '' : '';
-        document.getElementById('planInput').value = data ? data.plan || 'Starter Online Presence' : 'Starter Online Presence';
-        document.getElementById('templateInput').value = data ? data.template || 'CORPORATE_CLEAN' : 'CORPORATE_CLEAN';
-        document.getElementById('taglineInput').value = data ? data.tagline || '' : '';
-        document.getElementById('aboutTextInput').value = data ? data.aboutText || '' : '';
-        document.getElementById('statusInput').value = data ? data.status || 'Draft' : 'Draft';
+        setVal('clientNameInput', data ? data.clientName || '' : '');
+        setVal('businessNameInput', data ? data.businessName || '' : '');
+        setVal('planInput', data ? data.plan || 'Starter Online Presence' : 'Starter Online Presence');
+        setVal('templateInput', data ? data.template || 'CORPORATE_CLEAN' : 'CORPORATE_CLEAN');
+        setVal('taglineInput', data ? data.tagline || '' : '');
+        setVal('aboutTextInput', data ? data.aboutText || '' : '');
+        setVal('statusInput', data ? data.status || 'Draft' : 'Draft');
         
         // Services
-        document.getElementById('servicesInput').value = data && data.services ? data.services.map(s => `${s.name || ''} | ${s.price || ''} | ${s.description || ''}`).join('\n') : '';
+        setVal('servicesInput', data && data.services ? data.services.map(s => `${s.name || ''} | ${s.price || ''} | ${s.description || ''}`).join('\n') : '');
         
         // Contact
-        document.getElementById('phoneInput').value = data && data.contact ? data.contact.phone || '' : '';
-        document.getElementById('whatsappInput').value = data && data.contact ? data.contact.whatsapp || '' : '';
-        document.getElementById('addressInput').value = data && data.contact ? data.contact.address || '' : '';
-        document.getElementById('mapUrlInput').value = data && data.contact ? data.contact.mapUrl || '' : '';
+        setVal('phoneInput', data && data.contact ? data.contact.phone || '' : '');
+        setVal('whatsappInput', data && data.contact ? data.contact.whatsapp || '' : '');
+        setVal('addressInput', data && data.contact ? data.contact.address || '' : '');
+        setVal('mapUrlInput', data && data.contact ? data.contact.mapUrl || '' : '');
         
         // Media
-        document.getElementById('heroImageInput').value = data && data.images ? data.images.hero || '' : '';
-        document.getElementById('aboutImageInput').value = data && data.images ? data.images.about || '' : '';
-        document.getElementById('servicesImageInput').value = data && data.images ? data.images.services || '' : '';
-        document.getElementById('logoImageInput').value = data && data.images ? data.images.logo || '' : '';
-        document.getElementById('galleryImagesInput').value = data && data.images && data.images.gallery ? data.images.gallery.join('\n') : '';
+        setVal('heroImageInput', data && data.images ? data.images.hero || '' : '');
+        setVal('aboutImageInput', data && data.images ? data.images.about || '' : '');
+        setVal('servicesImageInput', data && data.images ? data.images.services || '' : '');
+        setVal('logoImageInput', data && data.images ? data.images.logo || '' : '');
+        setVal('galleryImagesInput', data && data.images && data.images.gallery ? data.images.gallery.join('\n') : '');
         
         // Hosting & Domains
-        document.getElementById('customDomainInput').value = data ? data.customDomain || '' : '';
-        document.getElementById('subdomainInput').value = data ? data.subdomain || '' : '';
-        document.getElementById('customDomainsListInput').value = data && data.custom_domains ? data.custom_domains.join(', ') : '';
+        setVal('customDomainInput', data ? data.customDomain || '' : '');
+        setVal('subdomainInput', data ? data.subdomain || '' : '');
+        setVal('customDomainsListInput', data && data.custom_domains ? data.custom_domains.join(', ') : '');
         
         // Advanced Universal Template Fields
-        document.getElementById('heroSettingsInput').value = data && data.hero ? `${data.hero.title || ''} | ${data.hero.subtitle || ''} | ${data.hero.cta || ''}` : '';
-        document.getElementById('featuresInput').value = data && data.features ? data.features.map(f => `${f.title || ''} | ${f.desc || ''} | ${f.icon || ''}`).join('\n') : '';
-        document.getElementById('testimonialsInput').value = data && data.testimonials ? data.testimonials.map(t => `${t.name || ''} | ${t.quote || ''}`).join('\n') : '';
-        document.getElementById('pricingInput').value = data && data.pricing ? data.pricing.map(p => `${p.plan || ''} | ${p.price || ''} | ${(p.features || []).join(', ')}`).join('\n') : '';
-        document.getElementById('ctaSettingsInput').value = data && data.cta ? `${data.cta.title || ''} | ${data.cta.btn || ''}` : '';
+        setVal('heroSettingsInput', data && data.hero ? `${data.hero.title || ''} | ${data.hero.subtitle || ''} | ${data.hero.cta || ''}` : '');
+        setVal('featuresInput', data && data.features ? data.features.map(f => `${f.title || ''} | ${f.desc || ''} | ${f.icon || ''}`).join('\n') : '');
+        setVal('testimonialsInput', data && data.testimonials ? data.testimonials.map(t => `${t.name || ''} | ${t.quote || ''}`).join('\n') : '');
+        setVal('pricingInput', data && data.pricing ? data.pricing.map(p => `${p.plan || ''} | ${p.price || ''} | ${(p.features || []).join(', ')}`).join('\n') : '');
+        setVal('ctaSettingsInput', data && data.cta ? `${data.cta.title || ''} | ${data.cta.btn || ''}` : '');
         
         // Billing & Subscriptions
-        document.getElementById('subscriptionPlanInput').value = data ? data.plan || data.subscriptionPlan || 'Starter Presence' : 'Starter Presence';
-        document.getElementById('paymentStatusInput').value = data ? data.paymentStatus || 'Unpaid' : 'Unpaid';
-        document.getElementById('setupFeeInput').value = data ? data.setupFee || 0 : 0;
-        document.getElementById('monthlyFeeInput').value = data ? data.monthlyFee || 0 : 0;
-        document.getElementById('featuresEnabledInput').value = data && data.featuresEnabled ? data.featuresEnabled.join(', ') : '';
-        document.getElementById('projectVisionInput').value = data ? data.projectVision || '' : '';
+        setVal('subscriptionPlanInput', data ? data.plan || data.subscriptionPlan || 'Starter Presence' : 'Starter Presence');
+        setVal('paymentStatusInput', data ? data.paymentStatus || 'Unpaid' : 'Unpaid');
+        setVal('setupFeeInput', data ? data.setupFee || 0 : 0);
+        setVal('monthlyFeeInput', data ? data.monthlyFee || 0 : 0);
+        setVal('featuresEnabledInput', data && data.featuresEnabled ? data.featuresEnabled.join(', ') : '');
+        setVal('projectVisionInput', data ? data.projectVision || '' : '');
 
         siteEditorModal.style.display = 'block';
     };
@@ -1382,29 +1388,33 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 testimonials: testimonials,
                 cta: cta,
                 images: {
-                    hero: content.heroImageUrl || document.getElementById('heroImageInput').value,
-                    about: content.aboutImageUrl || document.getElementById('aboutImageInput').value,
-                    services: content.servicesImageUrl || document.getElementById('servicesImageInput').value,
-                    logo: document.getElementById('logoImageInput').value,
-                    gallery: document.getElementById('galleryImagesInput').value.split('\n').filter(l => l.trim())
+                    hero: content.heroImageUrl || (document.getElementById('heroImageInput') ? document.getElementById('heroImageInput').value : ''),
+                    about: content.aboutImageUrl || (document.getElementById('aboutImageInput') ? document.getElementById('aboutImageInput').value : ''),
+                    services: content.servicesImageUrl || (document.getElementById('servicesImageInput') ? document.getElementById('servicesImageInput').value : ''),
+                    logo: document.getElementById('logoImageInput') ? document.getElementById('logoImageInput').value : '',
+                    gallery: document.getElementById('galleryImagesInput') ? document.getElementById('galleryImagesInput').value.split('\n').filter(l => l.trim()) : []
                 },
                 featuresEnabled: ['Features', 'Pricing', 'Testimonials', 'CTA'],
                 updatedAt: serverTimestamp()
             });
 
             // Update UI fields
-            document.getElementById('heroSettingsInput').value = `${hero.title} | ${hero.subtitle} | Learn More`;
-            document.getElementById('taglineInput').value = content.tagline || existingTagline;
-            document.getElementById('aboutTextInput').value = content.aboutText || existingAbout;
-            document.getElementById('servicesInput').value = services.map(s => `${s.name} | ${s.price} | ${s.description}`).join('\n');
-            document.getElementById('featuresInput').value = features.map(f => `${f.title} | ${f.desc} | ${f.icon}`).join('\n');
-            document.getElementById('pricingInput').value = pricing.map(p => `${p.plan} | ${p.price} | ${(p.features || []).join(', ')}`).join('\n');
-            document.getElementById('testimonialsInput').value = testimonials.map(t => `${t.name} | ${t.quote}`).join('\n');
-            document.getElementById('ctaSettingsInput').value = `${cta.title} | ${cta.btn}`;
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val !== undefined && val !== null ? val : '';
+            };
+            setVal('heroSettingsInput', `${hero.title} | ${hero.subtitle} | Learn More`);
+            setVal('taglineInput', content.tagline || existingTagline);
+            setVal('aboutTextInput', content.aboutText || existingAbout);
+            setVal('servicesInput', services.map(s => `${s.name} | ${s.price} | ${s.description}`).join('\n'));
+            setVal('featuresInput', features.map(f => `${f.title} | ${f.desc} | ${f.icon}`).join('\n'));
+            setVal('pricingInput', pricing.map(p => `${p.plan} | ${p.price} | ${(p.features || []).join(', ')}`).join('\n'));
+            setVal('testimonialsInput', testimonials.map(t => `${t.name} | ${t.quote}`).join('\n'));
+            setVal('ctaSettingsInput', `${cta.title} | ${cta.btn}`);
             
-            document.getElementById('heroImageInput').value = content.heroImageUrl || '';
-            document.getElementById('aboutImageInput').value = content.aboutImageUrl || '';
-            document.getElementById('servicesImageInput').value = content.servicesImageUrl || '';
+            setVal('heroImageInput', content.heroImageUrl || '');
+            setVal('aboutImageInput', content.aboutImageUrl || '');
+            setVal('servicesImageInput', content.servicesImageUrl || '');
 
             showToast("Design complete! Switched to Content tab to review results.", 'success');
             
@@ -1472,24 +1482,29 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         const desc = document.getElementById('addWebsiteModalDesc');
         const form = document.getElementById('addWebsiteForm');
 
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.value = val !== undefined && val !== null ? val : '';
+        };
+
         if (editData) {
             if (title) title.innerHTML = `Edit <span>Website</span>`;
             if (desc) desc.innerText = `Update the details of your digital asset.`;
-            document.getElementById('editWebsiteId').value = editData.id;
-            document.getElementById('siteName').value = editData.name || editData.title || editData.businessName || '';
-            document.getElementById('sitePrice').value = editData.price || '';
-            document.getElementById('siteDesc').value = editData.desc || editData.description || '';
-            document.getElementById('siteImage').value = editData.img || editData.image || '';
-            document.getElementById('siteLink').value = editData.link || editData.url || '';
+            setVal('editWebsiteId', editData.id);
+            setVal('siteName', editData.name || editData.title || editData.businessName || '');
+            setVal('sitePrice', editData.price || '');
+            setVal('siteDesc', editData.desc || editData.description || '');
+            setVal('siteImage', editData.img || editData.image || '');
+            setVal('siteLink', editData.link || editData.url || '');
             
-            const submitBtn = form.querySelector('button[type="submit"]');
+            const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
             if(submitBtn) submitBtn.innerText = 'Update Project';
             
             if(editData.category) {
                 selectCategory(editData.category);
-                document.getElementById('siteCategory').value = editData.category;
+                setVal('siteCategory', editData.category);
             } else {
-                document.getElementById('siteCategory').value = 'Other Digital Assets';
+                setVal('siteCategory', 'Other Digital Assets');
                 selectCategory('Other Digital Assets');
             }
         } else {
@@ -1497,7 +1512,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             if (desc) desc.innerText = `Fill in the details to showcase your digital asset in our elite marketplace.`;
             if(form) {
                 form.reset();
-                document.getElementById('editWebsiteId').value = '';
+                setVal('editWebsiteId', '');
                 const submitBtn = form.querySelector('button[type="submit"]');
                 if(submitBtn) submitBtn.innerText = 'Publish Project';
             }
@@ -2176,10 +2191,12 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
     if (manageBlogBtn) {
         manageBlogBtn.onclick = (e) => {
             e.preventDefault();
-            document.getElementById('blogModalTitle').innerHTML = 'Add <span>Blog Post</span>';
-            blogPostForm.reset();
-            document.getElementById('editPostId').value = '';
-            blogPostModal.style.display = 'block';
+            const blogTitle = document.getElementById('blogModalTitle');
+            if (blogTitle) blogTitle.innerHTML = 'Add <span>Blog Post</span>';
+            if (blogPostForm) blogPostForm.reset();
+            const editPostId = document.getElementById('editPostId');
+            if (editPostId) editPostId.value = '';
+            if (blogPostModal) blogPostModal.style.display = 'block';
         };
     }
 
@@ -2690,14 +2707,22 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 return;
             }
             
-            const name = document.getElementById('siteName').value;
-            const category = document.getElementById('siteCategory').value;
-            const price = document.getElementById('sitePrice').value;
-            const desc = document.getElementById('siteDesc').value;
-            const link = document.getElementById('siteLink').value;
-            
-            const img = document.getElementById('siteImage').value;
-            const editId = document.getElementById('editWebsiteId').value;
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val !== undefined && val !== null ? val : '';
+            };
+
+            const name = getVal('siteName');
+            const category = getVal('siteCategory');
+            const price = getVal('sitePrice');
+            const desc = getVal('siteDesc');
+            const link = getVal('siteLink');
+            const img = getVal('siteImage');
+            const editId = getVal('editWebsiteId');
 
             if (!category) {
                 showToast('Please select a category.', 'error');
@@ -2705,9 +2730,11 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             }
 
             const submitBtn = addWebsiteForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerText;
-            submitBtn.innerText = editId ? 'Updating...' : 'Publishing...';
-            submitBtn.disabled = true;
+            const originalText = submitBtn ? submitBtn.innerText : 'Submit';
+            if (submitBtn) {
+                submitBtn.innerText = editId ? 'Updating...' : 'Publishing...';
+                submitBtn.disabled = true;
+            }
 
             try {
                 if (editId) {
@@ -2734,20 +2761,21 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 }
 
                 addWebsiteForm.reset();
-                document.getElementById('editWebsiteId').value = '';
+                setVal('editWebsiteId', '');
                 // Reset category selector
                 const options = document.querySelectorAll('.category-option');
                 options.forEach(opt => opt.classList.remove('active'));
-                const hiddenInput = document.getElementById('siteCategory');
-                if (hiddenInput) hiddenInput.value = '';
+                setVal('siteCategory', '');
 
                 if (addWebsiteModal) addWebsiteModal.style.display = 'none';
                 
             } catch (error) {
                 handleFirestoreError(error, OperationType.WRITE, 'marketplaceItems');
             } finally {
-                submitBtn.innerText = originalText;
-                submitBtn.disabled = false;
+                if (submitBtn) {
+                    submitBtn.innerText = originalText;
+                    submitBtn.disabled = false;
+                }
             }
         });
     }
@@ -3393,15 +3421,24 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             const snapshot = await getDocs(query(collection(db, 'blogPosts'), where('__name__', '==', id)));
             if (!snapshot.empty) {
                 const post = snapshot.docs[0].data();
-                document.getElementById('blogModalTitle').innerHTML = 'Edit <span>Blog Post</span>';
-                document.getElementById('editPostId').value = id;
-                document.getElementById('postTitleInput').value = post.title;
-                document.getElementById('postSubtitleInput').value = post.subtitle;
-                document.getElementById('postImgInput').value = post.img;
-                document.getElementById('postLinkInput').value = post.link || '';
-                document.getElementById('postCategoryInput').value = post.category || 'Insights';
-                document.getElementById('postContentInput').value = post.content;
-                blogPostModal.style.display = 'block';
+                const setHTML = (id, html) => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = html;
+                };
+                const setVal = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = val !== undefined && val !== null ? val : '';
+                };
+
+                setHTML('blogModalTitle', 'Edit <span>Blog Post</span>');
+                setVal('editPostId', id);
+                setVal('postTitleInput', post.title);
+                setVal('postSubtitleInput', post.subtitle);
+                setVal('postImgInput', post.img);
+                setVal('postLinkInput', post.link || '');
+                setVal('postCategoryInput', post.category || 'Insights');
+                setVal('postContentInput', post.content);
+                if (blogPostModal) blogPostModal.style.display = 'block';
             }
         } catch (error) {
             handleFirestoreError(error, OperationType.GET, `blogPosts/${id}`);
@@ -3488,22 +3525,29 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
     if (blogPostForm) {
         blogPostForm.onsubmit = async (e) => {
             e.preventDefault();
-            const editId = document.getElementById('editPostId').value;
-            const img = document.getElementById('postImgInput').value;
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
+
+            const editId = getVal('editPostId');
+            const img = getVal('postImgInput');
 
             const submitBtn = blogPostForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerText;
-            submitBtn.innerText = 'Publishing...';
-            submitBtn.disabled = true;
+            const originalText = submitBtn ? submitBtn.innerText : 'Publishing...';
+            if (submitBtn) {
+                submitBtn.innerText = 'Publishing...';
+                submitBtn.disabled = true;
+            }
 
             try {
                 const postData = {
-                    title: document.getElementById('postTitleInput').value,
-                    subtitle: document.getElementById('postSubtitleInput').value,
+                    title: getVal('postTitleInput'),
+                    subtitle: getVal('postSubtitleInput'),
                     img: img,
-                    link: document.getElementById('postLinkInput').value,
-                    category: document.getElementById('postCategoryInput').value,
-                    content: document.getElementById('postContentInput').value,
+                    link: getVal('postLinkInput'),
+                    category: getVal('postCategoryInput'),
+                    content: getVal('postContentInput'),
                     date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
                     createdAt: serverTimestamp()
                 };
