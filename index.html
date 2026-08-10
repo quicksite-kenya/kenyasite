@@ -135,6 +135,7 @@
           <a href="index.html" class="logo">QuickSite<span>Kenya</span></a>
           <ul class="nav-links">
             <li><a href="index.html" class="active">Home</a></li>
+
             <li><a href="client-portal.html">Client Portal</a></li>
             <li><a href="services.html">Services</a></li>
             <li><a href="packages.html">Packages</a></li>
@@ -239,22 +240,16 @@
             <p>
               Nairobi's elite agency specializing in high-performance web design and data-driven social media advertising to help you scale your business.
             </p>
-            <div class="hero-btns">
-              <a href="contact.html" class="btn btn-secondary"
-                >Start Your Project</a
-              >
-              <a href="packages.html" class="btn btn-primary"
-                >Explore Packages</a
-              >
-              <a
-                href="portfolio.html"
-                class="btn btn-primary"
-                style="
-                  background: transparent;
-                  border: 1px solid rgba(255, 255, 255, 0.2);
-                "
-                >View Masterpieces</a
-              >
+            <div class="hero-btns" style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="#website-hub" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="globe" style="width: 16px; height: 16px;"></i> Web Dev Hub
+              </a>
+              <a href="#ads-hub" class="btn" style="background: linear-gradient(135deg, #1877f2 0%, #25D366 100%) !important; color: white !important; border: none !important; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(24,119,242,0.4);">
+                <i data-lucide="trending-up" style="width: 16px; height: 16px;"></i> Social Media Ads Sector
+              </a>
+              <a href="packages.html" class="btn btn-secondary">
+                View Packages
+              </a>
             </div>
           </div>
         </div>
@@ -296,7 +291,20 @@
         </div>
       </section>
 
-      <section class="service-pillars reveal">
+
+
+      <!-- WEB DEVELOPMENT HUB CONTAINER -->
+      <div id="website-hub" class="hub-view-container">
+        <div class="container">
+          <div class="hub-banner-badge gold-theme">
+            <span style="color: var(--primary-color); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="globe" style="width: 18px; height: 18px;"></i> Web Development & Online Presence Solutions
+            </span>
+            <span style="color: #888; font-size: 0.8rem;">48-Hour Delivery • M-Pesa Ready • SEO Optimized</span>
+          </div>
+        </div>
+
+        <section class="service-pillars reveal">
         <div class="container">
           <div class="pillars-grid">
             <div class="pillar-card reveal">
@@ -515,72 +523,107 @@
             <!-- Static fallback projects shown when DB is empty -->
             <div class="static-fallback">
               <div class="featured-grid" style="margin-bottom: 60px">
-                <div class="featured-img">
+                <div class="featured-img" style="position: relative;">
+                  <span style="position: absolute; top: 20px; left: 20px; background: linear-gradient(135deg, #d4af37 0%, #aa771c 100%); color: #000; font-weight: 800; font-size: 0.9rem; padding: 8px 18px; border-radius: 30px; z-index: 10; box-shadow: 0 10px 25px rgba(212,175,55,0.4);">$425 USD <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.8;">(KES 55,000)</span></span>
                   <img
-                    src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1200&q=80"
-                    alt="Safari Luxury"
+                    src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80"
+                    alt="Skybridge-Travel"
                     referrerpolicy="no-referrer"
                   />
+                  <div class="floating-attention-card">
+                    <div class="floating-icon-dot">🎁</div>
+                    <div class="floating-card-text">
+                      <span class="floating-card-title">6% OFF COUPON</span>
+                      <span class="floating-card-sub">Use Code: <strong>SAVE6</strong></span>
+                    </div>
+                  </div>
                 </div>
                 <div class="featured-info">
-                  <span class="section-tag" style="margin-bottom: 15px"
-                    >Real Estate</span
-                  >
-                  <h2>Safari <span>Luxury</span></h2>
-                  <p class="lead">
-                    Premium Real Estate platform for elite clients.
-                  </p>
+                  <span class="section-tag" style="margin-bottom: 15px">Corporate & Business Sites</span>
+                  <h2>Skybridge <span>Travel</span></h2>
+                  <p class="lead">Corporate & Business Sites solution for elite travel agencies.</p>
                   <p>
-                    An exclusive property showcase platform featuring
-                    high-resolution virtual tours, secure client portals, and
-                    seamless booking for high-end estates.
+                    Experience travel redefined with our modern airline & tour booking platform, featuring seamless itinerary planning, secure M-Pesa checkout, and instant ticket generation.
                   </p>
                   <ul class="service-features" style="margin-bottom: 30px">
-                    <li>
-                      <i data-lucide="check-circle"></i> Custom Elite Design
-                    </li>
+                    <li><i data-lucide="check-circle"></i> Custom Elite Design</li>
                     <li><i data-lucide="check-circle"></i> High Performance</li>
-                    <li>
-                      <i data-lucide="check-circle"></i> Secure Integration
-                    </li>
+                    <li><i data-lucide="check-circle"></i> M-Pesa & Card Integration</li>
                   </ul>
-                  <a href="portfolio.html" class="btn btn-primary"
-                    >Explore Project</a
-                  >
+                  <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <a href="contact.html?service=Skybridge-Travel" class="btn btn-primary">Claim This Offer ($425 USD)</a>
+                    <a href="portfolio.html" class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2);">Explore Project</a>
+                  </div>
                 </div>
               </div>
 
               <div class="featured-grid reverse" style="margin-bottom: 60px">
-                <div class="featured-img">
+                <div class="featured-img" style="position: relative;">
+                  <span style="position: absolute; top: 20px; right: 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: #fff; font-weight: 800; font-size: 0.9rem; padding: 8px 18px; border-radius: 30px; z-index: 10; box-shadow: 0 10px 25px rgba(59,130,246,0.4);">$270 USD <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;">(KES 35,000)</span></span>
+                  <img
+                    src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80"
+                    alt="Elitefit-gym"
+                    referrerpolicy="no-referrer"
+                  />
+                  <div class="floating-attention-card alt-left">
+                    <div class="floating-icon-dot">🎟️</div>
+                    <div class="floating-card-text">
+                      <span class="floating-card-title">SAVE 6% TODAY</span>
+                      <span class="floating-card-sub">Coupon Code: <strong>SAVE6</strong></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="featured-info">
+                  <span class="section-tag" style="margin-bottom: 15px">Business Landing Pages</span>
+                  <h2>Elitefit <span>Gym</span></h2>
+                  <p class="lead">High-converting business landing page solution for elite fitness brands.</p>
+                  <p>
+                    Transform your body, boost your confidence, and unlock your full potential with our dynamic fitness platform. Complete with online class booking, membership tiers, and trainer schedules.
+                  </p>
+                  <ul class="service-features" style="margin-bottom: 30px">
+                    <li><i data-lucide="check-circle"></i> Membership Funnel</li>
+                    <li><i data-lucide="check-circle"></i> WhatsApp Booking</li>
+                    <li><i data-lucide="check-circle"></i> Mobile Optimized</li>
+                  </ul>
+                  <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <a href="contact.html?service=Elitefit-gym" class="btn btn-primary">Claim This Offer ($270 USD)</a>
+                    <a href="portfolio.html" class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2);">Explore Project</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="featured-grid" style="margin-bottom: 60px">
+                <div class="featured-img" style="position: relative;">
+                  <span style="position: absolute; top: 20px; left: 20px; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #fff; font-weight: 800; font-size: 0.9rem; padding: 8px 18px; border-radius: 30px; z-index: 10; box-shadow: 0 10px 25px rgba(16,185,129,0.4);">$350 USD <span style="font-size: 0.75rem; font-weight: 600; opacity: 0.9;">(KES 45,000)</span></span>
                   <img
                     src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
                     alt="Nairobi Penthouse"
                     referrerpolicy="no-referrer"
                   />
+                  <div class="floating-attention-card">
+                    <div class="floating-icon-dot">🏷️</div>
+                    <div class="floating-card-text">
+                      <span class="floating-card-title">6% DISCOUNT ACTIVE</span>
+                      <span class="floating-card-sub">Use Coupon: <strong>SAVE6</strong></span>
+                    </div>
+                  </div>
                 </div>
                 <div class="featured-info">
-                  <span class="section-tag" style="margin-bottom: 15px"
-                    >Architecture</span
-                  >
+                  <span class="section-tag" style="margin-bottom: 15px">Business Landing Pages</span>
                   <h2>Nairobi <span>Penthouse</span></h2>
-                  <p class="lead">Architectural showcase for elite clients.</p>
+                  <p class="lead">Luxury real estate showcase for high-net-worth buyers.</p>
                   <p>
-                    A visually stunning portfolio site designed to highlight
-                    modern architectural marvels with immersive galleries and
-                    interactive 3D models.
+                    Find your perfect place to call home with our modern real estate platform. Designed to make buying, selling, and renting seamless with virtual 360° tours and instant agent inquiries via WhatsApp.
                   </p>
                   <ul class="service-features" style="margin-bottom: 30px">
-                    <li>
-                      <i data-lucide="check-circle"></i> Custom Elite Design
-                    </li>
-                    <li><i data-lucide="check-circle"></i> High Performance</li>
-                    <li>
-                      <i data-lucide="check-circle"></i> Secure Integration
-                    </li>
+                    <li><i data-lucide="check-circle"></i> Luxury Property Grid</li>
+                    <li><i data-lucide="check-circle"></i> WhatsApp Direct Lead</li>
+                    <li><i data-lucide="check-circle"></i> Secure Integration</li>
                   </ul>
-                  <a href="portfolio.html" class="btn btn-primary"
-                    >Explore Project</a
-                  >
+                  <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    <a href="contact.html?service=Nairobi-Penthouse" class="btn btn-primary">Claim This Offer ($350 USD)</a>
+                    <a href="portfolio.html" class="btn btn-secondary" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2);">Explore Project</a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -723,210 +766,7 @@
           </div>
         </div>
       </section>
-
-      <section id="ads-management" class="ads-management-section reveal">
-        <div class="container">
-          <div class="section-header">
-            <div
-              class="hero-badge"
-              style="
-                margin-bottom: 20px;
-                margin-left: auto;
-                margin-right: auto;
-              "
-            >
-              <i data-lucide="trending-up"></i>
-              <span>Digital Growth</span>
-            </div>
-            <span class="section-tag"
-              >Paid Advertising</span
-            >
-            <h2>Social Media Ads <span>Creation & Management</span></h2>
-            <p>
-              We help businesses reach more customers through targeted Facebook,
-              Instagram, and WhatsApp advertising.
-            </p>
-          </div>
-
-          <div class="ads-grid">
-            <!-- Card 1 -->
-            <div class="ads-card reveal">
-              <div class="icon-wrapper">
-                <i data-lucide="facebook"></i>
-              </div>
-              <h3>Facebook Ads</h3>
-              <ul>
-                <li>
-                  <i data-lucide="check-circle"></i> Create high-converting
-                  Facebook ad campaigns
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Audience targeting and
-                  retargeting
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Lead generation and brand
-                  awareness
-                </li>
-              </ul>
-              <a href="services.html#fb-ads" class="learn-more">Learn More <i data-lucide="arrow-right"></i></a>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="ads-card reveal">
-              <div class="icon-wrapper">
-                <i data-lucide="instagram"></i>
-              </div>
-              <h3>Instagram Ads</h3>
-              <ul>
-                <li>
-                  <i data-lucide="check-circle"></i> Professional Instagram
-                  promotional campaigns
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Story ads, reels ads, and
-                  feed promotions
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Engagement and follower
-                  growth strategies
-                </li>
-              </ul>
-              <a href="services.html#ig-ads" class="learn-more">Learn More <i data-lucide="arrow-right"></i></a>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="ads-card reveal">
-              <div class="icon-wrapper">
-                <i data-lucide="message-circle"></i>
-              </div>
-              <h3>WhatsApp Marketing</h3>
-              <ul>
-                <li>
-                  <i data-lucide="check-circle"></i> WhatsApp click-to-chat ads
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Customer engagement
-                  campaigns
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Direct inquiry and sales
-                  generation
-                </li>
-              </ul>
-              <a href="services.html#wa-ads" class="learn-more">Learn More <i data-lucide="arrow-right"></i></a>
-            </div>
-
-            <!-- Card 4 -->
-            <div class="ads-card reveal">
-              <div class="icon-wrapper">
-                <i data-lucide="palette"></i>
-              </div>
-              <h3>Ad Design & Content</h3>
-              <ul>
-                <li>
-                  <i data-lucide="check-circle"></i> Eye-catching graphics and
-                  ad creatives
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Promotional posters and
-                  banners
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Marketing copywriting for
-                  ads
-                </li>
-              </ul>
-              <a href="services.html#ad-content" class="learn-more">Learn More <i data-lucide="arrow-right"></i></a>
-            </div>
-
-            <!-- Card 5 -->
-            <div class="ads-card reveal">
-              <div class="icon-wrapper">
-                <i data-lucide="trending-up"></i>
-              </div>
-              <h3>Campaign Management</h3>
-              <ul>
-                <li>
-                  <i data-lucide="check-circle"></i> Full ad setup and
-                  optimization
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Performance monitoring and
-                  reporting
-                </li>
-                <li>
-                  <i data-lucide="check-circle"></i> Budget optimization for
-                  better ROI
-                </li>
-              </ul>
-              <a href="services.html#campaign-management" class="learn-more">Learn More <i data-lucide="arrow-right"></i></a>
-            </div>
-          </div>
-
-          <div class="ads-stats-bar reveal">
-            <div class="stat-box">
-                <span class="stat-value">5x+</span>
-                <span class="stat-label">Average Ad ROI</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-box">
-                <span class="stat-value">48hr</span>
-                <span class="stat-label">Campaign Setup</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-box">
-                <span class="stat-value">Daily</span>
-                <span class="stat-label">Lead Reporting</span>
-            </div>
-          </div>
-
-          <div class="ads-cta reveal">
-            <h2>Grow Your Business <span>Online Today</span></h2>
-            <p style="margin-bottom: 30px">
-              Partner with Nairobi's leading advertising experts to scale your
-              business.
-            </p>
-            <a href="contact.html?service=ads" class="btn btn-secondary btn-ads"
-              >Start Advertising Now</a
-            >
-          </div>
-        </div>
-      </section>
-
-      <section class="cta-section reveal">
-        <div class="container">
-          <div class="cta-box">
-            <div class="cta-content">
-              <div
-                class="hero-badge"
-                style="
-                  margin-bottom: 20px;
-                  margin-left: auto;
-                  margin-right: auto;
-                "
-              >
-                <i data-lucide="rocket"></i>
-                <span>Take the Leap</span>
-              </div>
-              <h2>Ready for Your Brand's <span>Digital Evolution?</span></h2>
-              <p>
-                Join Nairobi's most prestigious brands and take your presence to
-                the next level with our bespoke digital craftsmanship.
-              </p>
-              <div class="cta-btns">
-                <a href="contact.html" class="btn btn-secondary"
-                  >Request a Private Consultation</a
-                >
-                <a href="about.html" class="btn btn-primary"
-                  >Learn Our Legacy</a
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="cta-bg-glow"></div>
-      </section>
+      </div> <!-- END WEB DEVELOPMENT HUB CONTAINER -->
 
       <section class="live-slides reveal">
         <div class="container">
@@ -983,6 +823,408 @@
             </button>
           </div>
         </div>
+      </section>
+
+      <!-- SOCIAL MEDIA ADS HUB CONTAINER -->
+      <div id="ads-hub" class="hub-view-container">
+        <div class="container">
+          <div class="hub-banner-badge blue-theme">
+            <span style="color: #3b82f6; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="trending-up" style="width: 18px; height: 18px;"></i> Social Media Ads & Growth Marketing Solutions
+            </span>
+            <span style="color: #888; font-size: 0.8rem;">Meta Pixel Ready • WhatsApp Funnels • Guaranteed ROAS</span>
+          </div>
+        </div>
+
+        <section id="ads-management" class="ads-management-section reveal">
+        <div class="container">
+          <div class="section-header">
+            <div
+              class="hero-badge"
+              style="
+                margin-bottom: 20px;
+                margin-left: auto;
+                margin-right: auto;
+              "
+            >
+              <i data-lucide="trending-up"></i>
+              <span>High-Converting Paid Ads</span>
+            </div>
+            <span class="section-tag"
+              >Targeted Advertising</span
+            >
+            <h2>Social Media Ads <span>Creation & Management</span></h2>
+            <p style="max-width: 750px; margin-left: auto; margin-right: auto;">
+              Stop wasting money on blind post boosts. We build high-performing Facebook, Instagram, and WhatsApp ad funnels that deliver verified customer calls and messages directly to your business every single day.
+            </p>
+          </div>
+
+          <!-- 3-Step Proven Client Growth Formula -->
+          <div class="ads-blueprint-container reveal" style="margin-top: 50px; margin-bottom: 60px;">
+            <div style="text-align: center; margin-bottom: 35px;">
+              <span style="background: rgba(212,175,55,0.12); color: var(--primary-color); padding: 8px 20px; border-radius: 30px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(212,175,55,0.3); display: inline-flex; align-items: center; gap: 8px;">
+                <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i> Our Proven 3-Step Client Growth Blueprint
+              </span>
+              <h3 style="color: white; font-size: 1.8rem; margin-top: 14px; font-weight: 700; letter-spacing: -0.5px;">How We Turn Your Ad Budget Into Daily Customers</h3>
+            </div>
+
+            <div class="ads-blueprint-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+              <div class="blueprint-step-card" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); padding: 32px 26px; border-radius: 22px; position: relative; transition: all 0.3s ease;">
+                <div style="position: absolute; top: 18px; right: 22px; font-size: 2.2rem; font-weight: 900; color: rgba(212,175,55,0.15); font-family: monospace;">01</div>
+                <div style="width: 52px; height: 52px; background: rgba(212,175,55,0.12); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); margin-bottom: 22px; border: 1px solid rgba(212,175,55,0.2);">
+                  <i data-lucide="target" style="width: 26px; height: 26px;"></i>
+                </div>
+                <h4 style="color: white; font-size: 1.25rem; font-weight: 700; margin-bottom: 12px;">1. Precision Local Targeting</h4>
+                <p style="color: var(--text-secondary); font-size: 0.93rem; line-height: 1.6; margin: 0;">We pinpoint exact local buyers by location, age, interest, and purchasing power so zero ad shillings are wasted on disinterested audiences.</p>
+              </div>
+
+              <div class="blueprint-step-card" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); padding: 32px 26px; border-radius: 22px; position: relative; transition: all 0.3s ease;">
+                <div style="position: absolute; top: 18px; right: 22px; font-size: 2.2rem; font-weight: 900; color: rgba(212,175,55,0.15); font-family: monospace;">02</div>
+                <div style="width: 52px; height: 52px; background: rgba(212,175,55,0.12); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); margin-bottom: 22px; border: 1px solid rgba(212,175,55,0.2);">
+                  <i data-lucide="sparkles" style="width: 26px; height: 26px;"></i>
+                </div>
+                <h4 style="color: white; font-size: 1.25rem; font-weight: 700; margin-bottom: 12px;">2. Scroll-Stopping Ad Visuals</h4>
+                <p style="color: var(--text-secondary); font-size: 0.93rem; line-height: 1.6; margin: 0;">Our creative team crafts eye-catching promotional posters, high-converting copy, and short video reels that make users stop scrolling and tap.</p>
+              </div>
+
+              <div class="blueprint-step-card" style="background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.08); padding: 32px 26px; border-radius: 22px; position: relative; transition: all 0.3s ease;">
+                <div style="position: absolute; top: 18px; right: 22px; font-size: 2.2rem; font-weight: 900; color: rgba(212,175,55,0.15); font-family: monospace;">03</div>
+                <div style="width: 52px; height: 52px; background: rgba(212,175,55,0.12); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); margin-bottom: 22px; border: 1px solid rgba(212,175,55,0.2);">
+                  <i data-lucide="message-square" style="width: 26px; height: 26px;"></i>
+                </div>
+                <h4 style="color: white; font-size: 1.25rem; font-weight: 700; margin-bottom: 12px;">3. Direct WhatsApp Inquiries</h4>
+                <p style="color: var(--text-secondary); font-size: 0.93rem; line-height: 1.6; margin: 0;">One tap on your ad opens a pre-filled WhatsApp conversation directly on your phone so you can respond and close sales immediately.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Media Ads Image Slider Showcase -->
+          <div class="reveal" style="margin-bottom: 50px;">
+            <div style="text-align: center; margin-bottom: 25px;">
+              <span style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px;">
+                <i data-lucide="trending-up" style="width: 14px; height: 14px;"></i> Visual Campaign Showcase
+              </span>
+              <h3 style="color: white; font-size: 1.7rem; font-weight: 800; margin-bottom: 8px;">Social Media Ads Creation & Management in Action</h3>
+              <p style="color: var(--text-secondary); font-size: 0.95rem;">Explore our high-converting ad campaigns, WhatsApp funnels, and real-time ROAS dashboards.</p>
+            </div>
+
+            <div class="slider-container" style="max-width: 900px; margin: 0 auto; border: 1px solid rgba(59,130,246,0.3);">
+              <div class="slider-track" id="adsImageSlider">
+                <!-- Custom User Image Slide -->
+                <div class="slide">
+                  <div class="slide-content" style="height: 420px;">
+                    <img src="https://i.pinimg.com/1200x/97/d8/a9/97d8a96034dd55342c09f8aac48abc9c.jpg" alt="Reach Multiple Customers In Single Click" referrerPolicy="no-referrer">
+                    <div class="slide-info">
+                      <span class="slide-tag" style="background: #10b981; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">Instant Reach</span>
+                      <h3 style="color: white; font-size: 1.8rem; margin: 8px 0;">Reach Multiple Customers In Single Click</h3>
+                      <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">Handling Leads, Customers, and Replies Without Manual Effort.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Slide 1 -->
+                <div class="slide">
+                  <div class="slide-content" style="height: 420px;">
+                    <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1200&auto=format&fit=crop" alt="High-Impact Ad Creatives" referrerPolicy="no-referrer">
+                    <div class="slide-info">
+                      <span class="slide-tag" style="background: #3b82f6; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">Creative Design</span>
+                      <h3 style="color: white; font-size: 1.8rem; margin: 8px 0;">Scroll-Stopping Ad Creatives</h3>
+                      <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">We design stunning promotional posters, video reels, and carousel ads tailored to your target audience.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="slide">
+                  <div class="slide-content" style="height: 420px;">
+                    <img src="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=1200&auto=format&fit=crop" alt="WhatsApp Lead Funnels" referrerPolicy="no-referrer">
+                    <div class="slide-info">
+                      <span class="slide-tag" style="background: #25D366; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">WhatsApp Funnels</span>
+                      <h3 style="color: white; font-size: 1.8rem; margin: 8px 0;">Direct WhatsApp Inquiries</h3>
+                      <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">One tap on your ad opens a pre-filled WhatsApp chat on your phone so you can close sales instantly.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="slide">
+                  <div class="slide-content" style="height: 420px;">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop" alt="ROAS Analytics" referrerPolicy="no-referrer">
+                    <div class="slide-info">
+                      <span class="slide-tag" style="background: #8b5cf6; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">Data & Analytics</span>
+                      <h3 style="color: white; font-size: 1.8rem; margin: 8px 0;">Real-Time ROAS Optimization</h3>
+                      <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">Daily campaign monitoring, A/B testing, and Meta pixel tracking to maximize your return on ad spend.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Slide 4 -->
+                <div class="slide">
+                  <div class="slide-content" style="height: 420px;">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop" alt="Local Market Dominance" referrerPolicy="no-referrer">
+                    <div class="slide-info">
+                      <span class="slide-tag" style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">Audience Reach</span>
+                      <h3 style="color: white; font-size: 1.8rem; margin: 8px 0;">Hyper-Local Audience Targeting</h3>
+                      <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">Put your business in front of active buyers in your exact city, neighborhood, or nationwide.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Slide 5 -->
+                <div class="slide">
+                  <div class="slide-content" style="height: 420px;">
+                    <img src="https://images.unsplash.com/photo-1533750349077-cdcd1ec5f793?q=80&w=1200&auto=format&fit=crop" alt="Lead Generation Campaigns" referrerPolicy="no-referrer">
+                    <div class="slide-info">
+                      <span class="slide-tag" style="background: #ec4899; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">Lead Generation</span>
+                      <h3 style="color: white; font-size: 1.8rem; margin: 8px 0;">Qualified Customer Leads</h3>
+                      <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">Capture name, phone number, and email addresses directly inside Facebook & Instagram lead forms.</p>
+                    </div>
+                  </div>
+                </div>
+                <!-- Slide 6 -->
+                <div class="slide">
+                  <div class="slide-content" style="height: 420px;">
+                    <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1200&auto=format&fit=crop" alt="Video Commercial Production" referrerPolicy="no-referrer">
+                    <div class="slide-info">
+                      <span class="slide-tag" style="background: #06b6d4; color: white; padding: 4px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700;">Video Reels</span>
+                      <h3 style="color: white; font-size: 1.8rem; margin: 8px 0;">Cinematic Video Ads</h3>
+                      <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; margin: 0;">High-engagement short-form video reels optimized for Instagram Reels, TikTok, and Facebook Feeds.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button class="slider-btn prev" id="adsPrevSlide">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <button class="slider-btn next" id="adsNextSlide">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 Core Service Pillars Grid -->
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h3 style="color: white; font-size: 1.8rem; font-weight: 700;">Complete Ad Management Solutions</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">Everything you need for a hands-free, high-return advertising campaign.</p>
+          </div>
+
+          <div class="ads-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+            <!-- Card 1: Facebook Ads -->
+            <div class="ads-card reveal">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="icon-wrapper">
+                  <i data-lucide="facebook"></i>
+                </div>
+                <span style="font-size: 0.72rem; padding: 4px 10px; border-radius: 12px; background: rgba(212,175,55,0.15); color: var(--primary-color); font-weight: 700; border: 1px solid rgba(212,175,55,0.25);">Mass Local Reach</span>
+              </div>
+              <h3>Facebook Advertising</h3>
+              <p>Place your products & services right in front of active Facebook users in your neighborhood or county.</p>
+              <ul>
+                <li>
+                  <i data-lucide="check-circle"></i> Custom demographic & location targeting
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Facebook Meta Pixel integration & tracking
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Instant lead forms & call-now buttons
+                </li>
+              </ul>
+              <a href="services.html#fb-ads" class="learn-more">Explore Facebook Ads <i data-lucide="arrow-right"></i></a>
+            </div>
+
+            <!-- Card 2: Instagram Ads -->
+            <div class="ads-card reveal">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="icon-wrapper">
+                  <i data-lucide="instagram"></i>
+                </div>
+                <span style="font-size: 0.72rem; padding: 4px 10px; border-radius: 12px; background: rgba(212,175,55,0.15); color: var(--primary-color); font-weight: 700; border: 1px solid rgba(212,175,55,0.25);">High Visual Impact</span>
+              </div>
+              <h3>Instagram Promotions</h3>
+              <p>Captivate young & affluent customers with sleek Story, Reel, and Feed promotions that build brand authority.</p>
+              <ul>
+                <li>
+                  <i data-lucide="check-circle"></i> High-converting Stories & Reels promos
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Eye-catching carousel product showcases
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Follower-to-buyer sales funnels
+                </li>
+              </ul>
+              <a href="services.html#ig-ads" class="learn-more">Explore Instagram Ads <i data-lucide="arrow-right"></i></a>
+            </div>
+
+            <!-- Card 3: WhatsApp Marketing -->
+            <div class="ads-card reveal">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="icon-wrapper">
+                  <i data-lucide="message-circle"></i>
+                </div>
+                <span style="font-size: 0.72rem; padding: 4px 10px; border-radius: 12px; background: rgba(37,211,102,0.15); color: #25D366; font-weight: 700; border: 1px solid rgba(37,211,102,0.3);">Highest Conversion</span>
+              </div>
+              <h3>Click-to-WhatsApp Ads</h3>
+              <p>Bypass slow email threads and complicated forms. Direct interested buyers straight into your WhatsApp chat.</p>
+              <ul>
+                <li>
+                  <i data-lucide="check-circle"></i> Direct "Send Message" ad buttons
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Custom pre-filled customer prompt text
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Instant 1-on-1 sales conversion workflow
+                </li>
+              </ul>
+              <a href="services.html#wa-ads" class="learn-more">Explore WhatsApp Ads <i data-lucide="arrow-right"></i></a>
+            </div>
+
+            <!-- Card 4: Ad Design & Management -->
+            <div class="ads-card reveal">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="icon-wrapper">
+                  <i data-lucide="palette"></i>
+                </div>
+                <span style="font-size: 0.72rem; padding: 4px 10px; border-radius: 12px; background: rgba(212,175,55,0.15); color: var(--primary-color); font-weight: 700; border: 1px solid rgba(212,175,55,0.25);">100% Hands-Free</span>
+              </div>
+              <h3>Ad Creative & Management</h3>
+              <p>We handle everything: graphic poster design, persuasive copywriting, daily bid tuning, and performance tracking.</p>
+              <ul>
+                <li>
+                  <i data-lucide="check-circle"></i> Professional poster design & ad copy
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Continuous budget & ROI optimization
+                </li>
+                <li>
+                  <i data-lucide="check-circle"></i> Transparent weekly performance reports
+                </li>
+              </ul>
+              <a href="services.html#ad-content" class="learn-more">Explore Creative Studio <i data-lucide="arrow-right"></i></a>
+            </div>
+          </div>
+
+          <!-- Trust & Guarantees Banner -->
+          <div class="reveal" style="margin-top: 60px; background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 24px; padding: 35px 30px; backdrop-filter: blur(10px);">
+            <div style="text-align: center; margin-bottom: 25px;">
+              <h4 style="color: white; font-size: 1.3rem; font-weight: 700; margin-bottom: 8px;">Why Business Owners Choose QuickSite Kenya For Social Ads</h4>
+              <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">We protect your ad budget and guarantee transparent, measurable growth.</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+              <div style="display: flex; align-items: center; gap: 14px; background: rgba(0,0,0,0.2); padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(212,175,55,0.15); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); flex-shrink: 0;">
+                  <i data-lucide="zap" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                  <h5 style="color: white; font-size: 0.95rem; font-weight: 700; margin: 0 0 3px 0;">48hr Rapid Setup</h5>
+                  <p style="color: #aaa; font-size: 0.8rem; margin: 0;">Ads live within 2 business days</p>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 14px; background: rgba(0,0,0,0.2); padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(212,175,55,0.15); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); flex-shrink: 0;">
+                  <i data-lucide="piggy-bank" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                  <h5 style="color: white; font-size: 0.95rem; font-weight: 700; margin: 0 0 3px 0;">Zero Wasted Budget</h5>
+                  <p style="color: #aaa; font-size: 0.8rem; margin: 0;">Optimized for real customer actions</p>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 14px; background: rgba(0,0,0,0.2); padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(212,175,55,0.15); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); flex-shrink: 0;">
+                  <i data-lucide="line-chart" style="width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;"></i>
+                </div>
+                <div>
+                  <h5 style="color: white; font-size: 0.95rem; font-weight: 700; margin: 0 0 3px 0;">Transparent Reports</h5>
+                  <p style="color: #aaa; font-size: 0.8rem; margin: 0;">Weekly updates on leads & ROI</p>
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 14px; background: rgba(0,0,0,0.2); padding: 16px 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+                <div style="background: rgba(212,175,55,0.15); width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary-color); flex-shrink: 0;">
+                  <i data-lucide="headphones" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                  <h5 style="color: white; font-size: 0.95rem; font-weight: 700; margin: 0 0 3px 0;">Dedicated Ad Manager</h5>
+                  <p style="color: #aaa; font-size: 0.8rem; margin: 0;">Direct 1-on-1 local assistance</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="ads-stats-bar reveal">
+            <div class="stat-box">
+                <span class="stat-value">5x+</span>
+                <span class="stat-label">Average Ad ROI</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-box">
+                <span class="stat-value">48hr</span>
+                <span class="stat-label">Campaign Setup</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-box">
+                <span class="stat-value">100%</span>
+                <span class="stat-label">Managed Strategy</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-box">
+                <span class="stat-value">Daily</span>
+                <span class="stat-label">Verified Customer Leads</span>
+            </div>
+          </div>
+
+          <!-- High-Converting CTA Box -->
+          <div class="ads-cta reveal">
+            <h2>Ready To Scale Your Sales <span>With Targeted Ads?</span></h2>
+            <p style="margin-bottom: 30px; font-size: 1.05rem; max-width: 650px; margin-left: auto; margin-right: auto;">
+              Partner with Kenya's premier social advertising team. Let us build a customized ad strategy that connects your brand to ready buyers.
+            </p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+              <a href="contact.html?service=social-ads" class="btn btn-primary btn-ads" style="padding: 14px 28px;">
+                <i data-lucide="rocket" style="width: 18px; height: 18px; margin-right: 8px;"></i> Request Free Ad Consultation
+              </a>
+              <a href="https://wa.me/254700000000?text=Hello%20QuickSite%20Kenya,%20I%20am%20interested%20in%20Social%20Media%20Ads%20Management." target="_blank" class="btn btn-secondary" style="padding: 14px 28px; background: rgba(37,211,102,0.15); border: 1px solid rgba(37,211,102,0.4); color: #25D366;">
+                <i data-lucide="message-circle" style="width: 18px; height: 18px; margin-right: 8px;"></i> Chat on WhatsApp
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div> <!-- END SOCIAL MEDIA ADS HUB CONTAINER -->
+
+      <section class="cta-section reveal">
+        <div class="container">
+          <div class="cta-box">
+            <div class="cta-content">
+              <div
+                class="hero-badge"
+                style="
+                  margin-bottom: 20px;
+                  margin-left: auto;
+                  margin-right: auto;
+                "
+              >
+                <i data-lucide="rocket"></i>
+                <span>Take the Leap</span>
+              </div>
+              <h2>Ready for Your Brand's <span>Digital Evolution?</span></h2>
+              <p>
+                Join Nairobi's most prestigious brands and take your presence to
+                the next level with our bespoke digital craftsmanship.
+              </p>
+              <div class="cta-btns">
+                <a href="contact.html" class="btn btn-secondary"
+                  >Request a Private Consultation</a
+                >
+                <a href="about.html" class="btn btn-primary"
+                  >Learn Our Legacy</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cta-bg-glow"></div>
       </section>
 
       <section class="testimonials reveal">
@@ -1959,19 +2201,19 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Setup Fee (KES)</label>
+                  <label>Setup Fee ($)</label>
                   <input
                     type="number"
                     id="setupFeeInput"
-                    placeholder="e.g. 1999"
+                    placeholder="e.g. 169"
                   />
                 </div>
                 <div class="form-group">
-                  <label>Monthly Fee (KES)</label>
+                  <label>Monthly Fee ($)</label>
                   <input
                     type="number"
                     id="monthlyFeeInput"
-                    placeholder="e.g. 300"
+                    placeholder="e.g. 30"
                   />
                 </div>
               </div>

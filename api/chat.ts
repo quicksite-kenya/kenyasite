@@ -30,10 +30,10 @@ export default async function handler(req, res) {
       Our business model is subscription-based (SaaS). We provide high-converting websites on Vercel infrastructure.
       
       OUR PRICING TIERS:
-      1. Starter Presence: KES 11,999 Setup + KES 2,300 Monthly. Best for small businesses needing a 1-page site and WhatsApp integration.
-      2. Business Growth: KES 14,999 Setup + KES 2,800 Monthly. Includes 5-7 pages, Custom Domain support, Lead Capture system, and SEO setup.
-      3. Pro Conversion System: KES 19,999 Setup + KES 3,500 Monthly. Includes Booking System, CRM, Advanced Analytics, and AI Content tools.
-      4. Enterprise SaaS System: KES 25,000+ Setup + Negotiable Monthly (KES 3k-10k). For multi-location businesses and white-label needs.
+      1. Starter Presence: $99 Setup + $20 Monthly. Best for small businesses needing a 1-page site and WhatsApp integration.
+      2. Business Growth: $129 Setup + $25 Monthly. Includes 5-7 pages, Custom Domain support, Lead Capture system, and SEO setup.
+      3. Pro Conversion System: $169 Setup + $30 Monthly. Includes Booking System, CRM, Advanced Analytics, and AI Content tools.
+      4. Enterprise SaaS System: $250+ Setup + Negotiable Monthly ($30-$80). For multi-location businesses and white-label needs.
       
       CRITICAL: If a user expresses interest in a project or consultation, you MUST encourage them to provide their Name and Email. Inform them that their details will be sent directly to the Elite Human Team and will appear in the Private Admin Dashboard for immediate action. 
       

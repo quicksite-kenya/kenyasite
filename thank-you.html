@@ -174,9 +174,28 @@
 
     <script type="module" src="script.js"></script>
     <script>
-      if (window.lucide) {
-        lucide.createIcons();
-      }
+      document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const nameParam = urlParams.get('name');
+        const waParam = urlParams.get('wa');
+
+        if (nameParam) {
+          const h1El = document.querySelector('.thank-you-card h1');
+          if (h1El) h1El.innerHTML = `Thank <span>You, ${decodeURIComponent(nameParam)}!</span>`;
+        }
+
+        if (waParam) {
+          const waBtn = document.querySelector('.whatsapp-btn');
+          if (waBtn) {
+            waBtn.href = decodeURIComponent(waParam);
+            waBtn.innerHTML = '<i data-lucide="message-circle"></i> Continue on WhatsApp with Michael Mulili';
+          }
+        }
+
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+      });
     </script>
   </body>
 </html>

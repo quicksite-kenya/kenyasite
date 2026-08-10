@@ -56,6 +56,10 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  // Static images serving
+  app.use("/images", express.static(path.join(process.cwd(), "public/images")));
+  app.use("/images", express.static(path.join(process.cwd(), "images")));
+
   // --- GLOBAL REQUEST LOGGER ---
   app.use((req, res, next) => {
     console.log(`[GLOBAL LOG] ${req.method} ${req.originalUrl}`);
@@ -330,10 +334,10 @@ async function startServer() {
       const systemInstruction = `You are the Elite Digital Evolution Consultant for QuickSite Kenya.
 QuickSite Kenya is a premier web design agency in Nairobi providing 48-hour turnarounds for professional service businesses.
 Our packages include:
-1. Starter Presence: KES 11,999 Setup + KES 2,300 Monthly.
-2. Business Growth: KES 14,999 Setup + KES 2,800 Monthly.
-3. Pro Conversion System: KES 19,999 Setup + KES 3,500 Monthly.
-4. Enterprise SaaS System: KES 25,000+ Setup.
+1. Starter Presence: $99 Setup + $20 Monthly.
+2. Business Growth: $129 Setup + $25 Monthly.
+3. Pro Conversion System: $169 Setup + $30 Monthly.
+4. Enterprise SaaS System: $250+ Setup.
 
 CRITICAL: If a user expresses interest, encourage them to provide their Name and Email so the human team can follow up.`;
       

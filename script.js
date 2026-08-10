@@ -449,14 +449,8 @@ const initJargonDecoder = () => {
         }
     };
 
-    // Load saved client preference state
-    const savedPreference = localStorage.getItem('quicksite-jargon-mode');
-    if (savedPreference === 'simple') {
-        toggleCheckbox.checked = true;
-        setTimeout(() => {
-            applyPlainEnglish();
-        }, 300);
-    }
+    // Plain English mode stays off by default unless manually toggled
+    localStorage.removeItem('quicksite-jargon-mode');
 
     if (window.lucide) window.lucide.createIcons();
 };
@@ -1869,13 +1863,25 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             }
         }
 
+        const couponParam = urlParams.get('coupon');
+        if (couponParam) {
+            const messageField = document.getElementById('contactMessage');
+            if (messageField) {
+                if (!messageField.value.includes('SAVE6') && !messageField.value.includes('6% OFF')) {
+                    const currentVal = messageField.value ? messageField.value + '\n\n' : '';
+                    messageField.value = `${currentVal}[DISCOUNT COUPON APPLIED: ${couponParam.toUpperCase()} - 6% OFF All Services]`;
+                }
+            }
+            showToast('🎁 6% OFF Coupon Code "SAVE6" successfully applied to your consultation request!', 'success');
+        }
+
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = contactForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn ? submitBtn.innerText : 'Submit';
+            const originalText = submitBtn ? submitBtn.innerText : 'Submit Inquiry';
             
             if (submitBtn) {
-                submitBtn.innerText = 'Submitting Inquiry...';
+                submitBtn.innerText = 'Locking In 48h Build Slot...';
                 submitBtn.disabled = true;
             }
             
@@ -1885,16 +1891,19 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 service: formData.get('service'),
+                contactMethod: formData.get('contactMethod') || 'WhatsApp Direct',
+                budget: formData.get('budget') || 'Starter ($99 - $150)',
+                coupon: formData.get('coupon') || 'SAVE6',
                 message: formData.get('message'),
                 status: 'New',
                 createdAt: serverTimestamp()
             };
             
             try {
-                // 1. Direct Firestore Save (Bypasses Vercel timeouts + works perfectly with Rules)
+                // 1. Direct Firestore Save
                 await addDoc(collection(db, "inquiries"), data);
                 
-                // 2. Ping Vercel API purely for Email notification
+                // 2. Ping Email Notification endpoint if reachable
                 try {
                     await fetch('/api/consultation', {
                         method: 'POST',
@@ -1907,8 +1916,14 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                     console.warn("Email API ping failed, but DB saved successfully.", e);
                 }
                 
-                // Redirect to thank you page
-                window.location.href = 'thank-you.html';
+                // Construct WhatsApp message URL for instant lead response
+                const waText = encodeURIComponent(`Hi Michael Mulili (QuickSite Kenya),\nI just submitted an intake form:\n• Name: ${data.name}\n• Service: ${data.service}\n• Budget: ${data.budget}\n• Coupon: ${data.coupon}\n• Preferred Contact: ${data.contactMethod}\n• Message: ${data.message.substring(0, 150)}...\n\nLooking forward to our 48-hour build consultation!`);
+                const waUrl = `https://wa.me/254708691648?text=${waText}`;
+
+                showToast('🎉 Intake Submitted! Redirecting to confirmation...', 'success');
+                setTimeout(() => {
+                    window.location.href = `thank-you.html?name=${encodeURIComponent(data.name)}&wa=${encodeURIComponent(waUrl)}`;
+                }, 1200);
             } catch (error) {
                 console.error('Error sending inquiry:', error);
                 if (submitBtn) {
@@ -2817,6 +2832,45 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         }
     };
 
+    // Social Media Ads Image Slider Logic
+    let adsSliderInterval;
+    const initAdsSliderLogic = () => {
+        const sliderTrack = document.getElementById('adsImageSlider');
+        const prevBtn = document.getElementById('adsPrevSlide');
+        const nextBtn = document.getElementById('adsNextSlide');
+        
+        if (sliderTrack && prevBtn && nextBtn) {
+            if (adsSliderInterval) clearInterval(adsSliderInterval);
+            
+            let currentSlide = 0;
+            const slides = sliderTrack.querySelectorAll('.slide');
+            const totalSlides = slides.length;
+
+            if (totalSlides > 0) {
+                const updateSlider = () => {
+                    sliderTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+                };
+
+                nextBtn.onclick = (e) => {
+                    e.preventDefault();
+                    currentSlide = (currentSlide + 1) % totalSlides;
+                    updateSlider();
+                };
+
+                prevBtn.onclick = (e) => {
+                    e.preventDefault();
+                    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                    updateSlider();
+                };
+
+                adsSliderInterval = setInterval(() => {
+                    currentSlide = (currentSlide + 1) % totalSlides;
+                    updateSlider();
+                }, 5000);
+            }
+        }
+    };
+
     const loadLiveSliderItems = () => {
         const sliderTrack = document.getElementById('liveSlider');
         if (!sliderTrack) return;
@@ -2876,6 +2930,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
     // Initial load will be handled by onAuthStateChanged
     // loadLiveSliderItems();
     initSliderLogic();
+    initAdsSliderLogic();
 
     // CRITICAL: Firestore Error Handling Spec
     const OperationType = {
@@ -2995,6 +3050,36 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         });
     };
 
+    const getFormattedUsdPrice = (itemName = '', itemPrice = '') => {
+        const nameLower = itemName.toLowerCase();
+        
+        if (nameLower.includes('skybridge') || nameLower.includes('travel')) {
+            return '$425 USD';
+        }
+        if (nameLower.includes('elitefit') || nameLower.includes('gym')) {
+            return '$270 USD';
+        }
+        if (nameLower.includes('penthouse') || nameLower.includes('nairobi')) {
+            return '$350 USD';
+        }
+
+        if (!itemPrice) return '$299 USD';
+        
+        const strPrice = String(itemPrice).trim();
+        if (strPrice.includes('$')) return strPrice.includes('USD') ? strPrice : `${strPrice} USD`;
+        
+        const cleanNum = parseFloat(strPrice.replace(/[^0-9.]/g, ''));
+        if (!isNaN(cleanNum)) {
+            if (cleanNum === 55000) return '$425 USD';
+            if (cleanNum === 35000) return '$270 USD';
+            if (cleanNum === 45000) return '$350 USD';
+            if (cleanNum > 1000) return `$${Math.round(cleanNum / 130)} USD`;
+            return `$${cleanNum} USD`;
+        }
+        
+        return strPrice;
+    };
+
     const renderMarketplaceCategory = (category, items, container) => {
         const section = document.createElement('div');
         section.className = 'marketplace-category-section reveal';
@@ -3009,7 +3094,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         
         items.forEach(item => {
             const itemName = item.name || 'Unnamed Project';
-            const itemPrice = item.price || '0';
+            const itemPrice = item.price || '';
             const itemDesc = item.desc || 'No description available.';
             const itemCategory = item.category || 'Other Digital Assets';
             const itemLink = item.link || '#';
@@ -3017,7 +3102,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             
             const newItem = document.createElement('div');
             newItem.className = 'marketplace-item dynamic-item';
-            const formattedPrice = !isNaN(Number(itemPrice)) ? Number(itemPrice).toLocaleString() : itemPrice;
+            const displayPriceUSD = getFormattedUsdPrice(itemName, itemPrice);
             
             const deleteBtnHtml = isAdmin ? `
                 <button class="delete-item-btn admin-only block" data-id="${item.id}" title="Delete Listing" style="position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.7); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">
@@ -3031,19 +3116,28 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             newItem.innerHTML = `
                 <div class="item-badge">For Sale</div>
                 ${deleteBtnHtml}
-                <img src="${safeImgUrl}" alt="${itemName}" onerror="this.src='https://placehold.co/800x500/1a1a1a/d4af37?text=Preview'" referrerPolicy="no-referrer">
+                <div style="position: relative;">
+                    <img src="${safeImgUrl}" alt="${itemName}" onerror="this.src='https://placehold.co/800x500/1a1a1a/d4af37?text=Preview'" referrerPolicy="no-referrer">
+                    <div class="floating-attention-card" style="bottom: 10px; right: 10px; padding: 6px 12px;">
+                        <div class="floating-icon-dot" style="width:28px; height:28px; font-size:0.8rem;">🎁</div>
+                        <div class="floating-card-text">
+                            <span class="floating-card-title" style="font-size:0.75rem;">6% OFF COUPON</span>
+                            <span class="floating-card-sub" style="font-size:0.7rem;">Code: <strong>SAVE6</strong></span>
+                        </div>
+                    </div>
+                </div>
                 <div class="item-content">
                     <div class="item-header">
                         <div>
                             <h3 style="margin-bottom: 5px;">${itemName}</h3>
                             <span style="font-size: 0.7rem; color: var(--primary-color); text-transform: uppercase; letter-spacing: 1px;">${itemCategory}</span>
                         </div>
-                        <span class="price-tag">$${formattedPrice}</span>
+                        <span class="price-tag">${displayPriceUSD}</span>
                     </div>
                     <p>${itemDesc}</p>
                     <div class="item-footer">
                         <a href="contact.html?interest=${encodeURIComponent(itemName)}" class="btn btn-secondary btn-sm">Inquire Now</a>
-                        <a href="${itemLink}" class="btn btn-primary btn-sm" target="_blank">Live Demo</a>
+                        <a href="${itemLink}" class="btn btn-primary btn-sm" target="_blank">Claim (${displayPriceUSD})</a>
                     </div>
                 </div>
             `;
@@ -3082,8 +3176,95 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         container.appendChild(section);
     };
 
-    // Load Portfolio items (Gallery style)
+    // Curated Masterpieces Collection (Curated fallback & baseline items)
+    const DEFAULT_MASTERPIECES = [
+        {
+            id: 'masterpiece-1',
+            name: 'Skybridge Travel & Tours Portal',
+            category: 'Corporate & Business Sites',
+            price: 425,
+            desc: 'Automated safari reservation system featuring real-time itinerary booking, multi-currency pricing, M-Pesa paybill integration, and automated WhatsApp trip confirmation.',
+            img: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/services.html',
+            techTags: ['React', 'M-Pesa API', 'SEO Optimized', '48h Delivery']
+        },
+        {
+            id: 'masterpiece-2',
+            name: 'Apex Luxury E-Commerce Platform',
+            category: 'E-Commerce Platforms',
+            price: 550,
+            desc: 'Turnkey high-converting online merchant store with automated cart, product variant swatches, coupon code support, and express WhatsApp order triggers.',
+            img: 'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/packages.html',
+            techTags: ['E-Commerce', 'Paystack / M-Pesa', 'Analytics', 'Mobile First']
+        },
+        {
+            id: 'masterpiece-3',
+            name: 'EliteFit Gym & Fitness Hub',
+            category: 'Business Landing Pages',
+            price: 320,
+            desc: 'High-energy lead generation funnel featuring membership tier comparisons, trainer booking calendar, and instant WhatsApp trial triggers.',
+            img: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/contact.html',
+            techTags: ['Lead Funnel', 'WhatsApp Direct', 'Schedule Manager']
+        },
+        {
+            id: 'masterpiece-4',
+            name: 'Nairobi Penthouse Real Estate',
+            category: 'Corporate & Business Sites',
+            price: 680,
+            desc: 'Architectural property portal with 3D virtual walkthrough galleries, interactive floor plans, neighborhood guides, and VIP buyer schedule booking.',
+            img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/services.html',
+            techTags: ['Virtual Gallery', 'VIP Client Portal', 'Map Integration']
+        },
+        {
+            id: 'masterpiece-5',
+            name: 'EduLearn Academy LMS',
+            category: 'E-Learning Systems',
+            price: 490,
+            desc: 'Interactive online learning portal with student progress tracking, video module hosting, automated quizzes, and digital certificates.',
+            img: 'https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/services.html',
+            techTags: ['LMS Engine', 'Certificate Gen', 'Video Stream']
+        },
+        {
+            id: 'masterpiece-6',
+            name: 'SocialConnect Creator Network',
+            category: 'Social Media Websites',
+            price: 580,
+            desc: 'Modern community hub with user profile cards, live discussion feeds, direct chat messaging, and creator tipping integration.',
+            img: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/blog.html',
+            techTags: ['Community Feed', 'Live Messaging', 'Firebase DB']
+        },
+        {
+            id: 'masterpiece-7',
+            name: 'Savannah Safaris Expedition',
+            category: 'Portfolio & Creative Sites',
+            price: 380,
+            desc: 'Immersive photography-focused portfolio showcasing game park itineraries, client reviews, and custom tour booking forms.',
+            img: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/about.html',
+            techTags: ['High-Res Gallery', 'Booking Form', 'SEO Boost']
+        },
+        {
+            id: 'masterpiece-8',
+            name: 'FinTech Kenya Merchant Portal',
+            category: 'Custom Web Applications',
+            price: 750,
+            desc: 'Enterprise financial dashboard for tracking merchant disbursements, transaction analytics, and automated PDF statement exports.',
+            img: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/client-portal.html',
+            techTags: ['Analytics UI', 'PDF Exporter', 'Bank Grade Security']
+        }
+    ];
+
     let portfolioUnsubscribe = null;
+    let allMasterpiecesList = [];
+    let activePortfolioCategory = 'ALL';
+    let portfolioSearchQuery = '';
+
     const loadPortfolioItems = () => {
         if (!portfolioGrid) return;
         
@@ -3094,109 +3275,306 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
         
         const q = query(collection(db, 'marketplaceItems'), orderBy('createdAt', 'desc'));
         portfolioUnsubscribe = onSnapshot(q, (snapshot) => {
-            portfolioGrid.innerHTML = '';
-            
-            if (snapshot.empty) {
-                portfolioGrid.innerHTML = `
-                    <div class="no-items-message" style="text-align: center; padding: 40px; opacity: 0.6;">
-                        <p>Our latest masterpieces are currently being curated. Check back soon for new additions.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Group items by category
-            const groupedItems = {};
+            const dbItems = [];
             snapshot.forEach((docSnap) => {
-                const item = docSnap.data();
-                const category = item.category || 'Other Digital Assets';
-                if (!groupedItems[category]) {
-                    groupedItems[category] = [];
-                }
-                groupedItems[category].push({ id: docSnap.id, ...item });
+                dbItems.push({ id: docSnap.id, ...docSnap.data() });
             });
 
-            // Define the order of categories
-            const categoryOrder = [
-                "E-Commerce Platforms",
-                "E-Learning Systems",
-                "Social Media Websites",
-                "Business Landing Pages",
-                "Corporate & Business Sites",
-                "Portfolio & Creative Sites",
-                "Custom Web Applications",
-                "Other Digital Assets"
-            ];
+            // Combine DB items with baseline default masterpieces (avoid duplicate names)
+            const dbNames = new Set(dbItems.map(i => (i.name || '').toLowerCase().trim()));
+            const filteredDefaults = DEFAULT_MASTERPIECES.filter(d => !dbNames.has(d.name.toLowerCase().trim()));
+            
+            allMasterpiecesList = [...dbItems, ...filteredDefaults];
 
-            // Render sections
-            categoryOrder.forEach(category => {
-                if (groupedItems[category]) {
-                    renderPortfolioCategory(category, groupedItems[category], portfolioGrid);
-                    delete groupedItems[category];
-                }
-            });
-
-            // Render any remaining categories
-            Object.keys(groupedItems).forEach(category => {
-                renderPortfolioCategory(category, groupedItems[category], portfolioGrid);
-            });
+            setupPortfolioFiltersAndSearch();
+            renderFilteredPortfolio();
         }, (error) => {
             handleFirestoreError(error, OperationType.LIST, 'marketplaceItems');
+            allMasterpiecesList = [...DEFAULT_MASTERPIECES];
+            setupPortfolioFiltersAndSearch();
+            renderFilteredPortfolio();
         });
     };
 
-    const renderPortfolioCategory = (category, items, container) => {
+    const setupPortfolioFiltersAndSearch = () => {
+        const searchInput = document.getElementById('portfolioSearchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        if (searchInput && !searchInput.dataset.listenerAttached) {
+            searchInput.dataset.listenerAttached = 'true';
+            searchInput.addEventListener('input', (e) => {
+                portfolioSearchQuery = e.target.value.toLowerCase().trim();
+                renderFilteredPortfolio();
+            });
+        }
+
+        filterBtns.forEach(btn => {
+            if (!btn.dataset.listenerAttached) {
+                btn.dataset.listenerAttached = 'true';
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activePortfolioCategory = btn.getAttribute('data-category') || 'ALL';
+                    renderFilteredPortfolio();
+                });
+            }
+        });
+    };
+
+    const renderFilteredPortfolio = () => {
+        if (!portfolioGrid) return;
+
+        portfolioGrid.innerHTML = '';
+
+        // Filter items
+        let filtered = allMasterpiecesList.filter(item => {
+            const matchesCat = activePortfolioCategory === 'ALL' || item.category === activePortfolioCategory;
+            const textToSearch = `${item.name || ''} ${item.category || ''} ${item.desc || ''} ${(item.techTags || []).join(' ')}`.toLowerCase();
+            const matchesSearch = !portfolioSearchQuery || textToSearch.includes(portfolioSearchQuery);
+            return matchesCat && matchesSearch;
+        });
+
+        const countBadge = document.getElementById('portfolioMatchCount');
+        if (countBadge) {
+            countBadge.innerHTML = `<i data-lucide="layers" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> Showing <strong>${filtered.length}</strong> Masterpieces`;
+        }
+
+        if (filtered.length === 0) {
+            portfolioGrid.innerHTML = `
+                <div class="no-items-message" style="text-align: center; padding: 60px 20px; background: rgba(18,18,26,0.6); border: 1px dashed var(--glass-border); border-radius: 20px;">
+                    <i data-lucide="search-x" style="width: 48px; height: 48px; color: #d4af37; margin-bottom: 15px;"></i>
+                    <h3 style="color: white; font-size: 1.3rem; margin-bottom: 8px;">No Matching Masterpieces Found</h3>
+                    <p style="color: #aaa; font-size: 0.9rem;">Try adjusting your search query or switching to 'All Masterpieces'.</p>
+                </div>
+            `;
+            if (window.lucide) lucide.createIcons();
+            return;
+        }
+
+        // Group filtered items by category if ALL is selected, or render grid directly if specific category or search
+        if (activePortfolioCategory === 'ALL' && !portfolioSearchQuery) {
+            const grouped = {};
+            filtered.forEach(item => {
+                const cat = item.category || 'Other Digital Assets';
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(item);
+            });
+
+            const categoryOrder = [
+                "E-Commerce Platforms",
+                "Corporate & Business Sites",
+                "Business Landing Pages",
+                "Portfolio & Creative Sites",
+                "Custom Web Applications",
+                "E-Learning Systems",
+                "Social Media Websites",
+                "Other Digital Assets"
+            ];
+
+            categoryOrder.forEach(category => {
+                if (grouped[category]) {
+                    renderPortfolioCategoryGroup(category, grouped[category], portfolioGrid);
+                    delete grouped[category];
+                }
+            });
+
+            Object.keys(grouped).forEach(category => {
+                renderPortfolioCategoryGroup(category, grouped[category], portfolioGrid);
+            });
+        } else {
+            const section = document.createElement('div');
+            section.className = 'portfolio-category-section reveal';
+            section.style.marginBottom = '60px';
+            
+            section.innerHTML = `
+                <div class="portfolio-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px;"></div>
+            `;
+            
+            const grid = section.querySelector('.portfolio-grid');
+            filtered.forEach(item => {
+                grid.appendChild(createElitePortfolioCard(item));
+            });
+            
+            portfolioGrid.appendChild(section);
+        }
+
+        if (window.lucide) lucide.createIcons();
+    };
+
+    const renderPortfolioCategoryGroup = (category, items, container) => {
         const section = document.createElement('div');
         section.className = 'portfolio-category-section reveal';
         section.style.marginBottom = '60px';
         
         section.innerHTML = `
-            <h3 class="category-title" style="font-size: 1.5rem; margin-bottom: 30px; border-left: 4px solid var(--primary-color); padding-left: 15px; color: white; font-weight: 600;">${category}</h3>
-            <div class="portfolio-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h3 class="category-title" style="font-size: 1.4rem; border-left: 4px solid var(--primary-color); padding-left: 15px; color: white; font-weight: 700; display: flex; align-items: center; gap: 10px;">
+                    ${category}
+                </h3>
+                <span style="font-size: 0.8rem; color: #d4af37; background: rgba(212,175,55,0.12); padding: 4px 12px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3); font-weight: 700;">${items.length} Asset${items.length > 1 ? 's' : ''}</span>
+            </div>
+            <div class="portfolio-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px;"></div>
         `;
         
         const grid = section.querySelector('.portfolio-grid');
-        
         items.forEach(item => {
-            const itemName = item.name || 'Unnamed Project';
-            const itemCategory = item.category || 'Other Digital Assets';
-            const itemLink = item.link || '#';
-            const safeImgUrl = getSafeImageUrl(item.img, itemName);
-            
-            const newItem = document.createElement('div');
-            newItem.className = 'portfolio-item dynamic-item';
-            
-            const editBtnHtml = isAdmin ? `
-                <button class="edit-portfolio-btn" data-id="${item.id}" title="Edit Website Details" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; border: 1px solid var(--primary-color); border-radius: 50%; width: 35px; height: 35px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;">
-                    <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
-                </button>
-            ` : '';
-
-            newItem.innerHTML = `
-                ${editBtnHtml}
-                <img src="${safeImgUrl}" alt="${itemName}" referrerPolicy="no-referrer">
-                <div class="portfolio-overlay">
-                    <h3>${itemName}</h3>
-                    <p>${itemCategory}</p>
-                    <a href="${itemLink}" class="btn btn-primary btn-sm" target="_blank">View Live Site</a>
-                </div>
-            `;
-            
-            if (isAdmin) {
-                const editBtn = newItem.querySelector('.edit-portfolio-btn');
-                if (editBtn) {
-                    editBtn.onclick = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        openAddWebsiteModal(item.category, item);
-                    };
-                }
-            }
-            
-            grid.appendChild(newItem);
+            grid.appendChild(createElitePortfolioCard(item));
         });
         
         container.appendChild(section);
+    };
+
+    const createElitePortfolioCard = (item) => {
+        const itemName = item.name || 'Unnamed Project';
+        const itemCategory = item.category || 'Other Digital Assets';
+        const itemDesc = item.desc || 'High-performance bespoke web asset engineered for elite conversions.';
+        const itemLink = item.link || '#';
+        const safeImgUrl = getSafeImageUrl(item.img, itemName, 800, 500);
+        const itemPriceVal = getFormattedUsdPrice(itemName, item.price);
+        const tags = item.techTags || ['React', 'M-Pesa API', '48h Live', 'SEO Ready'];
+
+        const card = document.createElement('div');
+        card.className = 'elite-portfolio-card dynamic-item';
+
+        const editBtnHtml = isAdmin ? `
+            <button class="edit-portfolio-btn" data-id="${item.id}" title="Edit Website Details" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.85); color: #ffd700; border: 1px solid #d4af37; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                <i data-lucide="edit-3" style="width: 16px; height: 16px;"></i>
+            </button>
+        ` : '';
+
+        card.innerHTML = `
+            <div class="elite-card-img-wrapper">
+                <span class="elite-card-price-badge">${itemPriceVal}</span>
+                ${editBtnHtml}
+                <img src="${safeImgUrl}" alt="${itemName}" loading="lazy" referrerPolicy="no-referrer">
+                
+                <div class="floating-attention-card" style="bottom: 10px; right: 10px; padding: 6px 12px; z-index: 4;">
+                    <div class="floating-icon-dot" style="width:26px; height:26px; font-size:0.75rem;">🎁</div>
+                    <div class="floating-card-text">
+                        <span class="floating-card-title" style="font-size:0.7rem;">6% OFF COUPON</span>
+                        <span class="floating-card-sub" style="font-size:0.65rem;">Code: <strong>SAVE6</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="elite-card-body">
+                <div class="elite-card-category">
+                    <i data-lucide="check-circle-2" style="width: 14px; height: 14px; color: #25d366;"></i> ${itemCategory}
+                </div>
+                <h3 class="elite-card-title">${itemName}</h3>
+                <p class="elite-card-desc">${itemDesc}</p>
+
+                <div class="elite-tech-tags">
+                    ${tags.map(tag => `<span class="elite-tech-pill">⚡ ${tag}</span>`).join('')}
+                </div>
+
+                <div class="elite-card-actions">
+                    <a href="${itemLink}" class="btn btn-primary btn-sm" target="_blank" style="flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; padding: 8px 12px;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Live Demo
+                    </a>
+                    <button class="btn btn-secondary btn-sm quick-view-btn" style="flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; padding: 8px 12px; background: rgba(255,255,255,0.06); border-color: rgba(212,175,55,0.4); color: #ffd700;">
+                        <i data-lucide="eye" style="width: 14px; height: 14px;"></i> Specs
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Edit button handler
+        if (isAdmin) {
+            const editBtn = card.querySelector('.edit-portfolio-btn');
+            if (editBtn) {
+                editBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openAddWebsiteModal(item.category, item);
+                };
+            }
+        }
+
+        // Quick View button handler
+        const quickViewBtn = card.querySelector('.quick-view-btn');
+        if (quickViewBtn) {
+            quickViewBtn.onclick = (e) => {
+                e.preventDefault();
+                openPortfolioQuickViewModal(item);
+            };
+        }
+
+        return card;
+    };
+
+    // Quick View Modal Opener
+    const openPortfolioQuickViewModal = (item) => {
+        const modal = document.getElementById('portfolioQuickViewModal');
+        const content = document.getElementById('quickViewContent');
+        const closeBtn = document.getElementById('closeQuickViewModal');
+
+        if (!modal || !content) return;
+
+        const itemName = item.name || 'Unnamed Project';
+        const itemCategory = item.category || 'Other Digital Assets';
+        const itemDesc = item.desc || 'High-performance bespoke web asset engineered for elite conversions.';
+        const itemLink = item.link || '#';
+        const safeImgUrl = getSafeImageUrl(item.img, itemName, 1200, 800);
+        const itemPriceVal = getFormattedUsdPrice(itemName, item.price);
+        const tags = item.techTags || ['React 18', 'M-Pesa Express API', '100% Responsive', 'SEO Optimization', 'WhatsApp Trigger', '48h Turnaround'];
+
+        content.innerHTML = `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: center;">
+                <div style="position: relative; border-radius: 16px; overflow: hidden; border: 1px solid rgba(212,175,55,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
+                    <img src="${safeImgUrl}" alt="${itemName}" style="width: 100%; height: auto; display: block;" referrerPolicy="no-referrer">
+                    <span style="position: absolute; top: 15px; left: 15px; background: linear-gradient(135deg, #d4af37 0%, #aa771c 100%); color: #000; font-weight: 800; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem;">
+                        ${itemPriceVal}
+                    </span>
+                </div>
+
+                <div>
+                    <span style="font-size: 0.75rem; color: #d4af37; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                        <i data-lucide="award" style="width: 14px; height: 14px;"></i> ${itemCategory}
+                    </span>
+                    <h2 style="font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 12px; line-height: 1.2;">${itemName}</h2>
+                    <p style="color: #ccc; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">${itemDesc}</p>
+
+                    <div style="margin-bottom: 25px;">
+                        <h4 style="font-size: 0.85rem; color: #ffd700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 700;">Key Tech Specs & Features:</h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${tags.map(t => `<span style="background: rgba(212,175,55,0.12); border: 1px solid rgba(212,175,55,0.3); color: #ffd700; font-size: 0.8rem; padding: 6px 12px; border-radius: 12px; font-weight: 700;">✓ ${t}</span>`).join('')}
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.4); border-radius: 14px; padding: 12px 18px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="color: #25d366; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="tag"></i> Exclusive Offer: 6% OFF Active
+                        </span>
+                        <code style="background: rgba(0,0,0,0.5); color: #ffd700; padding: 3px 10px; border-radius: 6px; font-weight: 800;">SAVE6</code>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="${itemLink}" target="_blank" class="btn btn-primary" style="flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: 8px;">
+                            <i data-lucide="external-link"></i> Launch Live Demo
+                        </a>
+                        <a href="contact.html?coupon=SAVE6&project=${encodeURIComponent(itemName)}" class="btn btn-secondary" style="flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #d4af37 0%, #aa771c 100%); color: #000; font-weight: 800; border: none;">
+                            <i data-lucide="shopping-cart"></i> Claim This Build
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+        if (window.lucide) lucide.createIcons();
+
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                modal.style.display = 'none';
+            };
+        }
+
+        window.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
     };
 
     // Load Featured Projects (Home page style)
@@ -3242,10 +3620,23 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                     </button>
                 ` : '';
 
+                const itemPriceVal = getFormattedUsdPrice(itemName, item.price);
+                const priceBadgeHtml = `
+                    <span style="position: absolute; top: 20px; left: 20px; background: linear-gradient(135deg, #d4af37 0%, #aa771c 100%); color: #000; font-weight: 800; font-size: 0.9rem; padding: 8px 18px; border-radius: 30px; z-index: 10; box-shadow: 0 10px 25px rgba(212,175,55,0.4);">${itemPriceVal}</span>
+                `;
+
                 newItem.innerHTML = `
                     <div class="featured-img" style="position: relative;">
+                        ${priceBadgeHtml}
                         ${editBtnHtml}
                         <img src="${safeImgUrl}" alt="${itemName}" referrerPolicy="no-referrer">
+                        <div class="floating-attention-card ${isReverse ? 'alt-left' : ''}">
+                            <div class="floating-icon-dot">🎁</div>
+                            <div class="floating-card-text">
+                                <span class="floating-card-title">6% OFF COUPON</span>
+                                <span class="floating-card-sub">Use Code: <strong>SAVE6</strong></span>
+                            </div>
+                        </div>
                     </div>
                     <div class="featured-info">
                         <span class="section-tag" style="margin-bottom: 15px;">${itemCategory}</span>
@@ -3257,7 +3648,9 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
                             <li><i data-lucide="check-circle"></i> High Performance</li>
                             <li><i data-lucide="check-circle"></i> Secure Integration</li>
                         </ul>
-                        <a href="${itemLink}" class="btn btn-primary" target="_blank">Explore Project</a>
+                        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                            <a href="${itemLink}" class="btn btn-primary" target="_blank">Claim Offer (${itemPriceVal})</a>
+                        </div>
                     </div>
                 `;
                 
@@ -3338,105 +3731,392 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
     handlePortfolioParams();
 
     // --- Dynamic Blog Post Handling ---
+    const DEFAULT_BLOG_POSTS = [
+        {
+            id: 'article-spotlight-1',
+            title: 'How Kenyan Service Businesses Are Scaling Beyond M-Pesa with Automated Web Portals',
+            category: 'Strategy & Tech',
+            subtitle: 'Discover how integrating real-time booking engines, automated WhatsApp receipts, and instant Paybill triggers triples monthly revenue for local agencies.',
+            readTime: '5 min read',
+            author: 'QuickSite Editorial Desk',
+            authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80',
+            date: 'August 8, 2026',
+            img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80',
+            link: 'https://quicksitekenya.co.ke/services.html',
+            content: `
+                <p class="lead" style="font-size: 1.15rem; color: #ffd700; line-height: 1.6; margin-bottom: 25px; font-weight: 600;">In 2026, relying solely on manual WhatsApp inquiries and paper ledger records is standard practice for failing service providers in East Africa. Top-performing brands in Nairobi and Mombasa are automating client onboarding from first touch to final receipt.</p>
+
+                <h2 style="color: white; font-size: 1.5rem; margin: 30px 0 15px 0;">1. The Death of the Manual Inquiry Loop</h2>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">When a client requests pricing on WhatsApp at 9 PM and receives a response 10 hours later, 68% have already paid a competitor with an automated web booking portal. By embedding instant quote calculators and live availability calendars, businesses eliminate friction entirely.</p>
+
+                <h2 style="color: white; font-size: 1.5rem; margin: 30px 0 15px 0;">2. Automated Paybill & Express M-Pesa Triggers</h2>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">Modern web solutions allow buyers to enter their phone number and receive an instant M-Pesa STK push prompt. Once confirmed, the system immediately generates a branded PDF invoice, registers the order in the merchant dashboard, and notifies the fulfillment team in under 3 seconds.</p>
+
+                <div style="background: rgba(212,175,55,0.12); border-left: 4px solid #d4af37; padding: 22px; border-radius: 12px; margin: 30px 0; border: 1px solid rgba(212,175,55,0.3);">
+                    <p style="color: #ffd700; font-weight: 700; font-size: 1.05rem; margin: 0; line-height: 1.5;">"Automation isn't just about saving time — it's about converting late-night browser intent into verified revenue before sunrise."</p>
+                </div>
+
+                <h2 style="color: white; font-size: 1.5rem; margin: 30px 0 15px 0;">3. Claim Your Express Web Build</h2>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">At QuickSite Kenya, we deliver custom, high-converting digital portals in under 48 hours. Use coupon code <strong style="color: #ffd700; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 6px;">SAVE6</strong> today to lock in 6% off your entire project package.</p>
+            `
+        },
+        {
+            id: 'article-2',
+            title: '10 Conversion Hacks That Turned a Nairobi Safari Agency Into a KES 45M Powerhouse',
+            category: 'Case Studies',
+            subtitle: 'A breakdown of high-impact UI tweaks, speed optimization, and multi-currency payment checkout flows that unlocked international tourists.',
+            readTime: '6 min read',
+            author: 'Michael Mulili',
+            authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80',
+            date: 'August 5, 2026',
+            img: 'https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/portfolio.html',
+            content: `
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">Tour operator Skybridge Safaris struggled with abandoned itinerary inquiries until replacing their legacy brochure website with an interactive package visualizer.</p>
+                <h2 style="color: white; font-size: 1.4rem; margin: 25px 0 15px 0;">Key Enhancements Implemented:</h2>
+                <ul style="color: #ccc; line-height: 1.8; margin-left: 20px; margin-bottom: 25px;">
+                    <li>3D Interactive Game Park Maps with lodge filters.</li>
+                    <li>Instant multi-currency conversion (USD, EUR, KES).</li>
+                    <li>WhatsApp VIP direct connection for immediate custom quotes.</li>
+                    <li>Automated client reviews sync with Google Maps API.</li>
+                </ul>
+            `
+        },
+        {
+            id: 'article-3',
+            title: 'SEO in East Africa 2026: Dominating Local Search in Nairobi, Mombasa & Kisumu',
+            category: 'Digital Marketing',
+            subtitle: 'How structured Schema markup, localized keywords, and sub-second page loads rank your brand above established competitors.',
+            readTime: '7 min read',
+            author: 'QuickSite SEO Desk',
+            authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=100&q=80',
+            date: 'July 28, 2026',
+            img: 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/services.html',
+            content: `
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">Search engines now prioritize mobile performance and hyper-local geo-targeting above all else in East African commercial queries.</p>
+                <h2 style="color: white; font-size: 1.4rem; margin: 25px 0 15px 0;">Essential Local SEO Blueprint:</h2>
+                <p style="color: #ccc; line-height: 1.8;">Incorporate JSON-LD Organization Schema, optimize for voice queries ("best web designer near Westlands"), and maintain a 98+ Google Lighthouse performance score.</p>
+            `
+        },
+        {
+            id: 'article-4',
+            title: 'Why 48-Hour Web Delivery is Disrupting Traditional Software Agencies in Kenya',
+            category: 'Industry Insights',
+            subtitle: 'Traditional 3-month agency delays are dead. Modern modular engineering allows business owners to launch before momentum fades.',
+            readTime: '4 min read',
+            author: 'QuickSite Team',
+            authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80',
+            date: 'July 19, 2026',
+            img: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/packages.html',
+            content: `
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">In business, speed is a competitive moat. Waiting months for a simple corporate landing page results in lost seasonal demand and wasted marketing budgets.</p>
+            `
+        },
+        {
+            id: 'article-5',
+            title: 'E-Commerce Security & Paystack/M-Pesa Integration Best Practices for 2026',
+            category: 'E-Commerce',
+            subtitle: 'Protecting your online store against fraudulent charges while ensuring a seamless 1-click mobile checkout experience.',
+            readTime: '8 min read',
+            author: 'Tech Security Desk',
+            authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=100&q=80',
+            date: 'July 11, 2026',
+            img: 'https://images.unsplash.com/photo-1556742049-0a67d2685710?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/packages.html',
+            content: `
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">Security and speed are two sides of the same coin when running a high-traffic e-commerce brand in Kenya.</p>
+            `
+        },
+        {
+            id: 'article-6',
+            title: 'Maximizing Social Media ROI with Instant WhatsApp Lead Funnels',
+            category: 'Digital Marketing',
+            subtitle: 'Bridge the gap between TikTok, Instagram & Facebook ads directly into high-closing direct chat conversions.',
+            readTime: '5 min read',
+            author: 'Growth Marketing Lead',
+            authorAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=100&q=80',
+            date: 'June 30, 2026',
+            img: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=800&q=80',
+            link: 'https://quicksitekenya.co.ke/contact.html',
+            content: `
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">Directing ad traffic to a generic homepage is burning money. Direct them into custom landing pages with instant pre-filled WhatsApp prompts.</p>
+            `
+        }
+    ];
+
+    let allBlogPostsList = [];
+    let activeBlogCategory = 'ALL';
+    let blogSearchQuery = '';
+
     const loadBlogPosts = () => {
         const blogGrid = document.getElementById('blog-grid');
         if (!blogGrid) return;
 
         const q = query(collection(db, 'blogPosts'), orderBy('createdAt', 'desc'));
         onSnapshot(q, (snapshot) => {
-            blogGrid.innerHTML = '';
-            if (snapshot.empty) {
-                blogGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No elite insights published yet. Check back soon.</p>';
-                return;
-            }
-
+            const dbPosts = [];
             snapshot.forEach((docSnap) => {
-                const post = docSnap.data();
-                const postId = docSnap.id;
-                const article = document.createElement('article');
-                article.className = 'blog-card reveal';
+                dbPosts.push({ id: docSnap.id, ...docSnap.data() });
+            });
+
+            // Combine DB posts with baseline defaults without duplicating titles
+            const dbTitles = new Set(dbPosts.map(p => (p.title || '').toLowerCase().trim()));
+            const filteredDefaults = DEFAULT_BLOG_POSTS.filter(d => !dbTitles.has(d.title.toLowerCase().trim()));
+            
+            allBlogPostsList = [...dbPosts, ...filteredDefaults];
+
+            setupBlogSearchAndFilters();
+            renderBlogView();
+        }, (error) => {
+            handleFirestoreError(error, OperationType.LIST, 'blogPosts');
+            allBlogPostsList = [...DEFAULT_BLOG_POSTS];
+            setupBlogSearchAndFilters();
+            renderBlogView();
+        });
+    };
+
+    const setupBlogSearchAndFilters = () => {
+        const searchInput = document.getElementById('blogSearchInput');
+        const filterPills = document.querySelectorAll('.blog-filter-pill');
+        const newsletterForm = document.getElementById('blogNewsletterForm');
+        const addHeaderBtn = document.getElementById('addBlogHeaderBtn');
+
+        if (searchInput && !searchInput.dataset.listenerAttached) {
+            searchInput.dataset.listenerAttached = 'true';
+            searchInput.addEventListener('input', (e) => {
+                blogSearchQuery = e.target.value.toLowerCase().trim();
+                renderBlogView();
+            });
+        }
+
+        filterPills.forEach(pill => {
+            if (!pill.dataset.listenerAttached) {
+                pill.dataset.listenerAttached = 'true';
+                pill.addEventListener('click', () => {
+                    filterPills.forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    activeBlogCategory = pill.getAttribute('data-category') || 'ALL';
+                    renderBlogView();
+                });
+            }
+        });
+
+        if (newsletterForm && !newsletterForm.dataset.listenerAttached) {
+            newsletterForm.dataset.listenerAttached = 'true';
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = document.getElementById('blogNewsletterEmail');
+                showToast(`🎉 VIP Welcome! Use coupon code SAVE6 for 6% OFF your web project.`);
+                if (emailInput) emailInput.value = '';
+            });
+        }
+
+        if (addHeaderBtn && !addHeaderBtn.dataset.listenerAttached) {
+            addHeaderBtn.dataset.listenerAttached = 'true';
+            addHeaderBtn.addEventListener('click', () => {
+                const modal = document.getElementById('blogPostModal');
+                const form = document.getElementById('blogPostForm');
+                const editId = document.getElementById('editPostId');
+                if (form) form.reset();
+                if (editId) editId.value = '';
+                if (modal) modal.style.display = 'block';
+            });
+        }
+    };
+
+    const renderBlogView = () => {
+        const blogGrid = document.getElementById('blog-grid');
+        const spotlightContainer = document.getElementById('featuredArticleSpotlight');
+        const countBadge = document.getElementById('blogMatchCount');
+
+        if (!blogGrid) return;
+
+        let filtered = allBlogPostsList.filter(post => {
+            const matchesCat = activeBlogCategory === 'ALL' || (post.category || '').toLowerCase() === activeBlogCategory.toLowerCase();
+            const textToSearch = `${post.title || ''} ${post.subtitle || ''} ${post.category || ''} ${post.content || ''}`.toLowerCase();
+            const matchesSearch = !blogSearchQuery || textToSearch.includes(blogSearchQuery);
+            return matchesCat && matchesSearch;
+        });
+
+        if (countBadge) {
+            countBadge.innerHTML = `<i data-lucide="book-open" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i> Showing <strong>${filtered.length}</strong> Article${filtered.length !== 1 ? 's' : ''}`;
+        }
+
+        if (spotlightContainer) {
+            if (activeBlogCategory === 'ALL' && !blogSearchQuery && allBlogPostsList.length > 0) {
+                const spotlightPost = allBlogPostsList[0];
+                const safeSpotlightImg = getSafeImageUrl(spotlightPost.img, spotlightPost.title, 1200, 600);
                 
-                const safeImg = getSafeImageUrl(post.img, post.title, 600, 400);
-                
-                article.innerHTML = `
-                    <div class="blog-img">
-                        <img src="${safeImg}" alt="${post.title}" referrerPolicy="no-referrer">
-                        <div class="blog-category-badge">${post.category || 'Insights'}</div>
-                    </div>
-                    <div class="blog-content">
-                        <span class="blog-date">${post.date}</span>
-                        <h3>${post.title}</h3>
-                        <p>${post.subtitle}</p>
-                        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-                            <a href="blog-post.html?id=${postId}" class="btn btn-primary">Explore Article</a>
-                            ${post.link ? `<a href="${post.link}" class="btn btn-secondary" target="_blank">Visit Site</a>` : ''}
-                            ${isAdmin ? `
-                                <button class="btn btn-secondary edit-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem;">Edit</button>
-                                <button class="btn btn-primary delete-post-btn" data-id="${postId}" style="padding: 8px 15px; font-size: 0.7rem; background: #ff4444; border-color: #ff4444;">Delete</button>
-                                <button class="btn btn-secondary share-post-btn" data-id="${postId}" data-title="${post.title}" style="padding: 8px 15px; font-size: 0.7rem; background: #25D366; border-color: #25D366; color: white;">Share</button>
-                            ` : ''}
+                spotlightContainer.innerHTML = `
+                    <div style="background: linear-gradient(135deg, rgba(18, 18, 28, 0.95) 0%, rgba(10, 10, 15, 0.98) 100%); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 24px; overflow: hidden; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0; box-shadow: 0 20px 50px rgba(0,0,0,0.6); position: relative;">
+                        <div style="position: relative; height: 100%; min-height: 320px; overflow: hidden;">
+                            <img src="${safeSpotlightImg}" alt="${spotlightPost.title}" style="width: 100%; height: 100%; object-fit: cover;" referrerPolicy="no-referrer">
+                            <span style="position: absolute; top: 16px; left: 16px; background: linear-gradient(135deg, #d4af37 0%, #aa771c 100%); color: #000; font-weight: 800; font-size: 0.75rem; padding: 6px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                                ⭐ Editor's Spotlight
+                            </span>
+                            
+                            <div class="floating-attention-card" style="bottom: 12px; right: 12px; padding: 6px 12px; z-index: 4;">
+                                <div class="floating-icon-dot" style="width:26px; height:26px; font-size:0.75rem;">🎁</div>
+                                <div class="floating-card-text">
+                                    <span class="floating-card-title" style="font-size:0.7rem;">6% OFF COUPON</span>
+                                    <span class="floating-card-sub" style="font-size:0.65rem;">Code: <strong>SAVE6</strong></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="padding: 35px; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                                <span style="color: #d4af37; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">${spotlightPost.category || 'Strategy & Tech'}</span>
+                                <span style="color: #666;">•</span>
+                                <span style="color: #aaa; font-size: 0.8rem; font-weight: 600;">⏱️ ${spotlightPost.readTime || '5 min read'}</span>
+                            </div>
+
+                            <h2 style="font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 15px; line-height: 1.3;">${spotlightPost.title}</h2>
+                            <p style="color: #ccc; font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px;">${spotlightPost.subtitle}</p>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="${spotlightPost.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 1px solid #d4af37;" alt="Author">
+                                    <div>
+                                        <div style="color: white; font-size: 0.85rem; font-weight: 700;">${spotlightPost.author || 'QuickSite Editorial'}</div>
+                                        <div style="color: #888; font-size: 0.75rem;">${spotlightPost.date || 'August 2026'}</div>
+                                    </div>
+                                </div>
+
+                                <a href="blog-post.html?id=${spotlightPost.id}" class="btn btn-primary" style="padding: 10px 22px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;">
+                                    Read Article <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 `;
-                blogGrid.appendChild(article);
-            });
-
-            // Add event listeners for edit/delete
-            if (isAdmin) {
-                document.querySelectorAll('.edit-post-btn').forEach(btn => {
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        const id = btn.getAttribute('data-id');
-                        editBlogPost(id);
-                    };
-                });
-                document.querySelectorAll('.delete-post-btn').forEach(btn => {
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        const id = btn.getAttribute('data-id');
-                        deleteBlogPost(id);
-                    };
-                });
-                document.querySelectorAll('.share-post-btn').forEach(btn => {
-                    btn.onclick = (e) => {
-                        e.preventDefault();
-                        const id = btn.getAttribute('data-id');
-                        const title = btn.getAttribute('data-title');
-                        
-                        // Show the admin share prompt modal
-                        showSharePrompt(id, title);
-                    };
-                });
+                spotlightContainer.style.display = 'block';
+            } else {
+                spotlightContainer.style.display = 'none';
             }
+        }
 
+        blogGrid.innerHTML = '';
+
+        if (filtered.length === 0) {
+            blogGrid.innerHTML = `
+                <div class="no-items-message" style="grid-column: 1/-1; text-align: center; padding: 60px 20px; background: rgba(18,18,26,0.6); border: 1px dashed var(--glass-border); border-radius: 20px;">
+                    <i data-lucide="book-x" style="width: 48px; height: 48px; color: #d4af37; margin-bottom: 15px;"></i>
+                    <h3 style="color: white; font-size: 1.3rem; margin-bottom: 8px;">No Insights Found</h3>
+                    <p style="color: #aaa; font-size: 0.9rem;">Try adjusting your search keywords or choosing another category.</p>
+                </div>
+            `;
             if (window.lucide) window.lucide.createIcons();
-        }, (error) => {
-            handleFirestoreError(error, OperationType.LIST, 'blogPosts');
+            return;
+        }
+
+        const displayItems = (activeBlogCategory === 'ALL' && !blogSearchQuery && filtered.length > 1) ? filtered.slice(1) : filtered;
+
+        displayItems.forEach(post => {
+            const postId = post.id;
+            const article = document.createElement('article');
+            article.className = 'elite-blog-card dynamic-item reveal';
+
+            const safeImg = getSafeImageUrl(post.img, post.title, 800, 500);
+
+            const editBtnsHtml = isAdmin ? `
+                <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 10;">
+                    <button class="edit-post-btn" data-id="${postId}" title="Edit Article" style="background: rgba(0,0,0,0.85); color: #ffd700; border: 1px solid #d4af37; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i>
+                    </button>
+                    <button class="delete-post-btn" data-id="${postId}" title="Delete Article" style="background: rgba(255,68,68,0.85); color: white; border: 1px solid #ff4444; border-radius: 50%; width: 34px; height: 34px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                    </button>
+                </div>
+            ` : '';
+
+            article.innerHTML = `
+                <div class="elite-blog-img-wrapper">
+                    ${editBtnsHtml}
+                    <img src="${safeImg}" alt="${post.title}" loading="lazy" referrerPolicy="no-referrer">
+                    <span style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.8); color: #ffd700; border: 1px solid rgba(212,175,55,0.4); font-size: 0.7rem; font-weight: 800; padding: 4px 12px; border-radius: 12px; backdrop-filter: blur(8px);">
+                        ${post.category || 'Insights'}
+                    </span>
+                </div>
+
+                <div class="elite-blog-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #888; margin-bottom: 10px;">
+                        <span>📅 ${post.date || 'August 2026'}</span>
+                        <span style="color: #ffd700; font-weight: 700;">⏱️ ${post.readTime || '5 min read'}</span>
+                    </div>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: white; margin-bottom: 10px; line-height: 1.3;">${post.title}</h3>
+                    <p style="font-size: 0.88rem; color: #aaa; line-height: 1.5; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                        ${post.subtitle}
+                    </p>
+
+                    <div style="display: flex; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08);">
+                        <a href="blog-post.html?id=${postId}" class="btn btn-primary btn-sm" style="flex: 1; justify-content: center; display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem;">
+                            Read Insight <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                        </a>
+                        <button class="btn btn-secondary btn-sm share-post-btn" data-id="${postId}" data-title="${post.title}" style="padding: 8px 12px; font-size: 0.8rem; background: rgba(37,211,102,0.15); border-color: rgba(37,211,102,0.4); color: #25d366;">
+                            <i data-lucide="share-2" style="width: 14px; height: 14px;"></i> Share
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            blogGrid.appendChild(article);
         });
+
+        document.querySelectorAll('.share-post-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                const title = btn.getAttribute('data-title');
+                showSharePrompt(id, title);
+            };
+        });
+
+        if (isAdmin) {
+            document.querySelectorAll('.edit-post-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    editBlogPost(id);
+                };
+            });
+            document.querySelectorAll('.delete-post-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    deleteBlogPost(id);
+                };
+            });
+        }
+
+        if (window.lucide) window.lucide.createIcons();
     };
 
     const editBlogPost = async (id) => {
         try {
-            const postRef = doc(db, 'blogPosts', id);
-            const snapshot = await getDocs(query(collection(db, 'blogPosts'), where('__name__', '==', id)));
-            if (!snapshot.empty) {
-                const post = snapshot.docs[0].data();
-                const setHTML = (id, html) => {
-                    const el = document.getElementById(id);
-                    if (el) el.innerHTML = html;
-                };
+            let post = allBlogPostsList.find(p => p.id === id);
+            if (!post) {
+                const snapshot = await getDocs(query(collection(db, 'blogPosts'), where('__name__', '==', id)));
+                if (!snapshot.empty) {
+                    post = snapshot.docs[0].data();
+                }
+            }
+
+            if (post) {
                 const setVal = (id, val) => {
                     const el = document.getElementById(id);
                     if (el) el.value = val !== undefined && val !== null ? val : '';
                 };
 
-                setHTML('blogModalTitle', 'Edit <span>Blog Post</span>');
                 setVal('editPostId', id);
                 setVal('postTitleInput', post.title);
                 setVal('postSubtitleInput', post.subtitle);
                 setVal('postImgInput', post.img);
                 setVal('postLinkInput', post.link || '');
-                setVal('postCategoryInput', post.category || 'Insights');
+                setVal('postCategoryInput', post.category || 'Strategy & Tech');
                 setVal('postContentInput', post.content);
                 if (blogPostModal) blogPostModal.style.display = 'block';
             }
@@ -3446,10 +4126,10 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
     };
 
     const deleteBlogPost = (id) => {
-        showConfirm('Are you sure you want to delete this elite insight?', async () => {
+        showConfirm('Are you sure you want to remove this insight?', async () => {
             try {
                 await deleteDoc(doc(db, 'blogPosts', id));
-                showToast('Article removed from the digital ether.');
+                showToast('Article removed from database.');
             } catch (error) {
                 handleFirestoreError(error, OperationType.DELETE, `blogPosts/${id}`);
             }
@@ -3457,69 +4137,55 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
     };
 
     const showSharePrompt = (postId, postTitle) => {
-        const url = encodeURIComponent(`${window.location.origin}/blog-post.html?id=${postId}`);
-        const title = encodeURIComponent(postTitle);
         const rawUrl = `${window.location.origin}/blog-post.html?id=${postId}`;
+        const encodedUrl = encodeURIComponent(rawUrl);
+        const encodedTitle = encodeURIComponent(`Check out this digital strategy guide from QuickSite Kenya: "${postTitle}"`);
 
         const overlay = document.createElement('div');
-        overlay.className = 'modal active';
-        overlay.style.display = 'flex';
-        overlay.style.alignItems = 'center';
-        overlay.style.justifyContent = 'center';
-        overlay.style.zIndex = '10000';
-
+        overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:20px;';
+        
         overlay.innerHTML = `
-            <div class="modal-content" style="text-align: center; max-width: 400px; padding: 40px 30px;">
-                <div style="width: 60px; height: 60px; background: rgba(37, 211, 102, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                    <i data-lucide="check" style="color: #25D366; width: 30px; height: 30px;"></i>
+            <div style="background:#12121a; border:1px solid #d4af37; border-radius:20px; padding:30px; max-width:480px; width:100%; position:relative; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+                <span class="close-share" style="position:absolute; top:15px; right:20px; font-size:1.8rem; color:#aaa; cursor:pointer;">&times;</span>
+                <div style="text-align:center; margin-bottom:20px;">
+                    <i data-lucide="share-2" style="width:40px; height:40px; color:#ffd700; margin-bottom:10px;"></i>
+                    <h3 style="color:white; font-size:1.3rem;">Share Article Insight</h3>
+                    <p style="color:#aaa; font-size:0.85rem; margin-top:5px;">Spread high-impact knowledge with fellow entrepreneurs and clients.</p>
                 </div>
-                <h3 style="margin-bottom: 10px;">Post Published! 🎉</h3>
-                <p style="margin-bottom: 25px; font-size: 0.9rem; opacity: 0.8;">Share your elite insight with your network.</p>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u=${url}" target="_blank" class="btn btn-primary" style="background: #1877F2; border-color: #1877F2; color: white; display: flex; justify-content: center; gap: 10px;">
+
+                <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+                    <a href="https://wa.me/?text=${encodedTitle}%20${encodedUrl}" target="_blank" class="btn" style="background:#25D366; color:white; justify-content:center; display:flex; align-items:center; gap:8px; border-radius:12px; padding:12px;">
+                        <i data-lucide="message-circle"></i> Share via WhatsApp
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}" target="_blank" class="btn" style="background:#1DA1F2; color:white; justify-content:center; display:flex; align-items:center; gap:8px; border-radius:12px; padding:12px;">
+                        <i data-lucide="twitter"></i> Share on X (Twitter)
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}" target="_blank" class="btn" style="background:#4267B2; color:white; justify-content:center; display:flex; align-items:center; gap:8px; border-radius:12px; padding:12px;">
                         <i data-lucide="facebook"></i> Share on Facebook
                     </a>
-                    <a href="https://twitter.com/intent/tweet?text=${title}&url=${url}" target="_blank" class="btn btn-primary" style="background: #1DA1F2; border-color: #1DA1F2; color: white; display: flex; justify-content: center; gap: 10px;">
-                        <i data-lucide="twitter"></i> Share on Twitter (X)
-                    </a>
-                    <a href="https://api.whatsapp.com/send?text=${title}%20${url}" target="_blank" class="btn btn-primary" style="background: #25D366; border-color: #25D366; color: white; display: flex; justify-content: center; gap: 10px;">
-                        <i data-lucide="message-circle"></i> Share on WhatsApp
-                    </a>
-                    <button id="instagram-share-btn" class="btn btn-primary" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border: none; color: white; display: flex; justify-content: center; gap: 10px;">
-                        <i data-lucide="instagram"></i> Copy Link for Instagram
-                    </button>
-                    <button id="tiktok-share-btn" class="btn btn-primary" style="background: #000000; border-color: #333333; color: white; display: flex; justify-content: center; gap: 10px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tiktok"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg> Copy Link for TikTok
-                    </button>
                 </div>
-                <button id="close-share-prompt" class="btn btn-secondary" style="margin-top: 25px; width: 100%;">Done</button>
+
+                <div style="display:flex; gap:8px;">
+                    <input type="text" value="${rawUrl}" readonly style="flex:1; padding:10px; background:rgba(0,0,0,0.5); border:1px solid var(--glass-border); border-radius:8px; color:white; font-size:0.8rem;">
+                    <button id="copyShareUrlBtn" class="btn btn-primary" style="padding:10px 15px; font-size:0.8rem;">Copy Link</button>
+                </div>
             </div>
         `;
 
         document.body.appendChild(overlay);
         if (window.lucide) window.lucide.createIcons();
 
-        overlay.querySelector('#tiktok-share-btn').onclick = () => {
-            navigator.clipboard.writeText(rawUrl).then(() => {
-                showToast('Link copied! Open TikTok to paste and share.');
-                setTimeout(() => {
-                    window.open('https://www.tiktok.com/', '_blank');
-                }, 1500);
-            });
-        };
+        overlay.querySelector('.close-share').onclick = () => overlay.remove();
+        overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 
-        overlay.querySelector('#instagram-share-btn').onclick = () => {
-            navigator.clipboard.writeText(rawUrl).then(() => {
-                showToast('Link copied! Open Instagram to paste in your bio/story.');
-                setTimeout(() => {
-                    window.open('https://www.instagram.com/', '_blank');
-                }, 1500);
-            });
-        };
-
-        const close = () => document.body.removeChild(overlay);
-        overlay.querySelector('#close-share-prompt').onclick = close;
-        overlay.onclick = (e) => { if (e.target === overlay) close(); };
+        const copyBtn = overlay.querySelector('#copyShareUrlBtn');
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(rawUrl);
+                showToast('Article link copied to clipboard!');
+                copyBtn.innerText = 'Copied!';
+            };
+        }
     };
 
     if (blogPostForm) {
@@ -3578,53 +4244,77 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
 
         if (postId && window.location.pathname.includes('blog-post.html')) {
             try {
+                let post = null;
+
                 const q = query(collection(db, 'blogPosts'), where('__name__', '==', postId));
                 const snapshot = await getDocs(q);
                 
                 if (!snapshot.empty) {
-                    const post = snapshot.docs[0].data();
-                    // Update Metadata
+                    post = snapshot.docs[0].data();
+                } else {
+                    post = DEFAULT_BLOG_POSTS.find(p => p.id === postId);
+                }
+
+                if (post) {
                     document.title = `${post.title} | QuickSite Kenya`;
                     
-                    // Update Header
                     const dateEl = document.getElementById('post-date');
                     const titleEl = document.getElementById('post-title');
                     const subtitleEl = document.getElementById('post-subtitle');
                     const imgContainer = document.getElementById('post-img-container');
                     const bodyEl = document.getElementById('post-body');
 
-                    if (dateEl) dateEl.innerText = post.date;
+                    if (dateEl) dateEl.innerHTML = `<span style="color:#ffd700; font-weight:800; text-transform:uppercase;">${post.category || 'Insights'}</span> • ${post.date || 'August 2026'}`;
                     if (titleEl) titleEl.innerText = post.title;
                     if (subtitleEl) subtitleEl.innerText = post.subtitle;
                     
-                    // Update Image
                     if (imgContainer) {
                         const safeImg = getSafeImageUrl(post.img, post.title, 1200, 600);
-                        imgContainer.innerHTML = `<img src="${safeImg}" alt="${post.title}" referrerPolicy="no-referrer">`;
+                        imgContainer.innerHTML = `
+                            <div style="position:relative; border-radius: 20px; overflow: hidden; border: 1px solid rgba(212,175,55,0.4); box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
+                                <img src="${safeImg}" alt="${post.title}" style="width: 100%; max-height: 500px; object-fit: cover;" referrerPolicy="no-referrer">
+                            </div>
+                        `;
                     }
                     
-                    // Update Body
-                    if (bodyEl) bodyEl.innerHTML = post.content;
+                    if (bodyEl) {
+                        bodyEl.innerHTML = `
+                            <div style="font-size: 1.05rem; line-height: 1.8; color: #ddd; max-width: 850px; margin: 0 auto;">
+                                ${post.content}
+
+                                <div style="margin-top: 50px; background: linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(10,10,15,0.95) 100%); border: 2px solid rgba(212,175,55,0.5); border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5);">
+                                    <h3 style="color: white; font-size: 1.4rem; margin-bottom: 10px;">Ready to Scale Your Business Online?</h3>
+                                    <p style="color: #ccc; font-size: 0.95rem; margin-bottom: 20px;">Claim a custom express web build delivered in 48 hours with 6% OFF (Use Coupon Code: <strong style="color:#ffd700;">SAVE6</strong>).</p>
+                                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                                        <a href="contact.html?coupon=SAVE6" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
+                                            <i data-lucide="zap"></i> Claim Your 6% Discount
+                                        </a>
+                                        <a href="https://wa.me/254708691648?text=${encodeURIComponent(`Hi QuickSite Kenya, I read your article "${post.title}" and would like a consultation.`)}" target="_blank" class="btn btn-secondary" style="background: #25D366; border-color: #25D366; color: white; display: inline-flex; align-items: center; gap: 8px;">
+                                            <i data-lucide="message-circle"></i> Chat on WhatsApp
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
                     
-                    // Add Visit Site button if link exists
                     const navEl = document.querySelector('.post-navigation');
                     if (post.link && navEl) {
                         const visitBtn = document.createElement('a');
                         visitBtn.href = post.link;
                         visitBtn.className = 'btn btn-secondary';
                         visitBtn.target = '_blank';
-                        visitBtn.innerText = 'Visit Site';
+                        visitBtn.innerText = 'Visit Featured Link';
                         visitBtn.style.marginLeft = '10px';
                         navEl.appendChild(visitBtn);
                     }
                     
                     if (window.lucide) window.lucide.createIcons();
                 } else {
-                    // Handle post not found
                     const titleEl = document.getElementById('post-title');
                     const subtitleEl = document.getElementById('post-subtitle');
                     if (titleEl) titleEl.innerText = 'Article Not Found';
-                    if (subtitleEl) subtitleEl.innerText = 'The requested article could not be located.';
+                    if (subtitleEl) subtitleEl.innerText = 'The requested digital insight could not be located.';
                 }
             } catch (error) {
                 handleFirestoreError(error, OperationType.GET, `blogPosts/${postId}`);
@@ -3634,4 +4324,216 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
 
     loadBlogPosts();
     handleBlogParams();
+
+    // --- Remodeled Homepage Dual Service Switcher & Hub Navigation ---
+    const initServiceSwitcher = () => {
+        const webBtn = document.getElementById('tabWebsitesBtn');
+        const adsBtn = document.getElementById('tabAdsBtn');
+        const hybridBtn = document.getElementById('tabHybridBtn');
+        
+        const webHub = document.getElementById('website-hub');
+        const adsHub = document.getElementById('ads-hub');
+        const allBanner = document.getElementById('allInOneBanner');
+
+        if (!webBtn || !adsBtn || !webHub || !adsHub) return;
+
+        const switchTab = (target, shouldScroll = false) => {
+            // Reset button states
+            webBtn.classList.remove('active');
+            adsBtn.classList.remove('active');
+            if (hybridBtn) hybridBtn.classList.remove('active');
+
+            if (target === 'ads-hub' || target === 'ads') {
+                adsBtn.classList.add('active');
+                webHub.classList.add('hidden-hub');
+                adsHub.classList.remove('hidden-hub');
+                if (allBanner) allBanner.classList.add('hidden-hub');
+
+                if (shouldScroll) {
+                    setTimeout(() => {
+                        const targetEl = document.getElementById('ads-management') || adsHub;
+                        if (targetEl) {
+                            const rect = targetEl.getBoundingClientRect();
+                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            window.scrollTo({
+                                top: rect.top + scrollTop - 90,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 150);
+                }
+            } else if (target === 'website-hub' || target === 'web' || target === 'website') {
+                webBtn.classList.add('active');
+                webHub.classList.remove('hidden-hub');
+                adsHub.classList.add('hidden-hub');
+                if (allBanner) allBanner.classList.add('hidden-hub');
+
+                if (shouldScroll) {
+                    setTimeout(() => {
+                        const targetEl = webHub;
+                        if (targetEl) {
+                            const rect = targetEl.getBoundingClientRect();
+                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            window.scrollTo({
+                                top: rect.top + scrollTop - 90,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 150);
+                }
+            } else {
+                // Combined Ecosystem (Both visible)
+                if (hybridBtn) hybridBtn.classList.add('active');
+                webHub.classList.remove('hidden-hub');
+                adsHub.classList.remove('hidden-hub');
+                if (allBanner) allBanner.classList.remove('hidden-hub');
+
+                if (shouldScroll) {
+                    setTimeout(() => {
+                        const targetEl = document.getElementById('serviceSwitcherSection');
+                        if (targetEl) {
+                            const rect = targetEl.getBoundingClientRect();
+                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            window.scrollTo({
+                                top: rect.top + scrollTop - 90,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }, 150);
+                }
+            }
+
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        webBtn.addEventListener('click', () => {
+            switchTab('website-hub', true);
+            history.pushState(null, null, '#website-hub');
+        });
+
+        adsBtn.addEventListener('click', () => {
+            switchTab('ads-hub', true);
+            history.pushState(null, null, '#ads-hub');
+        });
+
+        if (hybridBtn) {
+            hybridBtn.addEventListener('click', () => {
+                switchTab('all-hub', true);
+                history.pushState(null, null, '#all-hub');
+            });
+        }
+
+        // Hash change detection
+        const handleHashSwitch = () => {
+            const hash = window.location.hash.toLowerCase();
+            if (hash.includes('ads')) {
+                switchTab('ads-hub', true);
+            } else if (hash.includes('all') || hash.includes('hybrid') || hash.includes('ecosystem')) {
+                switchTab('all-hub', false);
+            } else if (hash.includes('web')) {
+                switchTab('website-hub', true);
+            }
+        };
+
+        window.addEventListener('hashchange', handleHashSwitch);
+
+        if (window.location.hash) {
+            handleHashSwitch();
+        } else {
+            // Default to Website hub if no hash is specified, or let it show website tab properly
+            switchTab('website-hub', false);
+        }
+
+        // Intercept internal links pointing to #ads-management or #ads-hub or #website-hub
+        document.querySelectorAll('a[href*="#ads"], a[href*="#website"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && href.includes('ads')) {
+                    e.preventDefault();
+                    switchTab('ads-hub', true);
+                    history.pushState(null, null, '#ads-hub');
+                } else if (href && href.includes('website')) {
+                    e.preventDefault();
+                    switchTab('website-hub', true);
+                    history.pushState(null, null, '#website-hub');
+                }
+            });
+        });
+    };
+
+    const initFloatingCouponWidget = () => {
+        if (sessionStorage.getItem('quicksite-coupon-closed') === 'true') {
+            return;
+        }
+
+        if (document.getElementById('floatingCouponWidget')) return;
+
+        const widget = document.createElement('div');
+        widget.id = 'floatingCouponWidget';
+        widget.className = 'floating-coupon-widget';
+        widget.innerHTML = `
+            <div class="coupon-widget-icon">🎁</div>
+            <div class="coupon-widget-body">
+                <div class="coupon-widget-tag">
+                    <i data-lucide="sparkles" style="width: 12px; height: 12px;"></i>
+                    <span>6% OFF ALL SERVICES</span>
+                </div>
+                <div class="coupon-widget-title">Exclusive Discount Code</div>
+                <div class="coupon-code-pill" id="couponCodePill" title="Click to copy coupon code">
+                    <span>CODE: <strong>SAVE6</strong></span>
+                    <i data-lucide="copy" style="width: 12px; height: 12px; margin-left: 4px;"></i>
+                </div>
+            </div>
+            <div class="coupon-widget-actions">
+                <button class="coupon-btn-copy" id="claimCouponBtn">Claim 6% OFF</button>
+                <button class="coupon-widget-close" id="closeCouponBtn" title="Dismiss coupon">&times;</button>
+            </div>
+        `;
+
+        document.body.appendChild(widget);
+        if (window.lucide) window.lucide.createIcons();
+
+        const copyCode = () => {
+            const code = 'SAVE6';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).catch(() => {});
+            }
+            showToast('🎉 Coupon code SAVE6 copied! 6% Discount applied to your service.', 'success');
+        };
+
+        const pill = widget.querySelector('#couponCodePill');
+        if (pill) {
+            pill.onclick = (e) => {
+                e.preventDefault();
+                copyCode();
+            };
+        }
+
+        const claimBtn = widget.querySelector('#claimCouponBtn');
+        if (claimBtn) {
+            claimBtn.onclick = (e) => {
+                e.preventDefault();
+                copyCode();
+                setTimeout(() => {
+                    window.location.href = 'contact.html?coupon=SAVE6';
+                }, 800);
+            };
+        }
+
+        const closeBtn = widget.querySelector('#closeCouponBtn');
+        if (closeBtn) {
+            closeBtn.onclick = (e) => {
+                e.preventDefault();
+                widget.style.opacity = '0';
+                widget.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    widget.remove();
+                }, 300);
+                sessionStorage.setItem('quicksite-coupon-closed', 'true');
+            };
+        }
+    };
+
+    initFloatingCouponWidget();
+    initServiceSwitcher();
 });

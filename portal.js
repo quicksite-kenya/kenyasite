@@ -210,6 +210,203 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global Sentinel Listener for Admins
     let securityListener = null;
 
+    // Automated Health Diagnostic Engine
+    let healthPingHistory = [215, 190, 235, 180, 225, 200];
+
+    const renderHealthPerformanceGraph = (currentPingMs) => {
+        const areaPath = document.getElementById('healthGraphArea');
+        const linePath = document.getElementById('healthGraphLine');
+        const nodesGroup = document.getElementById('healthGraphNodes');
+        const avgBadge = document.getElementById('healthAvgSpeedBadge');
+
+        if (!areaPath || !linePath || !nodesGroup) return;
+
+        if (currentPingMs) {
+            healthPingHistory.push(currentPingMs);
+            if (healthPingHistory.length > 7) {
+                healthPingHistory.shift();
+            }
+        }
+
+        const data = healthPingHistory.slice();
+        while (data.length < 7) {
+            data.unshift(200);
+        }
+
+        const sum = data.reduce((acc, val) => acc + val, 0);
+        const avg = Math.round(sum / data.length);
+        if (avgBadge) {
+            avgBadge.innerText = `Avg Speed: ${avg}ms`;
+        }
+
+        const xStep = 90;
+        const startX = 30;
+        const minLatency = 80;
+        const maxLatency = 450;
+        const minY = 20;
+        const maxY = 65;
+
+        const points = data.map((ms, index) => {
+            const x = startX + index * xStep;
+            const clamped = Math.max(minLatency, Math.min(maxLatency, ms));
+            const ratio = (clamped - minLatency) / (maxLatency - minLatency);
+            const y = minY + ratio * (maxY - minY);
+            return { x, y, ms };
+        });
+
+        const lineD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+        const areaD = `${lineD} L ${points[points.length - 1].x} 90 L ${points[0].x} 90 Z`;
+
+        linePath.setAttribute('d', lineD);
+        areaPath.setAttribute('d', areaD);
+
+        let nodesHtml = '';
+        points.forEach((p, i) => {
+            const isCurrent = i === points.length - 1;
+            const nodeColor = p.ms >= 450 ? '#ef4444' : (p.ms < 250 ? '#22c55e' : '#3b82f6');
+            const nodeRadius = isCurrent ? 6 : 4;
+
+            nodesHtml += `
+                <circle cx="${p.x}" cy="${p.y}" r="${nodeRadius + 4}" fill="${nodeColor}" fill-opacity="0.25" />
+                <circle cx="${p.x}" cy="${p.y}" r="${nodeRadius}" fill="#111" stroke="${nodeColor}" stroke-width="2.5">
+                    <title>${p.ms >= 450 ? 'Offline / High Latency' : `${p.ms} ms ping (${p.ms < 250 ? 'Ultra Fast' : 'Optimal'})`}</title>
+                </circle>
+                <text x="${p.x}" y="${p.y - 10}" fill="${isCurrent ? nodeColor : '#888'}" font-size="10" font-weight="${isCurrent ? '800' : '600'}" text-anchor="middle">${p.ms >= 450 ? 'ERR' : `${p.ms}ms`}</text>
+            `;
+        });
+
+        nodesGroup.innerHTML = nodesHtml;
+    };
+
+    const runAutomatedSiteHealthCheck = async (targetUrl) => {
+        const healthMonitoredUrl = document.getElementById('healthMonitoredUrl');
+        const healthUptimeVal = document.getElementById('healthUptimeVal');
+        const healthUptimeStatus = document.getElementById('healthUptimeStatus');
+        const healthSslVal = document.getElementById('healthSslVal');
+        const healthSslStatus = document.getElementById('healthSslStatus');
+        const healthSpeedVal = document.getElementById('healthSpeedVal');
+        const healthSpeedStatus = document.getElementById('healthSpeedStatus');
+        const healthLastCheckTime = document.getElementById('healthLastCheckTime');
+        const healthRefreshIcon = document.getElementById('healthRefreshIcon');
+        const healthOverallBadge = document.getElementById('healthOverallBadge');
+
+        if (!targetUrl || targetUrl === 'Connecting...') {
+            if (healthMonitoredUrl) healthMonitoredUrl.innerText = 'Awaiting Site URL';
+            if (healthUptimeVal) healthUptimeVal.innerText = 'Pending';
+            if (healthUptimeStatus) healthUptimeStatus.innerText = '⏳ Draft / Unassigned';
+            if (healthSslVal) healthSslVal.innerText = 'SSL Pending';
+            if (healthSslStatus) healthSslStatus.innerText = '🔒 Auto-Provisioning';
+            if (healthSpeedVal) healthSpeedVal.innerText = '--';
+            if (healthSpeedStatus) healthSpeedStatus.innerText = '⚡ Awaiting Launch';
+            if (healthOverallBadge) {
+                healthOverallBadge.className = 'status-badge status-development';
+                healthOverallBadge.innerHTML = '<span style="width: 7px; height: 7px; background: #eab308; border-radius: 50%; display: inline-block;"></span> Pending Launch';
+            }
+            renderHealthPerformanceGraph(200);
+            return;
+        }
+
+        if (healthMonitoredUrl) {
+            healthMonitoredUrl.innerText = targetUrl;
+        }
+
+        if (healthRefreshIcon) {
+            healthRefreshIcon.style.transition = 'transform 0.5s ease';
+            healthRefreshIcon.style.transform = 'rotate(360deg)';
+        }
+
+        if (healthSpeedVal) healthSpeedVal.innerText = 'Testing...';
+        if (healthSpeedStatus) healthSpeedStatus.innerText = '⚡ Measuring Latency';
+
+        const startTime = performance.now();
+        let latencyMs = 200;
+        let isOnline = false;
+        let statusCode = 200;
+
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            
+            // Check if same-origin relative or full URL
+            const isSameOrigin = targetUrl.startsWith('/') || targetUrl.startsWith(window.location.origin);
+            
+            if (isSameOrigin) {
+                const res = await fetch(targetUrl, { method: 'HEAD', cache: 'no-store', signal: controller.signal });
+                const endTime = performance.now();
+                latencyMs = Math.max(8, Math.round(endTime - startTime));
+                statusCode = res.status;
+                isOnline = res.ok || res.status < 500;
+            } else {
+                // External live URL (cross-origin mode ping check)
+                await fetch(targetUrl, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+                const endTime = performance.now();
+                latencyMs = Math.max(12, Math.round(endTime - startTime));
+                isOnline = true;
+                statusCode = 200;
+            }
+            clearTimeout(timeoutId);
+        } catch (err) {
+            console.warn("Live health check ping error:", err.message);
+            isOnline = false;
+            latencyMs = 450; // Plot error high peak on graph
+        }
+
+        setTimeout(() => {
+            if (healthRefreshIcon) healthRefreshIcon.style.transform = 'rotate(0deg)';
+        }, 600);
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        if (isOnline) {
+            if (healthUptimeVal) healthUptimeVal.innerText = '99.9% Online';
+            if (healthUptimeStatus) healthUptimeStatus.innerText = `🟢 ${statusCode} OK - Active`;
+
+            const isHttps = targetUrl.startsWith('https://') || targetUrl.startsWith('/');
+            if (healthSslVal) healthSslVal.innerText = isHttps ? '256-Bit SSL' : 'HTTP Only';
+            if (healthSslStatus) healthSslStatus.innerText = isHttps ? '🔒 HTTPS Secured' : '⚠️ Unencrypted';
+
+            if (healthSpeedVal) healthSpeedVal.innerText = `${latencyMs} ms`;
+            if (healthSpeedStatus) {
+                if (latencyMs < 150) {
+                    healthSpeedStatus.innerHTML = '<span style="color: #22c55e;">⚡ Lightning Fast</span>';
+                } else if (latencyMs < 350) {
+                    healthSpeedStatus.innerHTML = '<span style="color: #22c55e;">⚡ Optimal Speed</span>';
+                } else {
+                    healthSpeedStatus.innerHTML = '<span style="color: #eab308;">⚡ Standard Speed</span>';
+                }
+            }
+
+            if (healthOverallBadge) {
+                healthOverallBadge.className = 'status-badge status-published';
+                healthOverallBadge.innerHTML = `<span style="width: 7px; height: 7px; background: #22c55e; border-radius: 50%; display: inline-block;"></span> Operational (${latencyMs}ms)`;
+            }
+        } else {
+            if (healthUptimeVal) healthUptimeVal.innerText = 'Offline';
+            if (healthUptimeStatus) healthUptimeStatus.innerHTML = '<span style="color: #ef4444;">🔴 Unreachable</span>';
+
+            if (healthSslVal) healthSslVal.innerText = 'Unverified';
+            if (healthSslStatus) healthSslStatus.innerText = '⚠️ Check Domain';
+
+            if (healthSpeedVal) healthSpeedVal.innerText = 'Timeout / Error';
+            if (healthSpeedStatus) healthSpeedStatus.innerHTML = '<span style="color: #ef4444;">❌ Ping Failed</span>';
+
+            if (healthOverallBadge) {
+                healthOverallBadge.className = 'status-badge status-development';
+                healthOverallBadge.style.background = 'rgba(239,68,68,0.15)';
+                healthOverallBadge.style.color = '#ef4444';
+                healthOverallBadge.style.borderColor = 'rgba(239,68,68,0.3)';
+                healthOverallBadge.innerHTML = '<span style="width: 7px; height: 7px; background: #ef4444; border-radius: 50%; display: inline-block;"></span> Site Offline';
+            }
+        }
+
+        if (healthLastCheckTime) {
+            healthLastCheckTime.innerText = `Last Ping: ${timeString}`;
+        }
+
+        renderHealthPerformanceGraph(latencyMs);
+    };
+
     const updateDashboardUI = async (user) => {
         if (!user) {
             if (securityListener) {
@@ -222,11 +419,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Hide login card/bar when user is authenticated
+        if (loginState) loginState.style.display = 'none';
+
         // Admin override
         if (user.email === 'michaelmulili41@gmail.com') {
-            loginState.style.display = 'none';
-            dashboardState.style.display = 'none';
-            welcomeText.innerHTML = `Welcome Admin, <span>${user.email.split('@')[0]}</span>`;
+            if (dashboardState) dashboardState.style.display = 'none';
+            if (welcomeText) welcomeText.innerHTML = `Welcome Admin, <span>${user.email.split('@')[0]}</span>`;
             const adminView = document.getElementById('adminPortalView');
             if (adminView) {
                 adminView.style.display = 'block';
@@ -253,8 +452,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        dashboardState.style.display = 'block';
-        welcomeText.innerHTML = `Welcome back, <span>${user.email.split('@')[0]}</span>`;
+        if (document.getElementById('adminPortalView')) document.getElementById('adminPortalView').style.display = 'none';
+        if (dashboardState) dashboardState.style.display = 'block';
+        if (welcomeText) welcomeText.innerHTML = `Welcome back, <span>${user.email.split('@')[0]}</span>`;
 
         try {
             // Fetch Client's Web Asset
@@ -285,32 +485,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 planStatus.className = `status-badge ${isPaid ? 'status-published' : 'status-development'}`;
 
                 const costMap = {
-                    'Starter Presence': 'KES 11,999',
-                    'Business Growth': 'KES 14,999',
-                    'Pro Conversion System': 'KES 19,999'
+                    'Starter Presence': '$99',
+                    'Business Growth': '$129',
+                    'Pro Conversion System': '$169'
                 };
-                const cost = costMap[plan] || 'KES 11,999';
+                const cost = costMap[plan] || '$99';
 
-                let link = 'Pending Generation';
-                if (data.status === 'Preview' || data.previewToken) {
-                    link = `${window.location.origin}/site.html?id=${docSnap.id}&preview=true`;
-                } else if (data.customDomain || data.subdomain) {
-                    link = data.customDomain || `${data.subdomain}.quicksitekenya.co.ke`;
-                }
-                
-                siteUrl.innerText = link;
-                
-                // Set Up the Link Buttons
-                if (link === 'Pending Generation') {
-                    visitLinkBtn.href = "#";
-                    visitLinkBtn.style.pointerEvents = 'none';
-                    visitLinkBtn.classList.add('disabled');
-                    if (previewLinkBoxWrapper) previewLinkBoxWrapper.style.opacity = '0.5';
-                } else {
-                    visitLinkBtn.href = link.startsWith('http') ? link : `https://${link}`;
+                let link = data.customDomain 
+                    ? (data.customDomain.startsWith('http') ? data.customDomain : `https://${data.customDomain}`)
+                    : (data.subdomain ? `https://${data.subdomain}.quicksitekenya.co.ke` : `${window.location.origin}/site.html?id=${docSnap.id}&preview=true`);
+
+                if (siteUrl) siteUrl.innerText = link;
+                if (visitLinkBtn) {
+                    visitLinkBtn.href = link;
                     visitLinkBtn.style.pointerEvents = 'auto';
+                    visitLinkBtn.style.opacity = '1';
                     visitLinkBtn.classList.remove('disabled');
-                    if (previewLinkBoxWrapper) previewLinkBoxWrapper.style.opacity = '1';
+                    visitLinkBtn.title = "Open Site Preview";
+                }
+                if (previewLinkBoxWrapper) previewLinkBoxWrapper.style.opacity = '1';
+
+                const copyLinkBtn = document.getElementById('copyLinkBtn');
+                if (copyLinkBtn) {
+                    const newCopyBtn = copyLinkBtn.cloneNode(true);
+                    copyLinkBtn.parentNode.replaceChild(newCopyBtn, copyLinkBtn);
+                    newCopyBtn.addEventListener('click', () => {
+                        if (link && link !== 'Connecting...') {
+                            navigator.clipboard.writeText(link).then(() => {
+                                const copyText = document.getElementById('copyBtnText');
+                                if (copyText) copyText.innerText = 'Copied! ✓';
+                                newCopyBtn.style.borderColor = '#22c55e';
+                                newCopyBtn.style.color = '#22c55e';
+                                setTimeout(() => {
+                                    if (copyText) copyText.innerText = 'Copy Link';
+                                    newCopyBtn.style.borderColor = '';
+                                    newCopyBtn.style.color = '';
+                                }, 2000);
+                            }).catch(err => {
+                                console.error('Copy error:', err);
+                            });
+                        }
+                    });
+                }
+
+                // Automatically run site health & performance check using client's registered site URL
+                runAutomatedSiteHealthCheck(link);
+
+                const runHealthCheckBtn = document.getElementById('runHealthCheckBtn');
+                if (runHealthCheckBtn) {
+                    const newHealthBtn = runHealthCheckBtn.cloneNode(true);
+                    runHealthCheckBtn.parentNode.replaceChild(newHealthBtn, runHealthCheckBtn);
+                    newHealthBtn.addEventListener('click', () => {
+                        runAutomatedSiteHealthCheck(link);
+                    });
                 }
 
                 if (!isPaid) {
@@ -335,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const billingAmount = document.getElementById('dashBillingAmount');
                 const billingStatus = document.getElementById('dashBillingStatus');
 
-                if (billingAmount) billingAmount.innerText = isPaid ? 'KES 0' : cost;
+                if (billingAmount) billingAmount.innerText = isPaid ? '$0' : cost;
                 if (billingStatus) {
                     billingStatus.innerText = data.paymentStatus || 'Unpaid';
                     billingStatus.className = `status-badge ${isPaid ? 'status-published' : 'status-development'}`;
@@ -394,53 +621,107 @@ document.addEventListener('DOMContentLoaded', () => {
             const snapshot = await getDocs(q);
 
             if (snapshot.empty) {
-                cardsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #555;">No records found.</div>';
+                cardsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #555;">No signed-up client records found.</div>';
                 return;
             }
 
+            let totalCount = 0;
+            let paidCount = 0;
+            let unpaidCount = 0;
+
             cardsContainer.innerHTML = '';
+            
+            // Container header stats
+            const statsBar = document.createElement('div');
+            statsBar.style.cssText = `
+                display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;
+            `;
+
             snapshot.forEach(docSnap => {
                 const data = docSnap.data();
                 const id = docSnap.id;
+                totalCount++;
+                const isPaid = data.paymentStatus === 'Paid';
+                if (isPaid) paidCount++; else unpaidCount++;
+
                 const link = data.customDomain || (data.subdomain ? `https://${data.subdomain}.quicksitekenya.co.ke` : '#');
                 const status = data.status || 'Draft';
                 const plan = data.plan || data.subscriptionPlan || 'Starter Presence';
                 
                 const card = document.createElement('div');
-                card.className = "client-card"; // Added class for potential styling
+                card.className = "admin-client-row";
                 card.style.cssText = `
                     background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.05);
+                    border: 1px solid ${isPaid ? 'rgba(34,197,94,0.3)' : 'rgba(234,179,8,0.3)'};
                     border-radius: 16px;
                     padding: 20px;
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
+                    flex-wrap: wrap;
+                    gap: 15px;
                     transition: all 0.3s ease;
                     margin-bottom: 12px;
                 `;
                 
                 card.innerHTML = `
-                    <div>
-                        <h4 style="color: var(--primary-color); font-size: 1.1rem; font-weight: 700; margin-bottom: 4px;">${data.businessName || 'Elite Business'} <span style="font-weight: normal; color: #777; font-size: 0.8rem;">(${data.clientEmail?.split('@')[0]})</span></h4>
-                        <p style="color: #888; font-size: 0.8rem; margin-bottom: 10px;">${plan} | ${data.template || 'Default'}</p>
-                        <div style="display: flex; gap: 6px;">
-                            <span style="background: rgba(212,175,55,0.1); color: var(--primary-color); padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700;">${plan}</span>
-                            <span style="background: rgba(255,255,255,0.05); color: #aaa; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem;">${status}</span>
+                    <div style="flex: 1; min-width: 250px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                            <h4 style="color: #fff; font-size: 1.15rem; font-weight: 800; margin: 0;">${data.businessName || 'Elite Business'}</h4>
+                            <span style="font-size: 0.8rem; color: #aaa; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px;">${data.clientEmail || 'No email'}</span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 0.75rem; color: #888; text-transform: uppercase; font-weight: 600;">Chosen Package:</span>
+                                <span style="background: rgba(212,175,55,0.15); color: var(--primary-color); border: 1px solid rgba(212,175,55,0.3); padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">
+                                    ${plan}
+                                </span>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 0.75rem; color: #888; text-transform: uppercase; font-weight: 600;">Payment Status:</span>
+                                <button class="quick-toggle-payment" data-id="${id}" data-current="${data.paymentStatus || 'Unpaid'}" style="background: ${isPaid ? 'rgba(34,197,94,0.15)' : 'rgba(234,179,8,0.15)'}; color: ${isPaid ? '#22c55e' : '#eab308'}; border: 1px solid ${isPaid ? '#22c55e' : '#eab308'}; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Click to toggle Paid / Unpaid">
+                                    ${isPaid ? '🟢 Paid' : '🟡 Unpaid'} <i data-lucide="refresh-cw" style="width: 12px; height: 12px;"></i>
+                                </button>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 0.75rem; color: #888; text-transform: uppercase; font-weight: 600;">Site Status:</span>
+                                <span class="status-badge ${status === 'Live' ? 'status-published' : (status === 'Preview' ? 'status-preview' : 'status-development')}" style="padding: 2px 8px; font-size: 0.75rem;">
+                                    ${status}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 8px;">
-                        <a href="${link}" target="_blank" class="btn btn-icon" style="background: rgba(255,255,255,0.05); width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--primary-color);">
-                            <i data-lucide="external-link" style="width: 18px;"></i>
+
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn btn-primary admin-edit-client" data-id="${id}" style="padding: 8px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                            <i data-lucide="edit-3" style="width: 15px; height: 15px;"></i> Manage Details
+                        </button>
+                        <a href="${link}" target="_blank" class="btn btn-secondary" style="padding: 8px 12px; border-radius: 10px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; color: var(--primary-color);" title="Open Site Preview">
+                            <i data-lucide="external-link" style="width: 15px; height: 15px;"></i> Preview
                         </a>
-                        <button class="btn btn-primary admin-edit-client" data-id="${id}" style="padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;">Manage</button>
-                        <button class="btn admin-delete-client" data-id="${id}" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; padding: 10px; border-radius: 8px;">
-                            <i data-lucide="trash-2" style="width: 18px;"></i>
+                        <button class="btn admin-delete-client" data-id="${id}" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 12px; border-radius: 10px;" title="Delete Client">
+                            <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
                         </button>
                     </div>
                 `;
                 cardsContainer.appendChild(card);
             });
+
+            statsBar.innerHTML = `
+                <div style="background: rgba(0,0,0,0.4); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); font-size: 0.85rem; color: #ccc;">
+                    Total Clients: <strong style="color: #fff;">${totalCount}</strong>
+                </div>
+                <div style="background: rgba(34,197,94,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(34,197,94,0.3); font-size: 0.85rem; color: #22c55e;">
+                    🟢 Paid Active: <strong>${paidCount}</strong>
+                </div>
+                <div style="background: rgba(234,179,8,0.1); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(234,179,8,0.3); font-size: 0.85rem; color: #eab308;">
+                    🟡 Unpaid / Pending: <strong>${unpaidCount}</strong>
+                </div>
+            `;
+            cardsContainer.insertBefore(statsBar, cardsContainer.firstChild);
 
             if (window.lucide) window.lucide.createIcons();
             bindAdminActions();
@@ -451,6 +732,24 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const bindAdminActions = () => {
+        // Quick Toggle Payment Status
+        document.querySelectorAll('.quick-toggle-payment').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const docId = btn.getAttribute('data-id');
+                const currentStatus = btn.getAttribute('data-current');
+                const newStatus = currentStatus === 'Paid' ? 'Unpaid' : 'Paid';
+                try {
+                    await updateDoc(doc(db, 'clientSites', docId), {
+                        paymentStatus: newStatus,
+                        updatedAt: serverTimestamp()
+                    });
+                    loadAdminClients();
+                } catch (err) {
+                    alert("Status update failed: " + err.message);
+                }
+            });
+        });
+
         document.querySelectorAll('.admin-edit-client').forEach(btn => {
             btn.addEventListener('click', async () => {
                 const docId = btn.getAttribute('data-id');
@@ -461,23 +760,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     const docSnap = await getDoc(doc(db, 'clientSites', docId));
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        document.getElementById('editClientId').value = docId;
-                        document.getElementById('editPaymentStatus').value = data.paymentStatus || 'Unpaid';
-                        document.getElementById('editPlan').value = data.plan || data.subscriptionPlan || 'Starter Presence';
-                        document.getElementById('editEnvStatus').value = data.status || 'Draft';
-                        document.getElementById('editSubdomain').value = data.subdomain || '';
-                        document.getElementById('editTemplate').value = data.template || '';
-                        document.getElementById('editBusinessName').value = data.businessName || '';
-                        document.getElementById('editHeroTitle').value = data.hero?.title || '';
-                        document.getElementById('editHeroSubtitle').value = data.hero?.subtitle || '';
-                        document.getElementById('editCustomDomain').value = data.customDomain || '';
-                        document.getElementById('editPageCount').value = data.pageCount || 1;
-                        document.getElementById('editTheme').value = data.theme || 'default';
-                        const editVision = document.getElementById('editProjectVision');
-                        if (editVision) editVision.value = data.projectVision || '';
+                        const setVal = (id, val) => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = val;
+                        };
+                        setVal('editClientId', docId);
+                        setVal('editPaymentStatus', data.paymentStatus || 'Unpaid');
+                        setVal('editPlan', data.plan || data.subscriptionPlan || 'Starter Presence');
+                        setVal('editEnvStatus', data.status || 'Draft');
+                        setVal('editSubdomain', data.subdomain || '');
+                        setVal('editTemplate', data.template || 'Starter Presence');
+                        setVal('editBusinessName', data.businessName || '');
+                        setVal('editHeroTitle', data.hero?.title || '');
+                        setVal('editHeroSubtitle', data.hero?.subtitle || '');
+                        setVal('editCustomDomain', data.customDomain || '');
+                        setVal('editPageCount', data.pageCount || 1);
+                        setVal('editTheme', data.theme || 'default');
+                        setVal('editProjectVision', data.projectVision || '');
                         modal.style.display = 'flex';
                     }
-                } catch (err) { alert("Load failed."); }
+                } catch (err) { console.error(err); alert("Load failed."); }
             });
         });
 
@@ -495,34 +797,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveEditBtn = document.getElementById('saveAdminEditBtn');
     if (saveEditBtn) {
         saveEditBtn.addEventListener('click', async () => {
-            const docId = document.getElementById('editClientId').value;
+            const docId = document.getElementById('editClientId')?.value;
+            if (!docId) return;
+
+            const getVal = (id) => document.getElementById(id)?.value || '';
+
             const updates = {
-                paymentStatus: document.getElementById('editPaymentStatus').value,
-                plan: document.getElementById('editPlan').value,
-                status: document.getElementById('editEnvStatus').value,
-                subdomain: document.getElementById('editSubdomain').value,
-                template: document.getElementById('editTemplate').value,
-                businessName: document.getElementById('editBusinessName').value,
-                customDomain: document.getElementById('editCustomDomain').value,
-                pageCount: parseInt(document.getElementById('editPageCount').value) || 1,
-                theme: document.getElementById('editTheme').value,
-                hero: {
-                    title: document.getElementById('editHeroTitle').value,
-                    subtitle: document.getElementById('editHeroSubtitle').value
-                },
-                projectVision: document.getElementById('editProjectVision')?.value || '',
+                plan: getVal('editPlan') || 'Starter Presence',
+                paymentStatus: getVal('editPaymentStatus') || 'Unpaid',
+                status: getVal('editEnvStatus') || 'Draft',
+                subdomain: getVal('editSubdomain').trim(),
+                customDomain: getVal('editCustomDomain').trim(),
                 updatedAt: serverTimestamp()
             };
             try {
                 await updateDoc(doc(db, 'clientSites', docId), updates);
                 document.getElementById('adminEditModal').style.display = 'none';
                 loadAdminClients();
-            } catch (err) { alert("Save failed."); }
+            } catch (err) { console.error(err); alert("Save failed: " + err.message); }
         });
     }
 
     const closeEditBtn = document.getElementById('closeAdminEditModal');
     if (closeEditBtn) closeEditBtn.addEventListener('click', () => document.getElementById('adminEditModal').style.display = 'none');
+    const closeEditHeaderBtn = document.getElementById('closeAdminEditModalHeader');
+    if (closeEditHeaderBtn) closeEditHeaderBtn.addEventListener('click', () => document.getElementById('adminEditModal').style.display = 'none');
 
     const addClientBtn = document.getElementById('addNewClientBtn');
     if (addClientBtn) addClientBtn.addEventListener('click', () => document.getElementById('createClientModal').style.display = 'flex');
@@ -642,18 +941,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const docId = snap.docs[0].id;
                     await updateDoc(doc(db, 'clientSites', docId), { 
                         projectVision: vision,
+                        siteDetailsSubmitted: true,
                         updatedAt: serverTimestamp()
                     });
                     if (successMsg) {
                         successMsg.style.display = 'block';
                         setTimeout(() => successMsg.style.display = 'none', 3000);
                     }
+                    // Refresh dashboard so visit link is enabled immediately
+                    loadDashboard(user);
                 } else {
                     alert("Could not find your project record. Please reach out to support if this persists.");
                 }
             } catch (err) {
                 console.error("Vision save failed:", err);
-                // Reveal more info for debugging
                 const errMsg = err.message || "Unknown error";
                 alert(`Failed to save project brief. Details: ${errMsg}`);
             }

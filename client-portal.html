@@ -231,124 +231,208 @@
                     <!-- View when client is already assigned a package -->
                     <div id="hasPackageView">
                         
-                        <!-- Unpaid State Warning -->
-                        <div id="unpaidWarning" style="display: none; background: rgba(255, 200, 0, 0.1); border: 1px solid rgba(255, 200, 0, 0.3); padding: 20px; border-radius: 12px; margin-bottom: 25px;">
-                            <h4 style="color: #ffc800; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><i data-lucide="alert-triangle" style="width: 20px;"></i> Activation Pending Payment</h4>
-                            <p style="font-size: 0.9rem; color: #eee; margin-bottom: 15px;">Your digital environment has been reserved. To complete setup and activate your live preview, please complete your package payment.</p>
-                            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px;">
-                                <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 5px;">M-PESA TILL NUMBER: <strong style="color: white; font-size: 1rem;">123456</strong> (QuickSite Kenya)</p>
-                                <p style="font-size: 0.85rem; color: #ccc;">Amount due: <strong id="amountDueDisplay" style="color: white; font-size: 1rem;">KES XXX</strong></p>
-                                <p style="font-size: 0.75rem; color: #aaa; margin-top: 10px;">*Once paid, send confirmation to our WhatsApp line.</p>
+                        <!-- Top Featured Banner: Website & Quick Launchpad -->
+                        <div class="portal-card" style="margin-bottom: 24px; border: 1px solid rgba(212,175,55,0.3); background: linear-gradient(135deg, rgba(212,175,55,0.06) 0%, rgba(0,0,0,0.4) 100%); padding: 22px 24px; border-radius: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                                <div>
+                                    <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="globe" style="color: var(--primary-color); width: 22px; height: 22px;"></i> Your Live Website & Link
+                                    </h3>
+                                    <p style="color: #aaa; font-size: 0.82rem; margin: 3px 0 0 0;">Your active web deployment address and client preview link.</p>
+                                </div>
+                                <span class="status-badge" id="dashSiteStatus">Draft</span>
+                            </div>
+
+                            <!-- Website URL Display Bar -->
+                            <div style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;" id="previewLinkBoxWrapper">
+                                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex: 1; min-width: 200px;">
+                                        <i data-lucide="link" style="color: var(--primary-color); width: 18px; height: 18px; flex-shrink: 0;"></i>
+                                        <code id="dashSiteUrl" style="color: #4ade80; font-family: monospace; font-size: 0.95rem; font-weight: 700; word-break: break-all;">Connecting...</code>
+                                    </div>
+                                    <button class="btn btn-secondary" style="padding: 7px 14px; font-size: 0.8rem; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15);" id="copyLinkBtn" title="Copy Website Link">
+                                        <i data-lucide="copy" style="width: 14px; height: 14px;"></i> <span id="copyBtnText">Copy Link</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Quick Action CTAs -->
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                                <a href="#" target="_blank" class="btn btn-primary" style="padding: 10px 18px; font-weight: 800; font-size: 0.85rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;" id="visitLinkBtn" title="Open Site Preview">
+                                    <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Visit Live Site
+                                </a>
+                                <a href="https://wa.me/254708691648?text=Hello%20QuickSite%20Developer%2C%20I%20would%20like%20to%20request%20some%20updates%20for%20my%20website." target="_blank" class="btn" style="background: rgba(37,211,102,0.15) !important; color: #25D366 !important; border: 1px solid rgba(37,211,102,0.4) !important; padding: 10px 18px; font-weight: 700; font-size: 0.85rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;" id="whatsappSupportBtn">
+                                    <i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Request Edits
+                                </a>
+                                <div style="font-size: 0.8rem; color: #aaa; background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); padding: 8px 12px; border-radius: 8px; flex: 1; min-width: 220px;" id="activationPendingBlock">
+                                    <strong style="color: #ffa500; font-size: 0.8rem;">⚡ Custom Domain Pending:</strong> Pay via M-PESA to activate domain.
+                                </div>
                             </div>
                         </div>
 
-                        <div class="dashboard-grid">
-                            <!-- Package Info -->
-                            <div class="portal-card">
-                                <h3><i data-lucide="package"></i> Subscription Details</h3>
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <div>
-                                        <span style="display: block; font-size: 0.8rem; color: #aaa; text-transform: uppercase;">Active Plan</span>
-                                        <strong style="font-size: 1.2rem; color: white;" id="dashPlanName">Fetching...</strong>
+                        <!-- Unpaid State Warning -->
+                        <div id="unpaidWarning" style="display: none; background: rgba(255, 200, 0, 0.1); border: 1px solid rgba(255, 200, 0, 0.4); padding: 18px; border-radius: 14px; margin-bottom: 24px;">
+                            <h4 style="color: #ffc800; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 1.05rem; font-weight: 700;">
+                                <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i> Package Activation Pending Payment
+                            </h4>
+                            <p style="font-size: 0.88rem; color: #eee; margin-bottom: 12px; line-height: 1.5;">Your package setup is registered! To activate your custom domain and deploy live, please send payment to M-PESA Till 123456.</p>
+                            <div style="background: rgba(0,0,0,0.4); padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,200,0,0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                <p style="font-size: 0.85rem; color: #ccc; margin: 0;">M-PESA TILL: <strong style="color: #fff; font-size: 1rem; background: rgba(212,175,55,0.2); padding: 2px 8px; border-radius: 6px;">123456</strong> (QuickSite Kenya)</p>
+                                <p style="font-size: 0.85rem; color: #ccc; margin: 0;">Due: <strong id="amountDueDisplay" style="color: #22c55e; font-size: 1.1rem;">$XXX</strong></p>
+                            </div>
+                        </div>
+
+                        <!-- Balanced 2-Column Dashboard Grid -->
+                        <div class="dashboard-grid" style="margin-top: 0; gap: 24px;">
+                            
+                            <!-- Left Column -->
+                            <div style="display: flex; flex-direction: column; gap: 24px;">
+                                
+                                <!-- Site Health & Status Monitor -->
+                                <div class="portal-card" style="padding: 20px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                                        <div>
+                                            <h3 style="color: #fff; font-size: 1.15rem; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                                <i data-lucide="activity" style="color: #22c55e; width: 20px; height: 20px;"></i> Website Health Monitor
+                                            </h3>
+                                            <p style="color: #aaa; font-size: 0.8rem; margin: 2px 0 0 0;">24/7 automated speed & response diagnostics.</p>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <button id="runHealthCheckBtn" class="btn btn-secondary" style="font-size: 0.78rem; padding: 5px 12px; border-radius: 8px; gap: 6px; display: inline-flex; align-items: center;">
+                                                <i data-lucide="refresh-cw" style="width: 13px; height: 13px;" id="healthRefreshIcon"></i> Test Ping
+                                            </button>
+                                            <span class="status-badge status-published" id="healthOverallBadge" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px;">
+                                                <span style="width: 7px; height: 7px; background: #22c55e; border-radius: 50%; display: inline-block;"></span> Operational
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span class="status-badge" id="dashPlanStatus">...</span>
-                                </div>
-                                
-                                <h4>Included Features:</h4>
-                                <ul class="feature-list" id="dashFeatures">
-                                    <li><i data-lucide="loader"></i> Loading features...</li>
-                                </ul>
-                            </div>
 
-                            <!-- Web Asset Info -->
-                            <div class="portal-card">
-                                <h3><i data-lucide="globe"></i> Your Web Asset</h3>
-                                
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                                    <span style="color: #aaa;">Status</span>
-                                    <span class="status-badge" id="dashSiteStatus">Draft</span>
-                                </div>
+                                    <!-- 3 Metrics -->
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px;">
+                                        <div style="padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+                                            <span style="font-size: 0.7rem; color: #888; font-weight: 700; text-transform: uppercase;">Uptime</span>
+                                            <div style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 2px;" id="healthUptimeVal">99.9%</div>
+                                            <div style="font-size: 0.72rem; color: #22c55e; margin-top: 2px;" id="healthUptimeStatus">🟢 200 OK</div>
+                                        </div>
 
-                                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 5px;">Your live preview environment:</p>
-                                
-                                <div class="preview-link-box" id="previewLinkBoxWrapper">
-                                    <code id="dashSiteUrl">Connecting...</code>
-                                    <div style="display: flex; gap: 10px;">
-                                        <button class="btn btn-secondary" style="padding: 8px;" id="copyLinkBtn">
-                                            <i data-lucide="copy" style="width: 16px; height: 16px;"></i>
-                                        </button>
-                                        <a href="#" target="_blank" class="btn btn-primary" style="padding: 8px; min-height: auto;" id="visitLinkBtn">
-                                            <i data-lucide="external-link" style="width: 16px; height: 16px;"></i>
-                                        </a>
+                                        <div style="padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+                                            <span style="font-size: 0.7rem; color: #888; font-weight: 700; text-transform: uppercase;">Speed</span>
+                                            <div style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 2px;" id="healthSpeedVal">Testing...</div>
+                                            <div style="font-size: 0.72rem; color: #3b82f6; margin-top: 2px;" id="healthSpeedStatus">⚡ Measuring</div>
+                                        </div>
+
+                                        <div style="padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+                                            <span style="font-size: 0.7rem; color: #888; font-weight: 700; text-transform: uppercase;">Security</span>
+                                            <div style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-top: 2px;" id="healthSslVal">SSL 256</div>
+                                            <div style="font-size: 0.72rem; color: var(--primary-color); margin-top: 2px;" id="healthSslStatus">🔒 Secure</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Speed Graph -->
+                                    <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                            <span style="font-size: 0.78rem; font-weight: 700; color: #ccc;">Latency History (ms)</span>
+                                            <span style="font-size: 0.75rem; color: #22c55e; font-weight: 700;" id="healthAvgSpeedBadge">Avg: 210ms</span>
+                                        </div>
+                                        <div style="position: relative; width: 100%; height: 85px;">
+                                            <svg id="healthGraphSvg" viewBox="0 0 600 90" style="width: 100%; height: 100%;" preserveAspectRatio="none">
+                                                <defs>
+                                                    <linearGradient id="healthGraphGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.25" />
+                                                        <stop offset="100%" stop-color="#22c55e" stop-opacity="0.0" />
+                                                    </linearGradient>
+                                                </defs>
+                                                <path id="healthGraphArea" d="" fill="url(#healthGraphGradient)" />
+                                                <path id="healthGraphLine" d="" fill="none" stroke="#22c55e" stroke-width="2.5" />
+                                                <g id="healthGraphNodes"></g>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.78rem; color: #888;">
+                                        <div>Target: <strong style="color: #ccc;" id="healthMonitoredUrl">Checking...</strong></div>
+                                        <div id="healthLastCheckTime">Last Ping: Today</div>
                                     </div>
                                 </div>
-                                
-                                <div style="margin-top: 20px; font-size: 0.8rem; color: #aaa; background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); padding: 12px; border-radius: 8px;" id="activationPendingBlock">
-                                    <strong style="color: #ffa500; display: block; margin-bottom: 5px;">Activation Pending Payment...</strong>
-                                </div>
 
-                                <div style="margin-top: 15px; font-size: 0.8rem; color: #aaa; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px;">
-                                    <strong>Need changes?</strong> For major content updates, please reach out via WhatsApp with your dedicated support line.
-                                </div>
-                            </div>
-
-                            <!-- Billing Info -->
-                            <div class="portal-card">
-                                <h3><i data-lucide="credit-card"></i> Billing & Payments</h3>
-                                
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                                    <div>
-                                        <span style="display: block; font-size: 0.8rem; color: #aaa; text-transform: uppercase;">Amount Due</span>
-                                        <strong style="font-size: 1.2rem; color: white;" id="dashBillingAmount">Fetching...</strong>
+                                <!-- Package Info Card -->
+                                <div class="portal-card" style="padding: 20px;">
+                                    <h3 style="font-size: 1.15rem; margin-bottom: 14px; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="package" style="width: 20px; height: 20px;"></i> Chosen Package & Plan
+                                    </h3>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                        <div>
+                                            <span style="display: block; font-size: 0.75rem; color: #aaa; text-transform: uppercase; font-weight: 600;">Selected Package</span>
+                                            <strong style="font-size: 1.2rem; color: white;" id="dashPlanName">Fetching...</strong>
+                                        </div>
+                                        <span class="status-badge" id="dashPlanStatus">...</span>
                                     </div>
-                                    <span class="status-badge" id="dashBillingStatus">...</span>
+                                    
+                                    <h4 style="color: #fff; font-size: 0.92rem; font-weight: 700; margin-bottom: 10px;">Package Features Included:</h4>
+                                    <ul class="feature-list" id="dashFeatures" style="margin-top: 0;">
+                                        <li><i data-lucide="loader"></i> Loading features...</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div style="display: flex; flex-direction: column; gap: 24px;">
+                                
+                                <!-- Billing & Payment Card -->
+                                <div class="portal-card" style="padding: 20px;">
+                                    <h3 style="font-size: 1.15rem; margin-bottom: 14px; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="credit-card" style="width: 20px; height: 20px;"></i> Payment & M-PESA Till
+                                    </h3>
+                                    
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                        <div>
+                                            <span style="display: block; font-size: 0.75rem; color: #aaa; text-transform: uppercase; font-weight: 600;">Package Fee</span>
+                                            <strong style="font-size: 1.25rem; color: white;" id="dashBillingAmount">Fetching...</strong>
+                                        </div>
+                                        <div>
+                                            <span style="display: block; font-size: 0.72rem; color: #aaa; text-transform: uppercase; font-weight: 600; margin-bottom: 2px;">Status</span>
+                                            <span class="status-badge" id="dashBillingStatus">...</span>
+                                        </div>
+                                    </div>
+
+                                    <div id="billingMpesaInstructions" style="background: rgba(0,0,0,0.4); padding: 14px; border-radius: 12px; border: 1px solid rgba(212,175,55,0.2); margin-bottom: 16px;">
+                                        <p style="font-size: 0.88rem; color: #fff; margin-bottom: 8px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                            <i data-lucide="smartphone" style="color: #22c55e; width: 16px; height: 16px;"></i> Pay via M-PESA Buy Goods
+                                        </p>
+                                        <ol style="font-size: 0.82rem; color: #ccc; padding-left: 18px; margin: 0; line-height: 1.6;">
+                                            <li>Go to M-PESA > Lipa na M-PESA</li>
+                                            <li>Select Buy Goods and Services</li>
+                                            <li>Till Number: <strong style="color: #fff; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 4px;">123456</strong> (QuickSite Kenya)</li>
+                                            <li>Amount: <strong style="color: #22c55e;" id="dashBillingMpesaAmount">...</strong></li>
+                                        </ol>
+                                    </div>
+
+                                    <button class="btn btn-primary" style="width: 100%; justify-content: center; background: #25D366 !important; border-color: #25D366 !important; color: white !important; font-weight: 700; padding: 11px; font-size: 0.85rem;" id="confirmPaymentBtn">
+                                        <i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Send Payment Confirmation via WhatsApp
+                                    </button>
                                 </div>
 
-                                <div id="billingMpesaInstructions" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
-                                    <p style="font-size: 0.85rem; color: #ccc; margin-bottom: 10px;"><strong>Pay via M-PESA</strong></p>
-                                    <ol style="font-size: 0.8rem; color: #aaa; padding-left: 15px; margin: 0; line-height: 1.6;">
-                                        <li>Go to M-PESA > Lipa na M-PESA</li>
-                                        <li>Select Buy Goods and Services</li>
-                                        <li>Enter Till: <strong style="color: white;">123456</strong></li>
-                                        <li>Enter Amount: <strong style="color: white;" id="dashBillingMpesaAmount">...</strong></li>
-                                    </ol>
+                                <!-- Upgrade / Change Plan Section -->
+                                <div class="portal-card" style="padding: 20px; border: 1px solid var(--primary-color); background: linear-gradient(135deg, rgba(212,175,55,0.08) 0%, rgba(0,0,0,0.3) 100%);">
+                                    <h3 style="display: flex; align-items: center; gap: 8px; color: var(--primary-color); font-size: 1.15rem; margin-bottom: 10px;">
+                                        <i data-lucide="zap" style="width: 18px; height: 18px;"></i> Upgrade Your Package
+                                    </h3>
+                                    <p style="font-size: 0.82rem; color: #ccc; margin-bottom: 14px;">Need automated booking calendars, client portals, or higher speeds?</p>
+                                    
+                                    <select id="upgradePlanSelect" class="form-input" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                                        <option value="Starter Presence">⚡ Starter Presence ($99 setup)</option>
+                                        <option value="Business Growth" selected>🚀 Business Growth ($129 setup)</option>
+                                        <option value="Pro Conversion System">💎 Pro Conversion System ($169 setup)</option>
+                                        <option value="Enterprise SaaS System">🏢 Enterprise SaaS System ($250+ setup)</option>
+                                    </select>
+                                    
+                                    <button id="upgradePlanBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px; font-weight: 700; font-size: 0.85rem;">
+                                        Request Package Upgrade
+                                    </button>
                                 </div>
 
-                                <button class="btn btn-secondary" style="width: 100%; justify-content: center; margin-bottom: 10px;" id="confirmPaymentBtn">
-                                    <i data-lucide="message-circle" style="width: 16px; height: 16px;"></i> Send Payment Confirmation
-                                </button>
-                                <p style="font-size: 0.75rem; color: #888; text-align: center;">Click to send confirmation to WhatsApp.</p>
                             </div>
 
-                            <!-- Upgrade Section -->
-                            <div class="portal-card" style="margin-top: 20px; border: 2px solid var(--primary-color); background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(0,0,0,0.2) 100%);">
-                                <h3 style="display: flex; align-items: center; gap: 10px; color: var(--primary-color);">
-                                    <i data-lucide="zap" style="width: 20px; height: 20px;"></i>
-                                    Unlock Your Growth!
-                                </h3>
-                                <p style="font-size: 0.95rem; color: #fff; margin-bottom: 20px;">Ready to scale? Upgrade today to access advanced features, better performance, and priority support.</p>
-                                
-                                <select id="upgradePlanSelect" class="form-input" style="width: 100%; padding: 12px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 20px; font-weight: 600; cursor: pointer;">
-                                    <option value="Business Growth">🚀 Business Growth</option>
-                                    <option value="Pro Conversion System">💎 Pro Conversion System</option>
-                                    <option value="Enterprise SaaS System">🏢 Enterprise SaaS System</option>
-                                </select>
-                                
-                                <button id="upgradePlanBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(212,175,55,0.3);">
-                                    Upgrade Now
-                                </button>
-                            </div>
-
-                            <!-- Project Vision -->
-                            <div class="portal-card">
-                                <h3><i data-lucide="pen-tool"></i> Project Vision</h3>
-                                <p style="font-size: 0.9rem; color: #ccc; margin-bottom: 15px;">Describe the website you want designed. Our elite team will build exactly what you envision.</p>
-                                <textarea id="clientProjectVision" class="form-input" style="width: 100%; min-height: 120px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; margin-bottom: 15px; font-family: inherit; resize: vertical;" placeholder="e.g. I want a modern, high-converting landing page for my bakery..."></textarea>
-                                <button id="saveVisionBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;">
-                                    <i data-lucide="save" style="width: 16px; height: 16px;"></i> Update Project Brief
-                                </button>
-                                <div id="visionSuccess" style="display: none; color: #4ade80; font-size: 0.85rem; margin-top: 10px; text-align: center;">Project brief updated successfully!</div>
-                            </div>
                         </div>
                     </div>
 
@@ -366,8 +450,8 @@
                                 
                                 <div style="margin-bottom: 25px;">
                                     <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Setup Fee</div>
-                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">KES 11,999</div>
-                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ KES 2,300 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
+                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">$99</div>
+                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ $20 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
                                 </div>
 
                                 <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
@@ -388,8 +472,8 @@
                                 
                                 <div style="margin-bottom: 25px;">
                                     <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Setup Fee</div>
-                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">KES 14,999</div>
-                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ KES 2,800 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
+                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">$129</div>
+                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ $25 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
                                 </div>
 
                                 <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
@@ -410,8 +494,8 @@
                                 
                                 <div style="margin-bottom: 25px;">
                                     <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Setup Fee</div>
-                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">KES 19,999</div>
-                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ KES 3,500 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
+                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">$169</div>
+                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ $30 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
                                 </div>
 
                                 <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
@@ -540,136 +624,87 @@
 
                 <!-- Admin Edit Modal -->
                 <div id="adminEditModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-                    <div style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
-                        <h3 style="color: white; margin-bottom: 20px; font-size: 1.3rem;">Manage Elite Client Website</h3>
+                    <div style="background: var(--bg-dark); border: 1px solid var(--glass-border); border-radius: 16px; padding: 28px; width: 92%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px;">
+                            <div>
+                                <h3 style="color: white; margin: 0; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="settings" style="color: var(--primary-color); width: 20px; height: 20px;"></i> Manage Client Settings
+                                </h3>
+                                <p style="color: #aaa; font-size: 0.8rem; margin: 4px 0 0 0;">Update client package tier and live web address URL.</p>
+                            </div>
+                            <button class="closeModalXBtn" id="closeAdminEditModalHeader" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer; padding: 4px;"><i data-lucide="x"></i></button>
+                        </div>
                         
                         <input type="hidden" id="editClientId">
-                        
-                        <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                                <h4 style="color: white; margin: 0; font-size: 1rem;">Core Logistics</h4>
-                            </div>
+                        <!-- Fallback elements for secondary attributes -->
+                        <input type="hidden" id="editTemplate" value="Starter Presence">
+                        <input type="hidden" id="editBusinessName" value="">
+                        <input type="hidden" id="editHeroTitle" value="">
+                        <input type="hidden" id="editHeroSubtitle" value="">
+                        <input type="hidden" id="editPageCount" value="1">
+                        <input type="hidden" id="editTheme" value="default">
+                        <input type="hidden" id="editProjectVision" value="">
+
+                        <!-- Sector 1: Package Tier (Upgrade / Downgrade) -->
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.2); padding: 18px; border-radius: 12px; margin-bottom: 18px;">
+                            <h4 style="color: #fff; margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="package-check" style="color: var(--primary-color); width: 18px; height: 18px;"></i> Package Tier & Subscription
+                            </h4>
                             
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                                <div class="form-group">
-                                    <label>Payment Status</label>
-                                    <select id="editPaymentStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                        <option value="Unpaid">Unpaid</option>
-                                        <option value="Paid">Paid</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Subscription Plan</label>
-                                    <select id="editPlan" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                        <option value="Starter Presence">Starter Presence</option>
-                                        <option value="Business Growth">Business Growth</option>
-                                        <option value="Pro Conversion System">Pro Conversion System</option>
-                                    </select>
-                                </div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label style="font-size: 0.82rem; color: #ccc; font-weight: 600; margin-bottom: 6px; display: block;">Client Package (Upgrade / Downgrade)</label>
+                                <select id="editPlan" class="form-input" style="padding: 10px 12px; width: 100%; background: #111; color: #fff; border: 1px solid #333; border-radius: 8px; font-weight: 600;">
+                                    <option value="Starter Presence">Starter Presence ($99 / year)</option>
+                                    <option value="Business Growth">Business Growth ($129 / year)</option>
+                                    <option value="Pro Conversion System">Pro Conversion System ($169 / year)</option>
+                                </select>
                             </div>
 
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                                 <div class="form-group">
-                                    <label>Environment Status</label>
-                                    <select id="editEnvStatus" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
+                                    <label style="font-size: 0.82rem; color: #ccc; font-weight: 600; margin-bottom: 4px; display: block;">Payment Status</label>
+                                    <select id="editPaymentStatus" class="form-input" style="padding: 8px 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 8px; font-size: 0.85rem;">
+                                        <option value="Unpaid">Unpaid</option>
+                                        <option value="Paid">Paid (Active)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label style="font-size: 0.82rem; color: #ccc; font-weight: 600; margin-bottom: 4px; display: block;">Site Status</label>
+                                    <select id="editEnvStatus" class="form-input" style="padding: 8px 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 8px; font-size: 0.85rem;">
                                         <option value="Draft">Draft (Offline)</option>
-                                        <option value="Preview">Preview</option>
+                                        <option value="Preview">Preview Link</option>
                                         <option value="Live">Live (Published)</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label>Design Template</label>
-                                    <select id="editTemplate" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                        <option value="Starter Presence">Starter Presence</option>
-                                        <option value="Universal Professional">Universal Professional</option>
-                                        <option value="Salon & Beauty">Salon & Beauty</option>
-                                        <option value="Fitness & Gym">Fitness & Gym</option>
-                                        <option value="Restaurant & Cafe">Restaurant & Cafe</option>
-                                        <option value="Medical & Health">Medical & Health</option>
-                                        <option value="Legal & Consulting">Legal & Consulting</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
-                                <div class="form-group">
-                                    <label>Website Pages (1-7)</label>
-                                    <input type="range" id="editPageCount" min="1" max="7" value="1" style="width: 100%; cursor: pointer;">
-                                </div>
-                                <div class="form-group">
-                                    <label>Color Theme</label>
-                                    <select id="editTheme" class="form-input" style="padding: 10px; width: 100%; background: #111; color: white; border: 1px solid #333; border-radius: 6px;">
-                                        <option value="default">Default</option>
-                                        <option value="ocean">Ocean Blue</option>
-                                        <option value="sunset">Sunset Orange</option>
-                                        <option value="forest">Forest Green</option>
-                                    </select>
-                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label>Business Name</label>
-                            <input type="text" id="editBusinessName" class="form-input" placeholder="e.g. John's Elite Bakery">
-                        </div>
+                        <!-- Sector 2: Web Address / Custom Domain URL -->
+                        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 18px; border-radius: 12px; margin-bottom: 22px;">
+                            <h4 style="color: #fff; margin: 0 0 12px 0; font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                                <i data-lucide="globe" style="color: #3b82f6; width: 18px; height: 18px;"></i> Live Website URL Configuration
+                            </h4>
 
-                        <!-- Content sections suggested for removal by admin - now optional behind toggle -->
-                        <details style="margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; background: rgba(0,0,0,0.2);">
-                            <summary style="cursor: pointer; color: #888; font-size: 0.85rem; padding: 5px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
-                                <i data-lucide="chevron-down" style="width: 14px;"></i> Advanced Content & Design Configuration
-                            </summary>
-                            
-                            <div style="padding-top: 15px;">
-                                <div class="form-group" style="margin-bottom: 15px;">
-                                    <label>Hero Title (Main Headline)</label>
-                                    <input type="text" id="editHeroTitle" class="form-input" placeholder="e.g. The Best Baking Experience">
-                                </div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label style="font-size: 0.82rem; color: #ccc; font-weight: 600; margin-bottom: 4px; display: block;">Custom Domain URL</label>
+                                <input type="text" id="editCustomDomain" class="form-input" style="padding: 10px; width: 100%; background: #111; color: #4ade80; font-family: monospace; border: 1px solid #333; border-radius: 8px;" placeholder="e.g. www.clientdomain.com or https://clientdomain.com">
+                                <span style="font-size: 0.72rem; color: #888; margin-top: 4px; display: block;">Primary live domain configured for this client website.</span>
+                            </div>
 
-                                <div class="form-group" style="margin-bottom: 15px;">
-                                    <label>Hero Subtitle</label>
-                                    <input type="text" id="editHeroSubtitle" class="form-input" placeholder="e.g. Artisan breads and pastries delivered fresh daily.">
-                                </div>
-
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                                    <div class="form-group">
-                                        <label>Subdomain Prefix</label>
-                                        <input type="text" id="editSubdomain" class="form-input" placeholder="johns-bakery">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Custom Domain</label>
-                                        <input type="text" id="editCustomDomain" class="form-input" placeholder="www.yourdomain.com">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Client Project Vision & Brief</label>
-                                    <textarea id="editProjectVision" class="form-input" style="width: 100%; min-height: 100px; background: #111; color: white; border: 1px solid #333; border-radius: 6px; padding: 10px; font-family: inherit; resize: vertical;" placeholder="Client's design instructions..."></textarea>
+                            <div class="form-group">
+                                <label style="font-size: 0.82rem; color: #ccc; font-weight: 600; margin-bottom: 4px; display: block;">Subdomain Prefix (Optional)</label>
+                                <div style="display: flex; align-items: center; background: #111; border: 1px solid #333; border-radius: 8px; overflow: hidden;">
+                                    <input type="text" id="editSubdomain" class="form-input" style="padding: 10px; border: none; background: transparent; color: #fff; flex: 1;" placeholder="mycompany">
+                                    <span style="padding: 0 10px; color: #666; font-size: 0.78rem; font-family: monospace; border-left: 1px solid #222;">.quicksitekenya.co.ke</span>
                                 </div>
                             </div>
-                        </details>
-
-                        <div style="background: rgba(212,175,55,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.2); margin-bottom: 25px;">
-                            <h4 style="color: var(--primary-color); margin-bottom: 10px; font-size: 0.95rem;">Preview & Delivery</h4>
-                            <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 15px;">Generate a secure temporary link and send it directly to your client via WhatsApp.</p>
-                            
-                            <div style="display: flex; gap: 10px;">
-                                <button id="generatePreviewLinkBtn" class="btn btn-secondary" style="flex: 2; justify-content: center; padding: 10px; font-weight: 700;">
-                                    <i data-lucide="link-2" style="width: 16px; margin-right: 8px;"></i> Generate Link
-                                </button>
-                                <button id="shareWhatsAppBtn" class="btn" style="flex: 1; background: #25D366; color: white; display: none; justify-content: center; align-items: center; border: none; padding: 10px; border-radius: 8px;">
-                                    <i data-lucide="message-circle" style="width: 16px; margin-right: 8px;"></i> Send
-                                </button>
-                            </div>
-                            
-                            <input type="text" id="previewLinkOutput" class="form-input" style="margin-top: 10px; display: none; font-size: 0.8rem; background: rgba(0,0,0,0.3);" readonly>
                         </div>
                         
-                        <div style="display: flex; gap: 15px; justify-content: space-between; align-items: center;">
-                            <button id="injectEliteDataBtn" class="btn" style="background: #eef2ff; color: #4f46e5; border: none; font-size: 0.8rem; padding: 8px 15px;"><i data-lucide="sparkles" style="width:14px;"></i> Inject Elite Demo Data</button>
-                            <div style="display: flex; gap: 10px;">
-                                <button id="closeAdminEditModal" class="btn btn-secondary" style="background: transparent; border: none;">Cancel</button>
-                                <button id="saveAdminEditBtn" class="btn btn-primary">Save Changes</button>
-                            </div>
+                        <div style="display: flex; gap: 10px; justify-content: flex-end; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+                            <button id="closeAdminEditModal" class="btn btn-secondary" style="padding: 9px 16px; font-weight: 600;">Cancel</button>
+                            <button id="saveAdminEditBtn" class="btn btn-primary" style="padding: 9px 20px; font-weight: 700;">
+                                <i data-lucide="check" style="width: 16px; height: 16px; margin-right: 4px;"></i> Save Settings
+                            </button>
                         </div>
                     </div>
                 </div>
