@@ -12,52 +12,191 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@0.259.0/dist/umd/lucide.min.js"></script>
 
     <style>
+        :root {
+            --portal-font: 'Plus Jakarta Sans', 'Poppins', sans-serif;
+            --gold-gradient: linear-gradient(135deg, #fff2a3 0%, #ffd700 50%, #d4af37 100%);
+            --card-glass-bg: linear-gradient(145deg, rgba(22, 22, 34, 0.94) 0%, rgba(12, 12, 18, 0.98) 100%);
+            --card-glass-border: rgba(212, 175, 55, 0.25);
+        }
+
+        body {
+            font-family: var(--portal-font);
+        }
+
         .portal-header {
-            padding: 120px 0 60px;
+            padding: 110px 0 45px;
             text-align: center;
+            position: relative;
+            background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 68%);
+        }
+
+        .portal-header h1 {
+            font-family: var(--portal-font);
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            margin-top: 14px;
+            margin-bottom: 8px;
+            color: #ffffff;
+            line-height: 1.2;
+        }
+
+        .portal-header h1 .gold-highlight {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .portal-header p {
+            font-size: 1.05rem;
+            color: #a0a0b8;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        .live-pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 10px #22c55e;
+            animation: pulseDot 2s infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.35); opacity: 0.5; }
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 40px;
+            gap: 28px;
+            margin-top: 24px;
         }
 
         .portal-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
+            background: var(--card-glass-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 22px;
+            padding: 28px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .portal-card:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(212, 175, 55, 0.15);
         }
 
         .portal-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+            font-family: var(--portal-font);
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
             gap: 10px;
             color: var(--primary-color);
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* Upgraded Login Glass Gateway */
+        .login-gateway-card {
+            background: linear-gradient(145deg, rgba(22, 22, 34, 0.96) 0%, rgba(10, 10, 16, 0.99) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 26px;
+            padding: 40px 34px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85), 0 0 45px rgba(212, 175, 55, 0.18);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
         }
 
-        .status-published { background: rgba(0, 255, 0, 0.1); color: #00ff00; border: 1px solid rgba(0, 255, 0, 0.2); }
-        .status-preview { background: rgba(0, 150, 255, 0.1); color: #0096ff; border: 1px solid rgba(0, 150, 255, 0.2); }
-        .status-development { background: rgba(255, 200, 0, 0.1); color: #ffc800; border: 1px solid rgba(255, 200, 0, 0.2); }
+        .login-gateway-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ffd700, #d4af37, transparent);
+        }
+
+        .login-icon-badge {
+            width: 58px;
+            height: 58px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(255, 215, 0, 0.05));
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            color: #ffd700;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.25);
+        }
+
+        .portal-input-field {
+            width: 100%;
+            padding: 14px 16px !important;
+            background: rgba(8, 8, 14, 0.85) !important;
+            border: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-radius: 12px !important;
+            color: #ffffff !important;
+            font-size: 0.95rem !important;
+            font-family: var(--portal-font) !important;
+            transition: all 0.3s ease !important;
+            box-sizing: border-box;
+        }
+
+        .portal-input-field:focus {
+            outline: none !important;
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.25) !important;
+            background: rgba(14, 14, 24, 0.95) !important;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .status-published {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.25);
+        }
+
+        .status-preview {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+        }
+
+        .status-development {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+        }
 
         .feature-list {
             list-style: none;
@@ -68,48 +207,117 @@
         .feature-list li {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            color: var(--text-secondary);
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #d1d1e0;
+            font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         .feature-list li i {
-            color: #00ff00;
-            width: 16px;
-            height: 16px;
+            color: #22c55e;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
 
         .preview-link-box {
-            background: rgba(0,0,0,0.5);
-            padding: 15px;
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 16px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            margin-top: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            margin-top: 18px;
         }
 
         .preview-link-box code {
-            color: white;
+            color: #4ade80;
             font-family: monospace;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .admin-tab-btn {
+            padding: 10px 22px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: #888;
+            background: transparent;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .admin-tab-btn.active {
             color: white !important;
-            background: rgba(255,255,255,0.05) !important;
-            box-shadow: 0 4px 15px -3px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.28), rgba(255, 255, 255, 0.08)) !important;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
-        
+
         .admin-tab-btn:hover:not(.active) {
-            background: rgba(255,255,255,0.02);
-            color: #aaa;
+            background: rgba(255, 255, 255, 0.04);
+            color: #ccc;
+        }
+
+        /* Package Tier Comparison Cards */
+        .package-tier-card {
+            background: linear-gradient(145deg, rgba(20, 20, 30, 0.95), rgba(12, 12, 18, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 32px 26px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.35s ease;
+            position: relative;
+        }
+
+        .package-tier-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(212, 175, 55, 0.45);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(212, 175, 55, 0.22);
+        }
+
+        .package-tier-card.featured-gold-tier {
+            border-color: #ffd700;
+            background: linear-gradient(145deg, rgba(35, 30, 15, 0.95) 0%, rgba(15, 15, 22, 0.98) 100%);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(212, 175, 55, 0.3);
+        }
+
+        .popular-badge-pill {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ffd700, #d4af37);
+            color: #000;
+            padding: 4px 18px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 900;
+            letter-spacing: 0.8px;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
+            }
+            .portal-header {
+                padding: 90px 0 35px;
+            }
+            .login-gateway-card {
+                padding: 28px 20px;
             }
         }
     </style>
@@ -163,64 +371,72 @@
         <header class="portal-header">
             <div class="container">
                 <div class="hero-badge reveal">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>SaaS Portal</span>
+                    <span class="live-pulse-dot"></span>
+                    <i data-lucide="crown" style="color: #ffd700;"></i>
+                    <span>SaaS Client Portal</span>
                 </div>
-                <h1 id="welcomeText">Welcome back, Client</h1>
-                <p>Manage your QuickSite assets and subscriptions.</p>
+                <h1 id="welcomeText">Welcome back, <span class="gold-highlight">Client</span></h1>
+                <p>Manage your QuickSite Kenya digital assets, domain links, and active subscriptions.</p>
             </div>
         </header>
 
         <section class="portal-content" style="padding-bottom: 100px;">
             <div class="container">
                 <!-- Login State -->
-                <div id="portalLoginState" style="max-width: 400px; margin: 0 auto; text-align: center;">
-                    <div class="portal-card">
-                        <h3 id="formTitle" style="justify-content: center;">Client Sign In</h3>
-                        <p id="formDesc" style="font-size: 0.9rem; color: #ccc; margin-bottom: 20px;">Please sign in to access your digital assets and subscription details.</p>
+                <div id="portalLoginState" style="max-width: 440px; margin: 0 auto;">
+                    <div class="login-gateway-card">
+                        <div class="login-icon-badge">
+                            <i data-lucide="shield-check" style="width: 28px; height: 28px;"></i>
+                        </div>
+                        <h3 id="formTitle" style="justify-content: center; font-size: 1.5rem; color: #fff; margin-bottom: 6px;">Client Sign In</h3>
+                        <p id="formDesc" style="font-size: 0.88rem; color: #a0a0b8; margin-bottom: 24px;">Please sign in to access your digital assets and subscription details.</p>
                         <form id="clientLoginForm">
-                            <input type="email" id="clientEmail" placeholder="Email Address" required style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 8px; color: white;">
-                            <input type="password" id="clientPassword" placeholder="Password" required style="width: 100%; padding: 12px; margin-bottom: 20px; background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 8px; color: white;">
-                            <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center;">Access Dashboard</button>
+                            <div style="margin-bottom: 16px;">
+                                <input type="email" id="clientEmail" class="portal-input-field" placeholder="Client Email Address" required>
+                            </div>
+                            <div style="margin-bottom: 22px;">
+                                <input type="password" id="clientPassword" class="portal-input-field" placeholder="Security Password" required>
+                            </div>
+                            <button type="submit" id="submitBtn" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px; font-weight: 800; border-radius: 12px; font-size: 0.95rem; box-shadow: 0 10px 25px rgba(212,175,55,0.3);">Access Portal Dashboard</button>
                         </form>
-                        <p style="margin-top: 20px; font-size: 0.85rem; color: #aaa;">
+                        <p style="margin-top: 22px; font-size: 0.88rem; color: #a0a0b8;">
                             <span id="toggleModeText">Don't have an account?</span> 
-                            <a href="#" id="toggleModeBtn" style="color: var(--primary-color); font-weight: bold; text-decoration: none;">Sign Up</a>
+                            <a href="#" id="toggleModeBtn" style="color: #ffd700; font-weight: 800; text-decoration: none; margin-left: 4px;">Sign Up</a>
                         </p>
                         
-                        <div id="authNetworkNote" style="display: none; margin-top: 20px; padding: 20px; background: rgba(255, 77, 77, 0.2); border: 2px solid #ff4d4d; border-radius: 16px; text-align: left; box-shadow: 0 15px 40px rgba(255, 77, 77, 0.2); animation: pulse-red 2s infinite;">
+                        <div id="authNetworkNote" style="display: none; margin-top: 20px; padding: 20px; background: rgba(255, 77, 77, 0.15); border: 1px solid rgba(255, 77, 77, 0.6); border-radius: 18px; text-align: left; box-shadow: 0 15px 40px rgba(255, 77, 77, 0.25); backdrop-filter: blur(10px);">
                             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                                <div style="width: 40px; height: 40px; background: #ff4d4d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">!</div>
+                                <div style="width: 36px; height: 36px; background: #ff4d4d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">!</div>
                                 <div>
-                                    <p style="font-size: 0.9rem; color: #ff4d4d; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Security Requests Blocked</p>
-                                    <p style="font-size: 0.7rem; color: #ccc; margin: 0;">Ad-Blocker or Firewall Detected</p>
+                                    <p style="font-size: 0.88rem; color: #ff4d4d; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 0.8px;">Security Handshake Blocked</p>
+                                    <p style="font-size: 0.72rem; color: #ccc; margin: 0;">Ad-Blocker or Privacy Shield Detected</p>
                                 </div>
                             </div>
                             
-                            <p style="font-size: 0.8rem; color: #eee; line-height: 1.6; margin-bottom: 15px;">Your browser is actively killing our security handshake. To sign in or create an account, you <b>must</b> allow these traffic nodes:</p>
+                            <p style="font-size: 0.8rem; color: #eee; line-height: 1.5; margin-bottom: 14px;">Your browser is actively killing our security handshake. To sign in or create an account, you <b>must</b> allow these traffic nodes:</p>
                             
-                            <div style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                                <p style="font-size: 0.65rem; color: var(--primary-color); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Whitelisted Domains Required:</p>
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <code style="background: #111; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">identitytoolkit.googleapis.com</code>
-                                    <code style="background: #111; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">securetoken.googleapis.com</code>
-                                    <code style="background: #111; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: white; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">firebaseinstallations.googleapis.com</code>
+                            <div style="background: rgba(0,0,0,0.5); padding: 12px; border-radius: 12px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                                <p style="font-size: 0.68rem; color: var(--primary-color); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">Whitelisted Domains Required:</p>
+                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                    <code style="background: #0a0a10; padding: 5px 8px; border-radius: 6px; font-size: 0.73rem; color: #4ade80; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">identitytoolkit.googleapis.com</code>
+                                    <code style="background: #0a0a10; padding: 5px 8px; border-radius: 6px; font-size: 0.73rem; color: #4ade80; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">securetoken.googleapis.com</code>
+                                    <code style="background: #0a0a10; padding: 5px 8px; border-radius: 6px; font-size: 0.73rem; color: #4ade80; border: 1px solid rgba(255,255,255,0.1); font-family: monospace;">firebaseinstallations.googleapis.com</code>
                                 </div>
                             </div>
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                 <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                                    <p style="font-size: 0.7rem; font-weight: 700; color: white; margin-bottom: 4px;">Brave Browser</p>
-                                    <p style="font-size: 0.65rem; color: #aaa;">Click the Lion icon → Turn Shields OFF</p>
+                                    <p style="font-size: 0.7rem; font-weight: 700; color: white; margin-bottom: 3px;">Brave Browser</p>
+                                    <p style="font-size: 0.65rem; color: #aaa; margin: 0;">Click Lion icon → Turn Shields OFF</p>
                                 </div>
                                 <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                                    <p style="font-size: 0.7rem; font-weight: 700; color: white; margin-bottom: 4px;">uBlock/AdBlock</p>
-                                    <p style="font-size: 0.65rem; color: #aaa;">Click icon → Power Button (Turn Off)</p>
+                                    <p style="font-size: 0.7rem; font-weight: 700; color: white; margin-bottom: 3px;">uBlock / AdBlock</p>
+                                    <p style="font-size: 0.65rem; color: #aaa; margin: 0;">Click icon → Disable for this site</p>
                                 </div>
                             </div>
                             
-                            <button onclick="window.open(window.location.href, '_blank')" style="width: 100%; margin-top: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                                Try in New Tab (Bypasses some iframe blocks)
+                            <button onclick="window.open(window.location.href, '_blank')" style="width: 100%; margin-top: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">
+                                Open in New Tab (Bypasses iframe blocks)
                             </button>
                         </div>
                     </div>
@@ -439,75 +655,77 @@
 
                     <!-- View when client needs to pick a package -->
                     <div id="noPackageView" style="display: none; text-align: center;">
-                        <h2 style="font-size: 2rem; color: white; margin-bottom: 5px;">Build Your Vision</h2>
-                        <p style="color: #ccc; max-width: 600px; margin: 0 auto 40px;">Select a package below to start your digital journey. Once selected, our team will immediately begin setting up your elite environment.</p>
+                        <h2 style="font-size: 2.2rem; font-weight: 800; color: white; margin-bottom: 8px;">Select Your Digital Package</h2>
+                        <p style="color: #a0a0b8; max-width: 620px; margin: 0 auto 40px; font-size: 0.98rem; line-height: 1.6;">Choose an elite package below to launch your web presence. Once selected, our dev team will immediately set up your dedicated environment and custom domain.</p>
 
-                        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); text-align: left; gap: 25px;">
+                        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); text-align: left; gap: 28px;">
                             
                             <!-- Starter Presence -->
-                            <div class="portal-card" style="display: flex; flex-direction: column; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
-                                <h3 style="color: white; margin-bottom: 5px; font-size: 1.4rem;">Starter Presence</h3>
-                                <p style="color: #aaa; font-style: italic; font-size: 0.85rem; margin-bottom: 20px;">“For small businesses ready to start their digital journey”</p>
+                            <div class="package-tier-card">
+                                <h3 style="color: white; margin-bottom: 6px; font-size: 1.45rem; font-weight: 800;">Starter Presence</h3>
+                                <p style="color: #a0a0b8; font-style: italic; font-size: 0.85rem; margin-bottom: 22px;">“For small businesses ready to launch their digital presence”</p>
                                 
-                                <div style="margin-bottom: 25px;">
-                                    <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Setup Fee</div>
-                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">$99</div>
-                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ $20 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
+                                <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                    <div style="font-size: 0.75rem; color: #a0a0b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Setup Fee</div>
+                                    <div style="font-size: 2.2rem; font-weight: 800; color: white; font-family: var(--portal-font);">$99</div>
+                                    <div style="font-size: 1.05rem; color: #ffd700; font-weight: 700;">+ $20 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
                                 </div>
 
-                                <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 1-Page Easy-to-use Website</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> Free Temporary Web Link (.quicksitekenya)</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> Tap-to-Chat WhatsApp Button</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 🔒 Customer Safety Lock & Hosting</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> Fast 48-Hour Live Launch</li>
+                                <ul class="feature-list" style="margin-bottom: 30px;">
+                                    <li><i data-lucide="check-circle"></i> 1-Page High-Conversion Website</li>
+                                    <li><i data-lucide="check-circle"></i> Free Temporary Subdomain (.quicksitekenya)</li>
+                                    <li><i data-lucide="check-circle"></i> Instant WhatsApp Tap-to-Chat Button</li>
+                                    <li><i data-lucide="check-circle"></i> 🔒 SSL Security Lock & Cloud Hosting</li>
+                                    <li><i data-lucide="check-circle"></i> Fast 48-Hour Express Launch</li>
                                 </ul>
-                                <button class="btn btn-secondary select-package-btn" data-package="Starter Presence" style="margin-top: auto; width: 100%; justify-content: center; padding: 12px;">Start Your Journey</button>
+                                <button class="btn btn-secondary select-package-btn" data-package="Starter Presence" style="margin-top: auto; width: 100%; justify-content: center; padding: 13px; font-weight: 800; border-radius: 12px;">Start Your Journey</button>
                             </div>
 
                             <!-- Business Growth -->
-                            <div class="portal-card" style="display: flex; flex-direction: column; border-color: var(--primary-color); position: relative; background: rgba(212,175,55,0.05); border: 1px solid var(--primary-color);">
-                                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: black; padding: 2px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px;">MOST POPULAR</div>
-                                <h3 style="color: white; margin-bottom: 5px; font-size: 1.4rem;">Business Growth</h3>
-                                <p style="color: #aaa; font-style: italic; font-size: 0.85rem; margin-bottom: 20px;">“For businesses looking to generate more leads daily”</p>
+                            <div class="package-tier-card featured-gold-tier">
+                                <div class="popular-badge-pill">
+                                    <i data-lucide="crown" style="width: 14px; height: 14px;"></i> MOST POPULAR
+                                </div>
+                                <h3 style="color: white; margin-bottom: 6px; font-size: 1.45rem; font-weight: 800;">Business Growth</h3>
+                                <p style="color: #a0a0b8; font-style: italic; font-size: 0.85rem; margin-bottom: 22px;">“For growing companies aiming to generate daily client leads”</p>
                                 
-                                <div style="margin-bottom: 25px;">
-                                    <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Setup Fee</div>
-                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">$129</div>
-                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ $25 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
+                                <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                    <div style="font-size: 0.75rem; color: #a0a0b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Setup Fee</div>
+                                    <div style="font-size: 2.2rem; font-weight: 800; color: white; font-family: var(--portal-font);">$129</div>
+                                    <div style="font-size: 1.05rem; color: #ffd700; font-weight: 700;">+ $25 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
                                 </div>
 
-                                <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> Full Multi-Page Website (5-7 Layouts)</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> Custom Web Domain Support (yourbrand.com)</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 📋 Online Customer Contact List (No paper filing)</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 📍 Google Maps Listing & Local Search Setup</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 💬 Automated Instant Replies (For faster replies)</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 🔑 Private Online Store Dashboard</li>
+                                <ul class="feature-list" style="margin-bottom: 30px;">
+                                    <li><i data-lucide="check-circle"></i> Full Multi-Page Website (5-7 Custom Pages)</li>
+                                    <li><i data-lucide="check-circle"></i> Custom Domain Integration (.com / .co.ke)</li>
+                                    <li><i data-lucide="check-circle"></i> 📋 Lead Capture & Customer Contact Manager</li>
+                                    <li><i data-lucide="check-circle"></i> 📍 Google Maps Listing & Local SEO Setup</li>
+                                    <li><i data-lucide="check-circle"></i> 💬 Automated Quick Reply Bot Configuration</li>
+                                    <li><i data-lucide="check-circle"></i> 🔑 Private Portal Access & Store Manager</li>
                                 </ul>
-                                <button class="btn btn-primary select-package-btn" data-package="Business Growth" style="margin-top: auto; width: 100%; justify-content: center; padding: 12px; box-shadow: 0 10px 20px rgba(212,175,55,0.2);">Fuel Your Growth</button>
+                                <button class="btn btn-primary select-package-btn" data-package="Business Growth" style="margin-top: auto; width: 100%; justify-content: center; padding: 13px; font-weight: 800; border-radius: 12px; box-shadow: 0 10px 25px rgba(212,175,55,0.35);">Fuel Your Growth</button>
                             </div>
 
                             <!-- Pro Conversion System -->
-                            <div class="portal-card" style="display: flex; flex-direction: column; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
-                                <h3 style="color: white; margin-bottom: 5px; font-size: 1.4rem;">Pro Conversion System</h3>
-                                <p style="color: #aaa; font-style: italic; font-size: 0.85rem; margin-bottom: 20px;">“For serious brands ready to scale with automation”</p>
+                            <div class="package-tier-card">
+                                <h3 style="color: white; margin-bottom: 6px; font-size: 1.45rem; font-weight: 800;">Pro Conversion System</h3>
+                                <p style="color: #a0a0b8; font-style: italic; font-size: 0.85rem; margin-bottom: 22px;">“For established brands scaling with modern automation”</p>
                                 
-                                <div style="margin-bottom: 25px;">
-                                    <div style="font-size: 0.8rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Setup Fee</div>
-                                    <div style="font-size: 1.8rem; font-weight: 800; color: white;">$169</div>
-                                    <div style="font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">+ $30 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
+                                <div style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                                    <div style="font-size: 0.75rem; color: #a0a0b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Setup Fee</div>
+                                    <div style="font-size: 2.2rem; font-weight: 800; color: white; font-family: var(--portal-font);">$169</div>
+                                    <div style="font-size: 1.05rem; color: #ffd700; font-weight: 700;">+ $30 <span style="font-size: 0.8rem; color: #888; font-weight: normal;">/ Month</span></div>
                                 </div>
 
-                                <ul style="list-style: none; padding: 0; margin-bottom: 30px; font-size: 0.9rem; color: #ccc;">
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 📅 Online Appointment Booking Calendar</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 📁 Secure Client Database Manager (No client info lost)</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 📈 Simple Visitor Counter & Cost Reports</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> 🤖 Automatic Written Post & Article Writer</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> ⚙️ Automated Follow-ups Setup for prospects</li>
-                                    <li style="margin-bottom: 12px; display: flex; align-items: center; gap: 10px;"><i data-lucide="check-circle" style="width: 16px; color: var(--primary-color);"></i> Multi-Staff System Access</li>
+                                <ul class="feature-list" style="margin-bottom: 30px;">
+                                    <li><i data-lucide="check-circle"></i> 📅 Online Appointment Booking Calendar</li>
+                                    <li><i data-lucide="check-circle"></i> 📁 Client Database Manager & CRM Tools</li>
+                                    <li><i data-lucide="check-circle"></i> 📈 Real-Time Visitor Counter & Analytics</li>
+                                    <li><i data-lucide="check-circle"></i> 🤖 AI-Powered Article & Content Engine</li>
+                                    <li><i data-lucide="check-circle"></i> ⚙️ Automated Email/SMS Follow-up Flows</li>
+                                    <li><i data-lucide="check-circle"></i> Multi-Staff Role & Access Control</li>
                                 </ul>
-                                <button class="btn btn-primary select-package-btn" data-package="Pro Conversion System" style="margin-top: auto; width: 100%; justify-content: center; padding: 12px;">Scale Pro</button>
+                                <button class="btn btn-primary select-package-btn" data-package="Pro Conversion System" style="margin-top: auto; width: 100%; justify-content: center; padding: 13px; font-weight: 800; border-radius: 12px;">Scale Pro</button>
                             </div>
                         </div>
                     </div>

@@ -1850,6 +1850,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             e.stopPropagation();
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
+            document.body.classList.toggle('nav-open');
             
             // Animate hamburger spans
             const spans = hamburger.querySelectorAll('span');
@@ -1871,6 +1872,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             if (navLinks.classList.contains('active') && !navLinks.contains(e.target) && !hamburger.contains(e.target)) {
                 hamburger.classList.remove('active');
                 navLinks.classList.remove('active');
+                document.body.classList.remove('nav-open');
                 const spans = hamburger.querySelectorAll('span');
                 if (spans.length >= 3) {
                     spans.forEach(span => span.style.transform = 'none');
@@ -1886,6 +1888,7 @@ Respond ONLY with a raw JSON object matching this exact structure. DO NOT wrap i
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 navLinks.classList.remove('active');
+                document.body.classList.remove('nav-open');
                 const spans = hamburger.querySelectorAll('span');
                 if (spans.length >= 3) {
                     spans.forEach(span => span.style.transform = 'none');
